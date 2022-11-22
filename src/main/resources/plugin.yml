@@ -1,0 +1,16 @@
+main: markiplites.SoyBlock.Main
+name: Soyblock
+version: 1.0
+api-version: 1.16
+authors: [BigDaddy,razoe]
+depend: [ArmorEquipEvent,ProtocolLib]
+description: Death Upon Israel
+commands:
+   sbgive:
+      description: Gives an item from the arraylist of item IDs.
+      usage: /<command> <player> <itemID>
+      permission: soyblock.giveitems
+      permission-message: You do not have access to this command.
+permissions:
+   soyblock.giveitems:
+      default: op
