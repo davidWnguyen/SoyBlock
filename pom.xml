@@ -12,8 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>16</maven.compiler.source>
-    <maven.compiler.target>16</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
   </properties>
   
 	<pluginRepositories>
@@ -24,10 +24,6 @@
 	</pluginRepositories>
 	
 	<repositories>
-     <repository>
-         <id>savagelabs</id>
-         <url>https://nexus.savagelabs.net/repository/maven-releases/</url>
-     </repository>
 	<repository>
         <id>spigot-repo</id>
         <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -54,7 +50,7 @@
 	<dependency>
 	   <groupId>org.spigotmc</groupId>
 	   <artifactId>spigot-api</artifactId>
-	   <version>1.16.5-R0.1-SNAPSHOT</version>
+	   <version>1.18.2-R0.1-SNAPSHOT</version>
 	   <scope>provided</scope>
 	</dependency>
     <dependency>
@@ -75,12 +71,6 @@
           <version>1.7.6</version>
           <scope>provided</scope>
       </dependency>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.16.5</version>
-            <scope>compile</scope>
-        </dependency>
 		<dependency>
 		    <groupId>com.jeff_media</groupId>
 		    <artifactId>CustomBlockData</artifactId>
@@ -158,22 +148,6 @@
 		                <groupId>com.codingforcookies</groupId>
 		                <artifactId>ArmorEquipEvent</artifactId>
 		                <version>1.7.6</version>
-		                <packaging>jar</packaging>
-		                <generatePom>true</generatePom>
-		            </configuration>
-		            <goals>
-		                <goal>install-file</goal>
-		            </goals>
-		    	</execution>
-		    	
-		        <execution>
-		            <id>install-external-second</id>
-					<phase>clean</phase>
-		            <configuration>
-		                <file>${basedir}/dependency/craftbukkit-1.16.5.jar</file>
-		                <groupId>org.bukkit</groupId>
-		                <artifactId>craftbukkit</artifactId>
-		                <version>1.16.5</version>
 		                <packaging>jar</packaging>
 		                <generatePom>true</generatePom>
 		            </configuration>

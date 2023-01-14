@@ -2,6 +2,7 @@ package markiplites.SoyBlock;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -78,20 +79,25 @@ public class EntityHandling implements Listener {
 		{
 			double absorption = entityAttributes.get(en).getOrDefault("Absorption", 0.0);
 			damageDealt *= (100.0-absorption)/100.0;
-			String colorFormat = "§x§f§b§9§7§0§0";
-			String damageCharacter = "⚔";
-			
-			if(damageType == 0)
-			{
-				if(isCrit)
-					en.getWorld().spawnParticle(Particle.CRIT, en.getLocation().add(0, 0.5,0), 15);
-			}else if(damageType == 1) {
-				damageCharacter = "★";
-				colorFormat = "§b";
-				if(isCrit)
-					en.getWorld().spawnParticle(Particle.CRIT_MAGIC, en.getLocation().add(0, 0.5,0), 15);
+			String damageCharacter = damageType == 0 ? "⚔":"★";
+			String finaldamage = "";
+
+			if(damageType == 0) {
+				if (isCrit) {
+					en.getWorld().spawnParticle(Particle.CRIT, en.getLocation().add(0, 0.5, 0), 15);
+					finaldamage = IridiumColorAPI.process(String.format("<GRADIENT:cc0000>- %.0f %s</GRADIENT:ff9933>",damageDealt,damageCharacter));
+				}else {
+					finaldamage = IridiumColorAPI.process(String.format("<SOLID:ffc000>- %.0f %s",damageDealt,damageCharacter));
+				}
 			}
-			String finaldamage = String.format("%s - %.0f %s",colorFormat,damageDealt,damageCharacter);
+			else if(damageType == 1) {
+				if(isCrit) {
+					en.getWorld().spawnParticle(Particle.CRIT_MAGIC, en.getLocation().add(0, 0.5, 0), 15);
+					finaldamage = IridiumColorAPI.process(String.format("<GRADIENT:45a6ff>- %.0f %s</GRADIENT:9b31ff>",damageDealt,damageCharacter));
+				}else {
+					finaldamage = IridiumColorAPI.process(String.format("<SOLID:2986cc>- %.0f %s",damageDealt,damageCharacter));
+				}
+			}
 			spawnIndicator(en.getLocation(), finaldamage, en);
 			entityAttributes.get(en).put("Health", entityAttributes.get(en).get("Health") - damageDealt);
 			if(entityAttributes.get(en).get("Health") > 0.0) {

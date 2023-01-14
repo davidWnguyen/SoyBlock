@@ -2,10 +2,10 @@ package markiplites.SoyBlock;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import com.comphenix.protocol.wrappers.BlockPosition;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,14 +30,8 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType;
 import com.jeff_media.customblockdata.CustomBlockData;
 import com.jeff_media.morepersistentdatatypes.DataType;
+import org.bukkit.util.Vector;
 
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.MobEffect;
-import net.minecraft.server.v1_16_R3.MobEffectList;
-import net.minecraft.server.v1_16_R3.Packet;
-import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEffect;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
 public class MiningSpeed implements Listener{
     //Arrays that tell whether a player is mining a block
     ArrayList<Player> playerMiningBlock = new ArrayList<>();
@@ -176,34 +170,49 @@ public class MiningSpeed implements Listener{
         }
     }
     public void MiningBlock(BlockDamageEvent event, Block block) {
-        CraftPlayer p = (CraftPlayer) event.getPlayer();
+        Player p = event.getPlayer();
         for(Player player : playerMiningBlock) {
               if(player == event.getPlayer()) {
-                  ((Player)p).addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 1000, 255, true));
+                  p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 1000, 255, true));
                   
-                  PlayerConnection connection = p.getHandle().playerConnection;
+                  /*PlayerConnection connection = p.getHandle().playerConnection;
                   @SuppressWarnings("deprecation")
                   PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.fromId(PotionEffectType.SLOW_DIGGING.getId()), Integer.MAX_VALUE, 255, true, false));
                   connection.sendPacket(entityEffect);
-                  
+
+				  PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EFFECT);
+				  potionPacket.getIntegers().write(0, p.getEntityId())
+						  .write(1, Integer.MAX_VALUE);
+				  potionPacket.getBytes().write(0, (byte) PotionEffectType.SLOW_DIGGING.getId())
+						  .write(1, (byte) );
+				  try {
+					  protocolManager.sendServerPacket(p, potionPacket);
+				  }catch(Exception e){
+
+				  }
+					*/
                   blockBreakingStages(event, p, 0, block);
               }
         }
     }
-   
-    public void SendPacket(CraftPlayer p, @SuppressWarnings("rawtypes") Packet packet) {
-        try {
-            Field field = packet.getClass().getDeclaredField("a");
-            field.setAccessible(true);// allows us to access the field
-            field.setInt(packet, 1);// sets the field to an integer
-            field.setAccessible(false);//we want to stop accessing this now
-        } catch(Exception x) {
-            x.printStackTrace();
-        }
-        p.getHandle().playerConnection.sendPacket(packet);
-    }
-   
-    public void blockBreakingStages(BlockDamageEvent event, CraftPlayer p, int stage, Block block) 
+
+	public void blockBreakEffect(Player player, Vector vector, int step) {
+		PacketContainer container = new PacketContainer(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+		container.getBlockPositionModifier().write(0, new BlockPosition(vector));
+		container.getIntegers()
+				.write(0, player.getEntityId())
+				.write(1, step);
+		execute(player, container);
+	}
+	void execute(Player receiver, PacketContainer container) {
+		try {
+			ProtocolLibrary.getProtocolManager().sendServerPacket(receiver, container);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+    public void blockBreakingStages(BlockDamageEvent event, Player p, int stage, Block block)
     {
 		final PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
 		double toolSpeed = Main.getAttributes().get(p).getOrDefault("MiningSpeed", 1.0);
@@ -218,8 +227,7 @@ public class MiningSpeed implements Listener{
 					foundPlayer = true;
 					if(blockBeingMined.get(i) == block)
 					{
-						PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(event.getPlayer().getEntityId(), new BlockPosition(event.getBlock().getX(), event.getBlock().getY(), event.getBlock().getZ()), stage);
-						SendPacket(p, packet);
+						blockBreakEffect(p, event.getBlock().getLocation().toVector(), stage);
 						if(stage < 9)
 						{
 							blockBreakingStages(event, p, stage + 1, block);

@@ -13,7 +13,6 @@ public class blargySouls implements Listener
 	}
 	public void init() {
 		//splurgy souls lel
-		item = new Sword();
 		HashMap<String, Double> attributes = new HashMap<>();
 		attributes.put("baseDamage", 1000.0);
 		attributes.put("baseAttackSpeed", 3.0);
@@ -24,6 +23,8 @@ public class blargySouls implements Listener
 		attributes.put("dexterityScaling", 1.35);
 		attributes.put("strengthBonusRaw", 100.0);
 		attributes.put("dexterityBonusRaw", 250.0);
-		item.createItem("MURASAMA", "Murasama", Material.IRON_SWORD, attributes, "fuck da media!");
+		attributes.put("itemType", 1.0);
+		attributes.put("rarity", 6.0);
+		item = new Sword("MURASAMA", "Murasama", Material.IRON_SWORD, attributes, "fuck da media!");
 	}
 }

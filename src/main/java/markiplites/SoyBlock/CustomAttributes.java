@@ -369,38 +369,38 @@ public class CustomAttributes implements Listener {
 		
 		if(critChance > 0) {
 			attributes.put("CritChance", attributes.get("CritChance") + critChance);
-			lore.add(String.format("§6\u2620 Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance));
+			lore.add(String.format("§6\u2620 Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance*100.0));
 		}else if(critChance < 0) {
 			attributes.put("CritChance", attributes.get("CritChance") + critChance);
-			lore.add(String.format("§6\u2620 Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance)));
+			lore.add(String.format("§6\u2620 Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance*100.0)));
 		}
 		
 		if(critDamage > 0) {
 			attributes.put("CritDamage", attributes.get("CritDamage") + critDamage);
-			lore.add(String.format("§6\u2620 Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage));
+			lore.add(String.format("§6\u2620 Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage*100.0));
 		}else if(critDamage < 0) {
 			attributes.put("CritDamage", attributes.get("CritDamage") + critDamage);
-			lore.add(String.format("§6\u2620 Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage)));
+			lore.add(String.format("§6\u2620 Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage*100.0)));
 		}
 
 		if(regenerationBonus > 0) {
 			attributes.put("RegenerationBonus", attributes.get("RegenerationBonus") + regenerationBonus);
-			lore.add(String.format("§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n",regenerationBonus));
+			lore.add(String.format("§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n",regenerationBonus*100.0));
 		}else if(regenerationBonus < 0) {
 			attributes.put("RegenerationBonus", attributes.get("RegenerationBonus") + regenerationBonus);
-			lore.add(String.format("§6\u2764 Regeneration Bonus: §c-%.0f%%\n",Math.abs(regenerationBonus)));
+			lore.add(String.format("§6\u2764 Regeneration Bonus: §c-%.0f%%\n",Math.abs(regenerationBonus*100.0)));
 		}
 		
 		if(moveSpeed > 0) {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
 			meta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
 			meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,new AttributeModifier("GENERIC_MOVEMENT_SPEED",moveSpeed,AttributeModifier.Operation.MULTIPLY_SCALAR_1));	
-			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed));
+			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
 		}else if(moveSpeed < 0) {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
 			meta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
 			meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,new AttributeModifier("GENERIC_MOVEMENT_SPEED",moveSpeed,AttributeModifier.Operation.MULTIPLY_SCALAR_1));	
-			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed)));
+			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed*100.0)));
 		}
 		
 		if(container.has(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING)) {	
@@ -408,7 +408,7 @@ public class CustomAttributes implements Listener {
 		}
 		
 		int rarity = container.has(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE)) : 1;
-		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 0;
 
 		switch (rarity) {
 			case 2 -> lore.add(IridiumColorAPI.process(String.format("<SOLID:33cccc>Uncommon %s", getItemTypeIntToString(itemType))));
@@ -468,11 +468,11 @@ public class CustomAttributes implements Listener {
 	public void onInventoryChange(PlayerItemHeldEvent e) { //works on item, not on armor
 		Player p = e.getPlayer();
 		HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
-		HashMap<String, Double> attributes = new HashMap<>();
-		
+		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
+
 		if(p.getInventory().getItem(e.getNewSlot()) != null) {
 			p.setCooldown(p.getInventory().getItem(e.getNewSlot()).getType(), 4);
-			giveItemStats(p.getInventory().getItem(e.getNewSlot()),attributes);
+			CustomAttributes.giveItemStats(p.getInventory().getItem(e.getNewSlot()),attributes);
 		}
 		new BukkitRunnable(){public void run(){//Start of Delay
 		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
@@ -504,7 +504,7 @@ public class CustomAttributes implements Listener {
 	public void onArmorChange(ArmorEquipEvent e) {
 		Player p = e.getPlayer();
 		HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
-		HashMap<String, Double> attributes = new HashMap<>();
+		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		new BukkitRunnable(){public void run(){//Start of Delay
 		for(ItemStack checkItem : p.getInventory()) {
@@ -534,11 +534,12 @@ public class CustomAttributes implements Listener {
 		attributes.put("Health", Main.getAttributes().get(p).get("Health"));
 		attributes.put("Mana", Main.getAttributes().get(p).get("Mana"));
 		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
-		
+
 		if(attributes.get("Health") > attributes.get("MaxHealth"))
 			attributes.put("Health", attributes.get("MaxHealth"));
 		if(attributes.get("Mana") > attributes.get("MaxMana"))
 			attributes.put("Mana", attributes.get("MaxMana"));
+
 		playerAttributes.put(p, attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
@@ -581,6 +582,7 @@ public class CustomAttributes implements Listener {
 	public static String getItemTypeIntToString(int lel)
 	{
 		switch (lel) {
+			case 0 -> {return "Material";}
 			case 1 -> {return "Sword";}
 			case 2 -> {return "Bow";}
 			case 3 -> {return "Hoe";}
