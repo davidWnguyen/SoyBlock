@@ -2,6 +2,7 @@ package markiplites.SoyBlock;
 import java.io.File;
 import java.util.HashMap;
 
+import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,6 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener{
 	private static Main instance;
-	ItemList itemList;
+	ItemListHandler itemListHandler;
 	public static HashMap<Player, HashMap<String, Double>> playerAttributes = new HashMap<>();
 	
 	FileConfiguration weaponConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "weaponConfig.yml"));
@@ -29,7 +31,7 @@ public class Main extends JavaPlugin implements Listener{
 	@Override
 	public void onEnable() {
 		instance = this;
-		itemList = new ItemList();
+		itemListHandler = new ItemListHandler();
 		Bukkit.getPluginManager().registerEvents(this, this); // registers eventlistener for events
 		Bukkit.getPluginManager().registerEvents(new CustomAttributes(), this);
 		Bukkit.getPluginManager().registerEvents(new HitDetection(), this);
@@ -38,14 +40,16 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 
 		blargySouls testItem = new blargySouls();
-		chestplateOfDoom testItem2 = new chestplateOfDoom();
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
 		this.getCommand("sbgive").setExecutor(new Commands());
 		this.getCommand("sbgive").setTabCompleter(new CommandsTabCompletion());
 	}
-	
+	@EventHandler
+	public void onHungerChange(FoodLevelChangeEvent event) {
+		event.setCancelled(true);
+	}
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) { //straight lollin' 
