@@ -27,6 +27,7 @@ public class Item implements Listener
 		stack = new ItemStack(mat);
 		meta = stack.getItemMeta();
 		if(meta == null) return;
+
 		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING, itemID);
 		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
 		
