@@ -195,8 +195,8 @@ public class CustomAttributes implements Listener {
 			lore.addAll(Arrays.asList(container.get(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING).split(", ")));
 		}
 		
-		int rarity = container.has(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE)) : 0;
-		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+		int rarity = container.has(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE)) : 1;
+		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 0;
 
 		switch (rarity) {
 			case 2 -> lore.add(IridiumColorAPI.process(String.format("<SOLID:33cccc>Uncommon %s", getItemTypeIntToString(itemType))));
@@ -520,7 +520,7 @@ public class CustomAttributes implements Listener {
 					return;
 				PersistentDataContainer container = meta.getPersistentDataContainer();
 				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType > 100)
+				if(itemType >= 100)
 					CustomAttributes.giveItemStats(checkItem,attributes);
 			}
 		}
