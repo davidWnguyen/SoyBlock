@@ -3,11 +3,12 @@ package markiplites.SoyBlock;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class blargySouls implements Listener
 {
-	private Sword item;
+	private ArrayList<Sword> item = new ArrayList<Sword>();
 	public blargySouls() {
 		init();
 	}
@@ -25,6 +26,23 @@ public class blargySouls implements Listener
 		attributes.put("dexterityBonusRaw", 250.0);
 		attributes.put("itemType", 1.0);
 		attributes.put("rarity", 6.0);
-		item = new Sword("MURASAMA", "Murasama", Material.IRON_SWORD, attributes, "fuck da media!");
+		item.add(new Sword("MURASAMA", "Murasama", Material.IRON_SWORD, attributes, "fuck da media!"));
+		
+		attributes.clear();
+		
+		
+		attributes.put("baseDamage", 150.0);
+		attributes.put("baseAttacKSpeed", 1.0);
+		attributes.put("attackReachBonusRaw", 1.5);
+		attributes.put("critChance", 0.5);
+		attributes.put("moveSpeed", 0.1);
+		attributes.put("strengthScaling", 1.5);
+		attributes.put("dexterityScaling", 0.9);
+		attributes.put("strengthBonusRaw", 75.0);
+		attributes.put("dexterityBonusRaw", 25.0);
+		attributes.put("itemType", 1.0);
+		attributes.put("rarity", 1.0);
+		item.add(new Sword("NIGGER", "Nigger", Material.WOODEN_SWORD, attributes, "niggar get out of china niggar :3333"));
+		
 	}
 }
