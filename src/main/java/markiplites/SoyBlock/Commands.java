@@ -17,8 +17,8 @@ public class Commands implements CommandExecutor {
 		
 		if(sender instanceof Player p) {
 			Player target = Bukkit.getPlayer(args[0]);
-			if(ItemList.getItemMap().containsKey(args[1]) && !Objects.equals(args[1], "")) {
-				ItemStack leItem = ItemList.generateItem(args[1]);
+			if(ItemListHandler.getItemMap().containsKey(args[1]) && !Objects.equals(args[1], "")) {
+				ItemStack leItem = ItemListHandler.generateItem(args[1]);
 				target.getInventory().addItem(leItem);
 				target.updateInventory();
 				target.sendMessage(String.format("%s gave you %s", p.getName(), args[1]));

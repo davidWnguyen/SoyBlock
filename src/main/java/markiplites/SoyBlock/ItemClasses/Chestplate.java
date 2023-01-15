@@ -1,5 +1,6 @@
-package markiplites.SoyBlock;
+package markiplites.SoyBlock.ItemClasses;
 
+import markiplites.SoyBlock.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;

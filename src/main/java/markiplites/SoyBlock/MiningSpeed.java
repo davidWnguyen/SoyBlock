@@ -3,6 +3,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import com.comphenix.protocol.wrappers.BlockPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -77,10 +78,12 @@ public class MiningSpeed implements Listener{
                         {
                             playerMiningBlock.remove(player);
                             blockBeingMined.remove(temp);
-                           
-            				if(p.hasPotionEffect(PotionEffectType.SLOW_DIGGING)) {
-            					p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
-            				}
+							BukkitScheduler scheduler = mainPlugin.getServer().getScheduler();
+							scheduler.runTask(mainPlugin, () -> {
+								if (p.hasPotionEffect(PotionEffectType.SLOW_DIGGING)) {
+									p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
+								}
+							});
                             break;
                         }
                         temp++;
@@ -112,12 +115,10 @@ public class MiningSpeed implements Listener{
 			customBlockData.set(blockHardnessKey, PersistentDataType.DOUBLE, blockHardness);
 			customBlockData.set(blockToolKey, PersistentDataType.DOUBLE, blockTool);
 			customBlockData.set(blockExpKey, PersistentDataType.INTEGER, blockExp);
-			if(container.has(new NamespacedKey(Main.getInstance(), "blockLoot"), DataType.asArrayList(DataType.ITEM_STACK)))
-			{
-				//PersistentDataType<byte[],ItemStack[]> ITEM_STACK_ARRAY; get to this later
-				//Premise is that you will have a persistent item stack array give you info for block loot
-				customBlockData.set(blockLootKey, DataType.asArrayList(DataType.ITEM_STACK), container.get(new NamespacedKey(Main.getInstance(), "blockLoot"), DataType.asArrayList(DataType.ITEM_STACK)));
-			}
+			//Premise is that you will have a persistent item stack array give you info for block loot
+			ItemStack[] items = container.get(new NamespacedKey(Main.getInstance(), "blockLoot"), DataType.ITEM_STACK_ARRAY);
+			if(items != null)
+				customBlockData.set(blockLootKey, DataType.ITEM_STACK_ARRAY, items);
 		}
     }
     @EventHandler
@@ -173,24 +174,27 @@ public class MiningSpeed implements Listener{
         Player p = event.getPlayer();
         for(Player player : playerMiningBlock) {
               if(player == event.getPlayer()) {
-                  p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 1000, 255, true));
+				  if(p.hasPotionEffect(PotionEffectType.SLOW_DIGGING)) {
+					  p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 3, 255, true));
                   
                   /*PlayerConnection connection = p.getHandle().playerConnection;
                   @SuppressWarnings("deprecation")
                   PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.fromId(PotionEffectType.SLOW_DIGGING.getId()), Integer.MAX_VALUE, 255, true, false));
                   connection.sendPacket(entityEffect);
-
-				  PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EFFECT);
-				  potionPacket.getIntegers().write(0, p.getEntityId())
-						  .write(1, Integer.MAX_VALUE);
-				  potionPacket.getBytes().write(0, (byte) PotionEffectType.SLOW_DIGGING.getId())
-						  .write(1, (byte) );
-				  try {
-					  protocolManager.sendServerPacket(p, potionPacket);
-				  }catch(Exception e){
-
-				  }
 					*/
+					  PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EFFECT);
+					  potionPacket.getIntegers().write(0, p.getEntityId())
+							  .write(1, Integer.MAX_VALUE);
+					  potionPacket.getBytes().write(0, (byte) PotionEffectType.SLOW_DIGGING.getId())
+							  .write(1, (byte) 255)
+							  .write(2, (byte) ((byte) 0x1 |
+									  ((byte) 0x0)));
+					  try {
+						  protocolManager.sendServerPacket(p, potionPacket);
+					  } catch (Exception e) {
+						  e.printStackTrace();
+					  }
+				  }
                   blockBreakingStages(event, p, 0, block);
               }
         }
@@ -240,18 +244,16 @@ public class MiningSpeed implements Listener{
 							event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
 							//da epic sphee
 							PersistentDataContainer customBlockData1 = new CustomBlockData(event.getBlock(), Main.getInstance());
-							if(customBlockData1.has(blockLootKey, DataType.asArrayList(DataType.ITEM_STACK)))
+							if(customBlockData1.has(blockLootKey, DataType.ITEM_STACK_ARRAY))
 							{
 								double blockTool = customBlockData1.has(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) ? customBlockData1.get(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) : -1.0;
-								ArrayList<ItemStack> blockLootID = customBlockData1.get(blockLootKey, DataType.asArrayList(DataType.ITEM_STACK));
-								if(blockLootID == null) return;
-								double miningFortune = 0.0;
-								if(blockTool == 1.0)
-									miningFortune = Main.getAttributes().get(p).getOrDefault("MiningFortune", 0.0);
+								ItemStack[] blockLootID = customBlockData1.get(blockLootKey, DataType.ITEM_STACK_ARRAY);
+
+								double miningFortune = Main.getAttributes().get(p).getOrDefault("MiningFortune", 0.0);
 
 								int blockExp = customBlockData1.has(blockExpKey, PersistentDataType.INTEGER) ? customBlockData1.get(blockExpKey, PersistentDataType.INTEGER) : 0;
 								p.giveExp(blockExp);
-								for(ItemStack item: blockLootID)
+								for(ItemStack item : blockLootID)
 								{
 									//Mining fortune for items that can be stacked
 									if(item.getMaxStackSize() != 1)

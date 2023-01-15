@@ -17,12 +17,10 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
-import com.jeff_media.morepersistentdatatypes.DataType;
 
-
-public class ItemList {
-	private static HashMap<String, ItemStack> itemMap = new HashMap<>();
-	public ItemList() {
+public class ItemListHandler {
+	private final static HashMap<String, ItemStack> itemMap = new HashMap<>();
+	public ItemListHandler() {
 		init();
 	}
 	public void init() {
@@ -162,52 +160,6 @@ public class ItemList {
 			
 			meta.setDisplayName(IridiumColorAPI.process(itemConfig.getString("itemName")));
 			
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-			meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-			item.setItemMeta(meta);
-			itemMap.put(itemID,item);
-			CustomAttributes.updateItem(item);
-		}
-		//Load blocks
-		for (String itemID : Main.getInstance().blockConfig.getKeys(false)) {
-			ConfigurationSection itemConfig = Main.getInstance().blockConfig.getConfigurationSection(itemID);
-			ConfigurationSection attributeList = Main.getInstance().blockConfig.getConfigurationSection(itemID+".attributes");
-			ConfigurationSection itemStackList = Main.getInstance().blockConfig.getConfigurationSection(itemID+".itemstacks");
-			Material mat = (Material.getMaterial(itemConfig.getString("material")));
-			Bukkit.getLogger().info("Added " + itemID + " to block dictionary.");
-			if(mat == null)
-			{
-				Bukkit.getLogger().info("INVALID block material for " + itemID);
-				continue;
-			}
-			ItemStack item = new ItemStack(mat);
-			ItemMeta meta = item.getItemMeta();
-
-			ArrayList<String> lore = new ArrayList<>(itemConfig.getStringList("lore"));
-			if(meta == null) return;
-			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(String.join(", ", lore)));
-			
-			for(String attributeName : attributeList.getKeys(false)) {
-				double attributeValue = attributeList.getDouble(attributeName);
-				meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), attributeName), PersistentDataType.DOUBLE, attributeValue);
-			}
-			//Load the block's itemstack loot
-			ArrayList<ItemStack> swag = new ArrayList<>();
-			for(String itemName : itemStackList.getKeys(false)) {
-				int itemAmount = itemStackList.getInt(itemName);
-				if(itemMap.containsKey(itemName))
-				{
-					ItemStack tempItem = itemMap.get(itemName).clone();
-					tempItem.setAmount(itemAmount);
-					swag.add(tempItem);
-				}
-			}
-			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "blockLoot"), DataType.asArrayList(DataType.ITEM_STACK), swag);
-			meta.setDisplayName(IridiumColorAPI.process(itemConfig.getString("itemName")));
-			
-			meta.setUnbreakable(true);
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
 			meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
