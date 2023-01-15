@@ -6,6 +6,7 @@ import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
@@ -31,7 +32,29 @@ public class EntityHandling implements Listener {
 	}
 	public void init() {
 		//DEV IMPLEMENTATION ONLY
-		Bukkit.getServer().getWorlds().forEach(world -> world.getEntities().stream().filter(entity -> !(entity instanceof Player)).forEach(Entity::remove));
+		for (World world : Bukkit.getServer().getWorlds()) {
+			for (Entity ent : world.getEntities()) {
+				if(ent instanceof Player)
+					continue;
+				if(ent.getType() == EntityType.ARMOR_STAND)
+					continue;
+
+				int mobLevel = new Random().nextInt(10 - 1 + 1) + 1;
+				HashMap<String, Double> attributes = new HashMap<>();
+				attributes.put("BaseDamage", 5.0 + (mobLevel*2));
+				attributes.put("Health", 40.0 + (mobLevel*10));
+				attributes.put("MaxHealth", 40.0 + (mobLevel*10));
+				//attributes.put("Absorption", 0.0 + (mobLevel*2.0));
+				attributes.put("Intelligence", 0.0);
+				attributes.put("IntelligenceScaling", 0.0);
+				attributes.put("Strength", 0.0);
+				attributes.put("StrengthScaling", 0.0);
+				attributes.put("Dexterity", 0.0);
+				attributes.put("DexterityScaling", 0.0);
+
+				entityAttributes.put((LivingEntity)ent, attributes);
+			}
+		}
 	}
 	//Reset IFrames
 	static void resetIFramesDelayed(LivingEntity en)
