@@ -1,9 +1,6 @@
 package markiplites.SoyBlock;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -26,7 +23,6 @@ import com.iridium.iridiumcolorapi.IridiumColorAPI;
 
 
 public class CustomAttributes implements Listener {
-	private static HashMap<String, Double> defaultAttributes = new HashMap<>();
     static String ScalingToLetter(double num) {
     	if(num <= 0.4) {
     		return "F";
@@ -433,6 +429,10 @@ public class CustomAttributes implements Listener {
 		init();
 	}
 	public void init() {
+	}
+	public static HashMap<String,Double> defaultStats()
+	{
+		final HashMap<String, Double> defaultAttributes = new HashMap<>();
 		defaultAttributes.put("BaseDamage", 5.0);
 		defaultAttributes.put("AttackSpeed", 4.0);
 		defaultAttributes.put("AttackSpeedBonus", 1.0);
@@ -455,9 +455,6 @@ public class CustomAttributes implements Listener {
 		defaultAttributes.put("MiningSpeed", 1.0);
 		defaultAttributes.put("ToolHardness", 0.0);
 		defaultAttributes.put("MiningFortune", 0.0);
-	}
-	public static HashMap<String,Double> defaultStats()
-	{
 		return defaultAttributes;
 	}
 	@EventHandler
