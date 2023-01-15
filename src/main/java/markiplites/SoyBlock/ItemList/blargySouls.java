@@ -1,12 +1,24 @@
 package markiplites.SoyBlock.ItemList;
 
 import markiplites.SoyBlock.Item;
+
+import markiplites.SoyBlock.ItemListHandler;
+import markiplites.SoyBlock.Main;
 import markiplites.SoyBlock.ItemClasses.Block;
 import markiplites.SoyBlock.ItemClasses.Chestplate;
 import markiplites.SoyBlock.ItemClasses.Sword;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,5 +94,30 @@ public class blargySouls implements Listener
 		Chestplate cp = new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
 				Material.LEATHER_CHESTPLATE, attributes, "carry on my wayward son","2 195 228");
 		cp.finalizeItem("chestplateOfDoom");
+	}
+
+
+
+	@EventHandler
+	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent e) {
+		Bukkit.getLogger().info("SOYBLOCK: PlayerInteractEntityEvent triggered");
+		ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
+		if(!item.equals(null)) {
+			ItemMeta meta = item.getItemMeta();
+			if(meta == null) return;
+			PersistentDataContainer p = meta.getPersistentDataContainer();
+			if(p == null) return;
+			String itemID = p.get(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING);
+			if(itemID == null) return;
+			switch(itemID) {
+				case "MURASAMA" -> murasama_ability();
+				
+			}
+		}
+	}
+
+
+	private void murasama_ability() {
+
 	}
 }

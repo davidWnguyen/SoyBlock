@@ -36,8 +36,9 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new CustomAttributes(), this);
 		Bukkit.getPluginManager().registerEvents(new HitDetection(), this);
 		Bukkit.getPluginManager().registerEvents(new EntityHandling(), this);
+		Bukkit.getPluginManager().registerEvents(new blargySouls(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
-		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		// Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 
 		blargySouls testItem = new blargySouls();
 		//Timers
