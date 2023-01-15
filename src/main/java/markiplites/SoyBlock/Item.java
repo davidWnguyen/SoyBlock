@@ -1,6 +1,7 @@
 package markiplites.SoyBlock;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import com.jeff_media.morepersistentdatatypes.DataType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -14,6 +15,8 @@ import java.util.HashMap;
 
 public class Item implements Listener
 {
+	private ItemMeta meta;
+	private ItemStack stack;
 	public Item(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore)
 	{
 		if(mat == null)
@@ -21,9 +24,11 @@ public class Item implements Listener
 			Bukkit.getLogger().info("INVALID material for " + itemID);
 			return;
 		}
-		ItemStack item = new ItemStack(mat);
-		ItemMeta meta = item.getItemMeta();
+		stack = new ItemStack(mat);
+		meta = stack.getItemMeta();
 		if(meta == null) return;
+
+		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING, itemID);
 		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
 		
 		for(String attributeName : attributes.keySet()) {
@@ -37,9 +42,20 @@ public class Item implements Listener
 		meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
 		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		item.setItemMeta(meta);
-		ItemList.putItemMap(itemID,item);
-		CustomAttributes.updateItem(item);	
-		Bukkit.getLogger().info("Added " + itemID + " to item dictionary.");
+		stack.setItemMeta(meta);
+	}
+	public ItemMeta getItemMeta()
+	{
+		return meta;
+	}
+	public ItemStack getItemStack() { return stack;}
+	public void setItemMeta(ItemMeta inputMeta)
+	{
+		meta = inputMeta;
+	}
+	public void setItemStack(ItemStack inputStack) { stack = inputStack;}
+	public void finalizeItem(String itemID){
+		ItemListHandler.putItemMap(itemID,stack);
+		CustomAttributes.updateItem(stack);
 	}
 }

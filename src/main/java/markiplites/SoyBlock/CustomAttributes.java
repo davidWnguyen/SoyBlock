@@ -1,9 +1,6 @@
 package markiplites.SoyBlock;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -199,7 +196,7 @@ public class CustomAttributes implements Listener {
 		}
 		
 		int rarity = container.has(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE)) : 1;
-		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 0;
 
 		switch (rarity) {
 			case 2 -> lore.add(IridiumColorAPI.process(String.format("<SOLID:33cccc>Uncommon %s", getItemTypeIntToString(itemType))));
@@ -432,37 +429,33 @@ public class CustomAttributes implements Listener {
 		init();
 	}
 	public void init() {
-		
-	
 	}
 	public static HashMap<String,Double> defaultStats()
 	{
-		HashMap<String, Double> attributes = new HashMap<>();
-		
-		attributes.put("BaseDamage", 5.0);
-		attributes.put("AttackSpeed", 4.0);
-		attributes.put("AttackSpeedBonus", 1.0);
-		attributes.put("Health", 100.0);
-		attributes.put("MaxHealth", 100.0);
-		attributes.put("Absorption", 0.0);
-		attributes.put("Mana", 100.0);
-		attributes.put("MaxMana", 100.0);
-		attributes.put("Intelligence", 0.0);
-		attributes.put("IntelligenceScaling", 0.0);
-		attributes.put("Strength", 0.0);
-		attributes.put("StrengthScaling", 0.0);
-		attributes.put("Dexterity", 0.0);
-		attributes.put("DexterityScaling", 0.0);
-		attributes.put("AttackRange", 3.0);
-		attributes.put("CritChance", 0.0);
-		attributes.put("CritDamage", 0.0);
-		attributes.put("RegenerationBonus", 0.0);
-		attributes.put("Speed", 1.0);
-		
-		attributes.put("MiningSpeed", 1.0);
-		attributes.put("ToolHardness", 0.0);
-		attributes.put("MiningFortune", 0.0);
-		return attributes;
+		final HashMap<String, Double> defaultAttributes = new HashMap<>();
+		defaultAttributes.put("BaseDamage", 5.0);
+		defaultAttributes.put("AttackSpeed", 4.0);
+		defaultAttributes.put("AttackSpeedBonus", 1.0);
+		defaultAttributes.put("Health", 100.0);
+		defaultAttributes.put("MaxHealth", 100.0);
+		defaultAttributes.put("Absorption", 0.0);
+		defaultAttributes.put("Mana", 100.0);
+		defaultAttributes.put("MaxMana", 100.0);
+		defaultAttributes.put("Intelligence", 0.0);
+		defaultAttributes.put("IntelligenceScaling", 0.0);
+		defaultAttributes.put("Strength", 0.0);
+		defaultAttributes.put("StrengthScaling", 0.0);
+		defaultAttributes.put("Dexterity", 0.0);
+		defaultAttributes.put("DexterityScaling", 0.0);
+		defaultAttributes.put("AttackRange", 3.0);
+		defaultAttributes.put("CritChance", 0.0);
+		defaultAttributes.put("CritDamage", 0.0);
+		defaultAttributes.put("RegenerationBonus", 0.0);
+		defaultAttributes.put("Speed", 1.0);
+		defaultAttributes.put("MiningSpeed", 1.0);
+		defaultAttributes.put("ToolHardness", 0.0);
+		defaultAttributes.put("MiningFortune", 0.0);
+		return defaultAttributes;
 	}
 	@EventHandler
 	public void onInventoryChange(PlayerItemHeldEvent e) { //works on item, not on armor
@@ -527,7 +520,7 @@ public class CustomAttributes implements Listener {
 					return;
 				PersistentDataContainer container = meta.getPersistentDataContainer();
 				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType > 100)
+				if(itemType >= 100)
 					CustomAttributes.giveItemStats(checkItem,attributes);
 			}
 		}

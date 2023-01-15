@@ -6,6 +6,7 @@ import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
@@ -20,6 +21,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.world.ChunkEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 
@@ -29,10 +33,7 @@ public class EntityHandling implements Listener {
 	public EntityHandling() {
 		init();
 	}
-	public void init() {
-		//DEV IMPLEMENTATION ONLY
-		Bukkit.getServer().getWorlds().forEach(world -> world.getEntities().stream().filter(entity -> !(entity instanceof Player)).forEach(Entity::remove));
-	}
+	public void init() {}
 	//Reset IFrames
 	static void resetIFramesDelayed(LivingEntity en)
 	{
@@ -133,6 +134,36 @@ public class EntityHandling implements Listener {
 				en.setHealth(0.0);
 			}
 			resetIFrames(en);
+		}
+	}
+	@EventHandler
+	public void onChunkLoaded(ChunkLoadEvent event)
+	{
+		for (Entity ent : event.getChunk().getEntities()) {
+			if (ent instanceof Player)
+				continue;
+			if(!(ent instanceof LivingEntity))
+				continue;
+			if (ent.getType() == EntityType.ARMOR_STAND)
+				continue;
+			if(entityAttributes.containsKey((LivingEntity)ent))
+				continue;
+			//Only give them randomized stats if they're not defined.
+			//Replace later with mob attribute system.
+			int mobLevel = new Random().nextInt(10 - 1 + 1) + 1;
+			HashMap<String, Double> attributes = new HashMap<>();
+			attributes.put("BaseDamage", 5.0 + (mobLevel * 2));
+			attributes.put("Health", 40.0 + (mobLevel * 10));
+			attributes.put("MaxHealth", 40.0 + (mobLevel * 10));
+			attributes.put("Absorption", 0.0 + (mobLevel * 2.0));
+			attributes.put("Intelligence", 0.0);
+			attributes.put("IntelligenceScaling", 0.0);
+			attributes.put("Strength", 0.0);
+			attributes.put("StrengthScaling", 0.0);
+			attributes.put("Dexterity", 0.0);
+			attributes.put("DexterityScaling", 0.0);
+
+			entityAttributes.put((LivingEntity) ent, attributes);
 		}
 	}
 	@EventHandler

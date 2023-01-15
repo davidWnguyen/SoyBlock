@@ -1,6 +1,7 @@
 package markiplites.SoyBlock.ItemList;
 
 import markiplites.SoyBlock.Item;
+
 import markiplites.SoyBlock.ItemListHandler;
 import markiplites.SoyBlock.Main;
 import markiplites.SoyBlock.ItemClasses.Block;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +95,7 @@ public class blargySouls implements Listener
 				Material.LEATHER_CHESTPLATE, attributes, "carry on my wayward son","2 195 228");
 		cp.finalizeItem("chestplateOfDoom");
 	}
+
 
 
 	@EventHandler
