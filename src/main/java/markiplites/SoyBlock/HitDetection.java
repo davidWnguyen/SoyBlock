@@ -135,7 +135,7 @@ public class HitDetection implements Listener {
         //goFuckYourself.add(player.getLocation().getDirection().toBlockVector().multiply(0.1));
         //player.sendMessage(String.format("%.1f,%.1f,%.1f",goFuckYourself.getX(),goFuckYourself.getY(),goFuckYourself.getZ()  ));
         //^confirmation that this does actually work
-        Predicate<Entity> ignoreList = i -> (i != player && i instanceof LivingEntity && i.getType() != EntityType.ARMOR_STAND);
+        Predicate<Entity> ignoreList = i -> (i != player && i instanceof LivingEntity && !i.isDead() && i.getType() != EntityType.ARMOR_STAND);
         RayTraceResult traceResult = player.getWorld().rayTrace(goFuckYourself, player.getEyeLocation().getDirection(), attackRange+0.2, FluidCollisionMode.NEVER, true,0.25, ignoreList);
         if(traceResult != null)
         {

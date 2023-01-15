@@ -18,5 +18,6 @@ public class Sword extends Item implements Listener
 	public Sword(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore)
 	{
 		super(itemID,itemName,mat,attributes,lore);
+		Bukkit.getLogger().info("Added Sword: " + itemID + " to item dictionary.");
 	}
 }

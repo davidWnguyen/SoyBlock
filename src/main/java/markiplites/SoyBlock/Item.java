@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 public class Item implements Listener
 {
+	private ItemMeta meta;
 	public Item(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore)
 	{
 		if(mat == null)
@@ -22,7 +23,7 @@ public class Item implements Listener
 			return;
 		}
 		ItemStack item = new ItemStack(mat);
-		ItemMeta meta = item.getItemMeta();
+		meta = item.getItemMeta();
 		if(meta == null) return;
 		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
 		
@@ -39,7 +40,10 @@ public class Item implements Listener
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		item.setItemMeta(meta);
 		ItemList.putItemMap(itemID,item);
-		CustomAttributes.updateItem(item);	
-		Bukkit.getLogger().info("Added " + itemID + " to item dictionary.");
+		CustomAttributes.updateItem(item);
+	}
+	public ItemMeta getItemMeta()
+	{
+		return meta;
 	}
 }

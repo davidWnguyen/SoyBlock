@@ -38,6 +38,7 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 
 		blargySouls testItem = new blargySouls();
+		chestplateOfDoom testItem2 = new chestplateOfDoom();
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
