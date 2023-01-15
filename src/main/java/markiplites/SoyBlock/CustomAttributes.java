@@ -26,6 +26,7 @@ import com.iridium.iridiumcolorapi.IridiumColorAPI;
 
 
 public class CustomAttributes implements Listener {
+	private static HashMap<String, Double> defaultAttributes = new HashMap<>();
     static String ScalingToLetter(double num) {
     	if(num <= 0.4) {
     		return "F";
@@ -432,37 +433,32 @@ public class CustomAttributes implements Listener {
 		init();
 	}
 	public void init() {
-		
-	
+		defaultAttributes.put("BaseDamage", 5.0);
+		defaultAttributes.put("AttackSpeed", 4.0);
+		defaultAttributes.put("AttackSpeedBonus", 1.0);
+		defaultAttributes.put("Health", 100.0);
+		defaultAttributes.put("MaxHealth", 100.0);
+		defaultAttributes.put("Absorption", 0.0);
+		defaultAttributes.put("Mana", 100.0);
+		defaultAttributes.put("MaxMana", 100.0);
+		defaultAttributes.put("Intelligence", 0.0);
+		defaultAttributes.put("IntelligenceScaling", 0.0);
+		defaultAttributes.put("Strength", 0.0);
+		defaultAttributes.put("StrengthScaling", 0.0);
+		defaultAttributes.put("Dexterity", 0.0);
+		defaultAttributes.put("DexterityScaling", 0.0);
+		defaultAttributes.put("AttackRange", 3.0);
+		defaultAttributes.put("CritChance", 0.0);
+		defaultAttributes.put("CritDamage", 0.0);
+		defaultAttributes.put("RegenerationBonus", 0.0);
+		defaultAttributes.put("Speed", 1.0);
+		defaultAttributes.put("MiningSpeed", 1.0);
+		defaultAttributes.put("ToolHardness", 0.0);
+		defaultAttributes.put("MiningFortune", 0.0);
 	}
 	public static HashMap<String,Double> defaultStats()
 	{
-		HashMap<String, Double> attributes = new HashMap<>();
-		
-		attributes.put("BaseDamage", 5.0);
-		attributes.put("AttackSpeed", 4.0);
-		attributes.put("AttackSpeedBonus", 1.0);
-		attributes.put("Health", 100.0);
-		attributes.put("MaxHealth", 100.0);
-		attributes.put("Absorption", 0.0);
-		attributes.put("Mana", 100.0);
-		attributes.put("MaxMana", 100.0);
-		attributes.put("Intelligence", 0.0);
-		attributes.put("IntelligenceScaling", 0.0);
-		attributes.put("Strength", 0.0);
-		attributes.put("StrengthScaling", 0.0);
-		attributes.put("Dexterity", 0.0);
-		attributes.put("DexterityScaling", 0.0);
-		attributes.put("AttackRange", 3.0);
-		attributes.put("CritChance", 0.0);
-		attributes.put("CritDamage", 0.0);
-		attributes.put("RegenerationBonus", 0.0);
-		attributes.put("Speed", 1.0);
-		
-		attributes.put("MiningSpeed", 1.0);
-		attributes.put("ToolHardness", 0.0);
-		attributes.put("MiningFortune", 0.0);
-		return attributes;
+		return defaultAttributes;
 	}
 	@EventHandler
 	public void onInventoryChange(PlayerItemHeldEvent e) { //works on item, not on armor
