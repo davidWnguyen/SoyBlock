@@ -2,6 +2,7 @@ package markiplites.SoyBlock.ItemList;
 
 import markiplites.SoyBlock.Item;
 
+import markiplites.SoyBlock.ItemClasses.Talisman;
 import markiplites.SoyBlock.ItemListHandler;
 import markiplites.SoyBlock.Main;
 import markiplites.SoyBlock.ItemClasses.Block;
@@ -84,7 +85,7 @@ public class blargySouls implements Listener
 		Block steel_block = new Block("STEEL_BLOCK", "Steel Block", Material.IRON_BLOCK, attributes, "i am a dwarf and diggy dig hole :###",blockLoot);
 		steel_block.finalizeItem("STEEL_BLOCK");
 
-
+		attributes.clear();
 		attributes.put("critChance", 0.3);
 		attributes.put("moveSpeed", 0.5);
 		attributes.put("strengthBonusRaw", 100.0);
@@ -94,6 +95,33 @@ public class blargySouls implements Listener
 		Chestplate cp = new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
 				Material.LEATHER_CHESTPLATE, attributes, "carry on my wayward son","2 195 228");
 		cp.finalizeItem("chestplateOfDoom");
+
+		attributes.clear();
+		attributes.put("regenerationBonus", 100.0);
+		attributes.put("dexterityBonusRaw", 300.0);
+		attributes.put("itemType", 200.0);
+		attributes.put("rarity", 3.0);
+		Talisman talismanExample = new Talisman("soulRing", "<GRADIENT:02e494>Soules Ring</GRADIENT:0252e4>",
+				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
+		talismanExample.finalizeItem("soulRing");
+
+		attributes.clear();
+		attributes.put("regenerationBonus", 500.0);
+		attributes.put("dexterityBonusRaw", 800.0);
+		attributes.put("itemType", 200.0);
+		attributes.put("rarity", 4.0);
+		Talisman talismanExample2 = new Talisman("soulRingRare", "<GRADIENT:02e494>Darkest Soules Ring</GRADIENT:0252e4>",
+				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
+		talismanExample2.finalizeItem("soulRingRare");
+
+		attributes.clear();
+		attributes.put("moveSpeed", 1.0);
+		attributes.put("dexterityBonusRaw", -100.0);
+		attributes.put("itemType", 200.0);
+		attributes.put("rarity", 5.0);
+		Talisman talismanExample3 = new Talisman("waterAffinityFeather", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
+				Material.FEATHER, attributes, "Gives bonus swag.","waterAffinity");
+		talismanExample3.finalizeItem("waterAffinityFeather");
 	}
 
 

@@ -38,7 +38,7 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new EntityHandling(), this);
 		Bukkit.getPluginManager().registerEvents(new blargySouls(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
-		// Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 
 		blargySouls testItem = new blargySouls();
 		//Timers
@@ -59,33 +59,10 @@ public class Main extends JavaPlugin implements Listener{
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		//Standard Procedure to calculate stats
-		for(ItemStack checkItem : p.getInventory()) {
-			if(checkItem != null && checkItem.equals(p.getItemInHand())) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType < 100)
-				{
-					CustomAttributes.giveItemStats(checkItem,attributes);
-				}
-			}
-		}
-		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
-			if(checkItem != null) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType > 100)
-					CustomAttributes.giveItemStats(checkItem,attributes);
-			}
-		}
+		CustomAttributes.getUpdatedPlayerAttributes(p, attributes);
 		attributes.put("Health", attributes.get("MaxHealth"));
+		attributes.put("Mana", attributes.get("MaxMana"));
 		playerAttributes.put(p, attributes);
-	
 	}
 	public static Main getInstance() {
 		return instance;
