@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -108,6 +109,8 @@ public class blargySouls implements Listener
 
 	@EventHandler
 	public void PlayerInteractAtEntityEvent(PlayerInteractEntityEvent e) {
+		if(e.getHand() != null && !e.getHand().equals(EquipmentSlot.HAND)) return; //fix double fire
+
 		ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
 		if(!item.equals(null)) {
 			ItemMeta meta = item.getItemMeta();
