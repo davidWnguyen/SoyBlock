@@ -12,9 +12,13 @@ import markiplites.SoyBlock.ItemClasses.Sword;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -26,7 +30,13 @@ import java.util.HashMap;
 
 public class blargySouls implements Listener
 {
+	private HashMap<String, Boolean> ability_cooldown = new HashMap<String, Boolean>();
+	
 	public blargySouls() {
+		//cooldown booleans
+		ability_cooldown.put("MURASAMA", true);
+
+
 		init();
 	}
 	public void init() {
@@ -127,8 +137,9 @@ public class blargySouls implements Listener
 
 
 	@EventHandler
-	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent e) {
-		Bukkit.getLogger().info("SOYBLOCK: PlayerInteractEntityEvent triggered");
+	public void PlayerInteractAtEntityEvent(PlayerInteractEntityEvent e) {
+		if(e.getHand() != null && !e.getHand().equals(EquipmentSlot.HAND)) return; //fix double fire
+
 		ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
 		if(!item.equals(null)) {
 			ItemMeta meta = item.getItemMeta();
@@ -138,14 +149,27 @@ public class blargySouls implements Listener
 			String itemID = p.get(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING);
 			if(itemID == null) return;
 			switch(itemID) {
-				case "MURASAMA" -> murasama_ability();
+				case "MURASAMA" -> murasama_ability(e);
 				
 			}
 		}
 	}
 
 
-	private void murasama_ability() {
-
+	private void murasama_ability(PlayerInteractEntityEvent e) {
+		if(ability_cooldown.get("MURASAMA")) {
+		double currentMana = Main.getAttributes().get(e.getPlayer()).get("Mana");
+		if(currentMana - 25 >= 0) {
+			e.getPlayer().getWorld().spawnEntity(e.getRightClicked().getLocation(), EntityType.PRIMED_TNT);
+			Main.getAttributes().get(e.getPlayer()).replace("Mana", (currentMana - 25));
+			ability_cooldown.replace("MURASAMA", false);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace("MURASAMA", true);}, 20); //1 second delay
+		}
+		else {
+			e.getPlayer().sendMessage("§4You do not have enough mana for this!");
+		}
+		} else {
+			e.getPlayer().sendMessage("§4Ability on cooldown.");
+		}	
 	}
 }
