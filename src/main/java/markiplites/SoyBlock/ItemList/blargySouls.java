@@ -1,31 +1,24 @@
 package markiplites.SoyBlock.ItemList;
 
 import markiplites.SoyBlock.Item;
-
-import markiplites.SoyBlock.ItemClasses.Talisman;
-import markiplites.SoyBlock.ItemListHandler;
-import markiplites.SoyBlock.Main;
 import markiplites.SoyBlock.ItemClasses.Block;
 import markiplites.SoyBlock.ItemClasses.Chestplate;
 import markiplites.SoyBlock.ItemClasses.Sword;
-
+import markiplites.SoyBlock.ItemClasses.Talisman;
+import markiplites.SoyBlock.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class blargySouls implements Listener
@@ -132,6 +125,13 @@ public class blargySouls implements Listener
 		Talisman talismanExample3 = new Talisman("waterAffinityFeather", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
 				Material.FEATHER, attributes, "Gives bonus swag.","waterAffinity");
 		talismanExample3.finalizeItem("waterAffinityFeather");
+
+		attributes.clear();
+		attributes.put("itemAction", 1.0);
+		attributes.put("itemType", 0.0);
+		attributes.put("rarity", 6.0);
+		Item menu = new Item("SBMENU", "Main Menu", Material.BELL, attributes, "<SOLID:e40252>RIGHT CLICK:View your in-game stats.");
+		menu.finalizeItem("SBMENU");
 	}
 
 

@@ -1,16 +1,21 @@
 package markiplites.SoyBlock;
 
-import java.util.*;
-
-import org.bukkit.Bukkit;
+import com.codingforcookies.armorequip.ArmorEquipEvent;
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import de.themoep.inventorygui.InventoryGui;
+import de.themoep.inventorygui.StaticGuiElement;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -19,8 +24,10 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.codingforcookies.armorequip.ArmorEquipEvent;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.UUID;
 
 
 public class CustomAttributes implements Listener {
@@ -484,10 +491,62 @@ public class CustomAttributes implements Listener {
 	@EventHandler
 	public void onPickupEvent(EntityPickupItemEvent e) {
 		Entity entity = e.getEntity();
-		if(entity instanceof Player)
+		if(!(entity instanceof Player))
+			return;
+		ItemStack item = e.getItem().getItemStack();
+		updateItem(item);
+	}
+	@EventHandler
+	public void onDropItemEvent(PlayerDropItemEvent e)
+	{
+		Player p = e.getPlayer();
+		if(p == null)
+			return;
+		Item item = e.getItemDrop();
+		if(item == null)
+			return;
+
+		ItemStack itemStack = item.getItemStack();
+		ItemMeta meta = itemStack.getItemMeta();
+		if(meta == null)
+			return;
+
+		PersistentDataContainer container = meta.getPersistentDataContainer();
+		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+		if(itemType == 200 || itemStack == p.getInventory().getItemInMainHand())
 		{
-			ItemStack item = e.getItem().getItemStack();
-			updateItem(item);
+			HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+			HashMap<String, Double> attributes = CustomAttributes.defaultStats();
+
+			new BukkitRunnable(){public void run(){//Start of Delay
+				getUpdatedPlayerAttributes(p, attributes);
+				playerAttributes.put(p, attributes);
+			}}.runTaskLater(Main.getInstance(), 1);
+		}
+		int itemActionType = container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE)) : -1;
+		switch (itemActionType) {
+			case 1 -> {
+				String[] guiSetup = {
+						"    s    ",
+						"         ",
+						"         "
+				};
+				InventoryGui gui = new InventoryGui(Main.getInstance(), p, "Soyblock Menu", guiSetup);
+				gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS, 1)); // fill the empty slots with this
+
+				gui.addElement(new StaticGuiElement('s',
+						new ItemStack(Material.REDSTONE),
+						69,
+						click -> {
+							click.getRawEvent().getWhoClicked().sendMessage(ChatColor.RED + "lel!");
+							return true; // returning true will cancel the click event and stop taking the item
+						},
+						"Soyblock Stats",
+						CustomAttributes.getPlayerStatsFormat(p)
+				));
+				gui.show(p);
+				e.setCancelled(true);
+			}
 		}
 	}
 	public static String getPlayerStatsFormat(Player player)
@@ -496,7 +555,7 @@ public class CustomAttributes implements Listener {
 		String statFormat = "";
 		
 		//if(playerAttributes.get(player).containsKey("BaseDamage"))String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(player).get("BaseDamage"));
-		if(playerAttributes.get(player).containsKey("AttackSpeedBonus") && playerAttributes.get(player).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(player).get("AttackSpeedBonus"));
+		if(playerAttributes.get(player).containsKey("AttackSpeedBonus") && playerAttributes.get(player).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(player).get("AttackSpeedBonus")*100.0);
 		if(playerAttributes.get(player).containsKey("MaxHealth") && playerAttributes.get(player).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(player).get("MaxHealth"));
 		if(playerAttributes.get(player).containsKey("Absorption") && playerAttributes.get(player).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(player).get("Absorption"));
 		if(playerAttributes.get(player).containsKey("Intelligence") && playerAttributes.get(player).get("Intelligence")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(player).get("Intelligence"));
@@ -507,9 +566,9 @@ public class CustomAttributes implements Listener {
 		if(playerAttributes.get(player).containsKey("DexterityScaling") && playerAttributes.get(player).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(player).get("DexterityScaling"));
 		
 		if(playerAttributes.get(player).containsKey("CritChance") && playerAttributes.get(player).get("CritChance")!=0.0)statFormat=String.format("%s§6\u2620 Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(player).get("CritChance")*100.0);
-		if(playerAttributes.get(player).containsKey("CritDamage") && playerAttributes.get(player).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(player).get("CritDamage")*100.0);
-		if(playerAttributes.get(player).containsKey("RegenerationBonus") && playerAttributes.get(player).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a§c%.0f%%\n", statFormat,playerAttributes.get(player).get("RegenerationBonus"));
-		if(playerAttributes.get(player).containsKey("Speed") && playerAttributes.get(player).get("Speed")!=0.0)statFormat=String.format("%s§6\u2604 Speed: §a§c%.0f%%\n", statFormat,playerAttributes.get(player).get("Speed")*100.0);
+		if(playerAttributes.get(player).containsKey("CritDamage") && playerAttributes.get(player).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(player).get("CritDamage")*100.0);
+		if(playerAttributes.get(player).containsKey("RegenerationBonus") && playerAttributes.get(player).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(player).get("RegenerationBonus")*100.0);
+		if(playerAttributes.get(player).containsKey("Speed") && playerAttributes.get(player).get("Speed")!=0.0)statFormat=String.format("%s§6\u2604 Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(player).get("Speed")*100.0);
 		
 		if(playerAttributes.get(player).containsKey("MiningSpeed") && playerAttributes.get(player).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6\u26CF Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(player).get("MiningSpeed"));
 		if(playerAttributes.get(player).containsKey("ToolHardness") && playerAttributes.get(player).get("ToolHardness")!=0.0)statFormat=String.format("%s§6\u26CF Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(player).get("ToolHardness"));

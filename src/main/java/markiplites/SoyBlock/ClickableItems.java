@@ -1,5 +1,6 @@
 package markiplites.SoyBlock;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -7,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -45,7 +47,7 @@ public class ClickableItems implements Listener {
 
 					gui.addElement(new StaticGuiElement('s',
 							new ItemStack(Material.REDSTONE),
-							42, // Display a number as the item count
+							69,
 							click -> {
 								click.getRawEvent().getWhoClicked().sendMessage(ChatColor.RED + "lel!");
 								return true; // returning true will cancel the click event and stop taking the item
@@ -53,9 +55,14 @@ public class ClickableItems implements Listener {
 							"Soyblock Stats",
 							CustomAttributes.getPlayerStatsFormat(player)
 					));
-
+					gui.show(player);
 				}
 			}
         }
+	}
+	@EventHandler
+	public void PlayerInventoryInteract(InventoryInteractEvent e)
+	{
+
 	}
 }

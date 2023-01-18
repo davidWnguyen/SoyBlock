@@ -10,8 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Block extends Item implements Listener
@@ -27,6 +25,7 @@ public class Block extends Item implements Listener
 
 		super.setItemMeta(meta);
 		super.setItemStack(stack);
+		//DO NOT ADD UUID ITEMS IN BLOCK LOOT
 		Bukkit.getLogger().info("Added Block: " + itemID + " to item dictionary.");
 	}
 }

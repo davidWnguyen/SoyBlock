@@ -1,7 +1,6 @@
 package markiplites.SoyBlock;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
-import com.jeff_media.morepersistentdatatypes.DataType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class Item implements Listener
 {
@@ -35,6 +35,7 @@ public class Item implements Listener
 			double attributeValue = attributes.get(attributeName);
 			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), attributeName), PersistentDataType.DOUBLE, attributeValue);
 		}
+
 		meta.setDisplayName(IridiumColorAPI.process(itemName));
 
 		meta.setUnbreakable(true);
@@ -49,10 +50,7 @@ public class Item implements Listener
 		return meta;
 	}
 	public ItemStack getItemStack() { return stack;}
-	public void setItemMeta(ItemMeta inputMeta)
-	{
-		meta = inputMeta;
-	}
+	public void setItemMeta(ItemMeta inputMeta) {meta = inputMeta;}
 	public void setItemStack(ItemStack inputStack) { stack = inputStack;}
 	public void finalizeItem(String itemID){
 		ItemListHandler.putItemMap(itemID,stack);
