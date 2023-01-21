@@ -2,6 +2,8 @@ package markiplites.SoyBlock;
 
 import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -9,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -35,13 +38,19 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new blargySouls(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
 		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
-
-		blargySouls testItem = new blargySouls();
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
 		this.getCommand("sbgive").setExecutor(new Commands());
 		this.getCommand("sbgive").setTabCompleter(new CommandsTabCompletion());
+
+		for(World world : Bukkit.getWorlds())
+		{
+			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+			world.setGameRule(GameRule.DO_INSOMNIA, false);
+			world.setGameRule(GameRule.KEEP_INVENTORY, true);
+			world.setGameRule(GameRule.NATURAL_REGENERATION, false);
+		}
 	}
 	@EventHandler
 	public void onHungerChange(FoodLevelChangeEvent event) {
@@ -59,6 +68,9 @@ public class Main extends JavaPlugin implements Listener{
 		attributes.put("Health", attributes.get("MaxHealth"));
 		attributes.put("Mana", attributes.get("MaxMana"));
 		playerAttributes.put(p, attributes);
+
+		ItemStack mainMenu = ItemListHandler.generateItem("SBMENU");
+		p.getInventory().setItem(8, mainMenu);
 	}
 	public static Main getInstance() {
 		return instance;

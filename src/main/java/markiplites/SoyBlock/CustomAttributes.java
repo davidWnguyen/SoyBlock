@@ -512,6 +512,9 @@ public class CustomAttributes implements Listener {
 			return;
 
 		PersistentDataContainer container = meta.getPersistentDataContainer();
+		if(container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+			{e.setCancelled(true);return;}
+
 		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
 		if(itemType == 200 || itemStack == p.getInventory().getItemInMainHand())
 		{
@@ -522,31 +525,6 @@ public class CustomAttributes implements Listener {
 				getUpdatedPlayerAttributes(p, attributes);
 				playerAttributes.put(p, attributes);
 			}}.runTaskLater(Main.getInstance(), 1);
-		}
-		int itemActionType = container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE)) : -1;
-		switch (itemActionType) {
-			case 1 -> {
-				String[] guiSetup = {
-						"    s    ",
-						"         ",
-						"         "
-				};
-				InventoryGui gui = new InventoryGui(Main.getInstance(), p, "Soyblock Menu", guiSetup);
-				gui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS, 1)); // fill the empty slots with this
-
-				gui.addElement(new StaticGuiElement('s',
-						new ItemStack(Material.REDSTONE),
-						69,
-						click -> {
-							click.getRawEvent().getWhoClicked().sendMessage(ChatColor.RED + "lel!");
-							return true; // returning true will cancel the click event and stop taking the item
-						},
-						"Soyblock Stats",
-						CustomAttributes.getPlayerStatsFormat(p)
-				));
-				gui.show(p);
-				e.setCancelled(true);
-			}
 		}
 	}
 	public static String getPlayerStatsFormat(Player player)
