@@ -100,7 +100,9 @@ public class MiningSpeed implements Listener{
 		if(meta == null) return;
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 		
-		if(container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE) || container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE))
+		if(container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE)
+				|| container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE)
+				|| container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
 			event.setCancelled(true);
 		
 		if(container.has(new NamespacedKey(Main.getInstance(), "blockDurability"), PersistentDataType.DOUBLE))
