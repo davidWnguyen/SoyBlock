@@ -4,7 +4,6 @@ import markiplites.SoyBlock.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -12,8 +11,9 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class Helmet extends Item implements Listener
+public class Helmet extends Item
 {
+	@SuppressWarnings("deprecation")
 	public Helmet(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, String cosmetic)
 	{
 		super(itemID,itemName,mat,attributes,lore);

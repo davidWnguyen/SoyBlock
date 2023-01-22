@@ -2,10 +2,6 @@ package markiplites.SoyBlock;
 
 import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
-import de.themoep.inventorygui.InventoryGui;
-import de.themoep.inventorygui.StaticGuiElement;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
