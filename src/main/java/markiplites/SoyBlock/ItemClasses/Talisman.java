@@ -12,20 +12,20 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 
-public class Block extends Item implements Listener
+public class Talisman extends Item implements Listener
 {
-	public Block(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, ItemStack[] itemArray)
+	public Talisman(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, String family)
 	{
 		super(itemID,itemName,mat,attributes,lore);
 		ItemStack stack = super.getItemStack();
 		ItemMeta meta = super.getItemMeta();
 
-		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "blockLoot"), DataType.ITEM_STACK_ARRAY, itemArray.clone());
+		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "talismanFamily"), DataType.STRING, family);
 		stack.setItemMeta(meta);
 
 		super.setItemMeta(meta);
 		super.setItemStack(stack);
-		//DO NOT ADD UUID ITEMS IN BLOCK LOOT
-		Bukkit.getLogger().info("Added Block: " + itemID + " to item dictionary.");
+
+		Bukkit.getLogger().info("Added Talisman: " + itemID + " to item dictionary.");
 	}
 }

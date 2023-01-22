@@ -1,15 +1,21 @@
 package markiplites.SoyBlock;
 
-import java.util.*;
-
+import com.codingforcookies.armorequip.ArmorEquipEvent;
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import de.themoep.inventorygui.InventoryGui;
+import de.themoep.inventorygui.StaticGuiElement;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -18,8 +24,10 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.codingforcookies.armorequip.ArmorEquipEvent;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.UUID;
 
 
 public class CustomAttributes implements Listener {
@@ -167,15 +175,15 @@ public class CustomAttributes implements Listener {
 		}
 		
 		if(critChance > 0) {
-			lore.add(String.format("§6\u2620 Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance));
+			lore.add(String.format("§6\u2620 Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance*100.0));
 		}else if(critChance < 0) {
-			lore.add(String.format("§6\u2620 Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance)));
+			lore.add(String.format("§6\u2620 Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance)*100.0));
 		}
 		
 		if(critDamage > 0) {
-			lore.add(String.format("§6\u2620 Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage));
+			lore.add(String.format("§6\u2620 Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage*100.0));
 		}else if(critDamage < 0) {
-			lore.add(String.format("§6\u2620 Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage)));
+			lore.add(String.format("§6\u2620 Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage)*100.0));
 		}
 		
 		if(regenerationBonus > 0) {
@@ -185,9 +193,9 @@ public class CustomAttributes implements Listener {
 		}
 		
 		if(moveSpeed > 0) {
-			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed));
+			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
 		}else if(moveSpeed < 0) {
-			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed)));
+			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed)*100.0));
 		}
 		
 
@@ -390,13 +398,9 @@ public class CustomAttributes implements Listener {
 		
 		if(moveSpeed > 0) {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
-			meta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
-			meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,new AttributeModifier("GENERIC_MOVEMENT_SPEED",moveSpeed,AttributeModifier.Operation.MULTIPLY_SCALAR_1));	
 			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
 		}else if(moveSpeed < 0) {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
-			meta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
-			meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,new AttributeModifier("GENERIC_MOVEMENT_SPEED",moveSpeed,AttributeModifier.Operation.MULTIPLY_SCALAR_1));	
 			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed*100.0)));
 		}
 		
@@ -451,7 +455,7 @@ public class CustomAttributes implements Listener {
 		defaultAttributes.put("CritChance", 0.0);
 		defaultAttributes.put("CritDamage", 0.0);
 		defaultAttributes.put("RegenerationBonus", 0.0);
-		defaultAttributes.put("Speed", 1.0);
+		defaultAttributes.put("Speed", 0.0);
 		defaultAttributes.put("MiningSpeed", 1.0);
 		defaultAttributes.put("ToolHardness", 0.0);
 		defaultAttributes.put("MiningFortune", 0.0);
@@ -468,31 +472,11 @@ public class CustomAttributes implements Listener {
 			CustomAttributes.giveItemStats(p.getInventory().getItem(e.getNewSlot()),attributes);
 		}
 		new BukkitRunnable(){public void run(){//Start of Delay
-		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
-			if(checkItem != null) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType > 100)
-					CustomAttributes.giveItemStats(checkItem,attributes);
-			}
-		}
-		attributes.put("Health", Main.getAttributes().get(p).get("Health"));
-		attributes.put("Mana", Main.getAttributes().get(p).get("Mana"));
-		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
-		
-		if(attributes.get("Health") > attributes.get("MaxHealth"))
-			attributes.put("Health", attributes.get("MaxHealth"));
-		if(attributes.get("Mana") > attributes.get("MaxMana"))
-			attributes.put("Mana", attributes.get("MaxMana"));
-		
+		getUpdatedPlayerAttributes(p, attributes, false);
 		playerAttributes.put(p, attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
-	
-	@SuppressWarnings("deprecation")
+
 	@EventHandler
 	public void onArmorChange(ArmorEquipEvent e) {
 		Player p = e.getPlayer();
@@ -500,49 +484,47 @@ public class CustomAttributes implements Listener {
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		new BukkitRunnable(){public void run(){//Start of Delay
-		for(ItemStack checkItem : p.getInventory()) {
-			if(checkItem != null && checkItem.equals(p.getItemInHand())) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType < 100)
-				{
-					CustomAttributes.giveItemStats(checkItem,attributes);
-				}
-			}
-		}
-		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
-			if(checkItem != null) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType >= 100)
-					CustomAttributes.giveItemStats(checkItem,attributes);
-			}
-		}
-		attributes.put("Health", Main.getAttributes().get(p).get("Health"));
-		attributes.put("Mana", Main.getAttributes().get(p).get("Mana"));
-		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
-
-		if(attributes.get("Health") > attributes.get("MaxHealth"))
-			attributes.put("Health", attributes.get("MaxHealth"));
-		if(attributes.get("Mana") > attributes.get("MaxMana"))
-			attributes.put("Mana", attributes.get("MaxMana"));
-
+			getUpdatedPlayerAttributes(p, attributes);
 		playerAttributes.put(p, attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
 	@EventHandler
 	public void onPickupEvent(EntityPickupItemEvent e) {
 		Entity entity = e.getEntity();
-		if(entity instanceof Player)
+		if(!(entity instanceof Player))
+			return;
+		ItemStack item = e.getItem().getItemStack();
+		updateItem(item);
+	}
+	@EventHandler
+	public void onDropItemEvent(PlayerDropItemEvent e)
+	{
+		Player p = e.getPlayer();
+		if(p == null)
+			return;
+		Item item = e.getItemDrop();
+		if(item == null)
+			return;
+
+		ItemStack itemStack = item.getItemStack();
+		ItemMeta meta = itemStack.getItemMeta();
+		if(meta == null)
+			return;
+
+		PersistentDataContainer container = meta.getPersistentDataContainer();
+		if(container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+			{e.setCancelled(true);return;}
+
+		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+		if(itemType == 200 || itemStack == p.getInventory().getItemInMainHand())
 		{
-			ItemStack item = e.getItem().getItemStack();
-			updateItem(item);
+			HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+			HashMap<String, Double> attributes = CustomAttributes.defaultStats();
+
+			new BukkitRunnable(){public void run(){//Start of Delay
+				getUpdatedPlayerAttributes(p, attributes);
+				playerAttributes.put(p, attributes);
+			}}.runTaskLater(Main.getInstance(), 1);
 		}
 	}
 	public static String getPlayerStatsFormat(Player player)
@@ -551,7 +533,7 @@ public class CustomAttributes implements Listener {
 		String statFormat = "";
 		
 		//if(playerAttributes.get(player).containsKey("BaseDamage"))String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(player).get("BaseDamage"));
-		if(playerAttributes.get(player).containsKey("AttackSpeedBonus") && playerAttributes.get(player).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(player).get("AttackSpeedBonus"));
+		if(playerAttributes.get(player).containsKey("AttackSpeedBonus") && playerAttributes.get(player).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(player).get("AttackSpeedBonus")*100.0);
 		if(playerAttributes.get(player).containsKey("MaxHealth") && playerAttributes.get(player).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(player).get("MaxHealth"));
 		if(playerAttributes.get(player).containsKey("Absorption") && playerAttributes.get(player).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(player).get("Absorption"));
 		if(playerAttributes.get(player).containsKey("Intelligence") && playerAttributes.get(player).get("Intelligence")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(player).get("Intelligence"));
@@ -561,16 +543,143 @@ public class CustomAttributes implements Listener {
 		if(playerAttributes.get(player).containsKey("Dexterity") && playerAttributes.get(player).get("Dexterity")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity: §a§x§d§8§0§0§6§8%.0f\n", statFormat,playerAttributes.get(player).get("Dexterity"));
 		if(playerAttributes.get(player).containsKey("DexterityScaling") && playerAttributes.get(player).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(player).get("DexterityScaling"));
 		
-		if(playerAttributes.get(player).containsKey("CritChance") && playerAttributes.get(player).get("CritChance")!=0.0)statFormat=String.format("%s§6\u2620 Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(player).get("CritChance"));
-		if(playerAttributes.get(player).containsKey("CritDamage") && playerAttributes.get(player).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(player).get("CritDamage"));
-		if(playerAttributes.get(player).containsKey("RegenerationBonus") && playerAttributes.get(player).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a§c%.0f%%\n", statFormat,playerAttributes.get(player).get("RegenerationBonus"));
-		if(playerAttributes.get(player).containsKey("Speed") && playerAttributes.get(player).get("Speed")!=1.0)statFormat=String.format("%s§6\u2604 Speed: §a§c%.0f%%\n", statFormat,playerAttributes.get(player).get("Speed"));
+		if(playerAttributes.get(player).containsKey("CritChance") && playerAttributes.get(player).get("CritChance")!=0.0)statFormat=String.format("%s§6\u2620 Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(player).get("CritChance")*100.0);
+		if(playerAttributes.get(player).containsKey("CritDamage") && playerAttributes.get(player).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(player).get("CritDamage")*100.0);
+		if(playerAttributes.get(player).containsKey("RegenerationBonus") && playerAttributes.get(player).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(player).get("RegenerationBonus")*100.0);
+		if(playerAttributes.get(player).containsKey("Speed") && playerAttributes.get(player).get("Speed")!=0.0)statFormat=String.format("%s§6\u2604 Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(player).get("Speed")*100.0);
 		
 		if(playerAttributes.get(player).containsKey("MiningSpeed") && playerAttributes.get(player).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6\u26CF Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(player).get("MiningSpeed"));
 		if(playerAttributes.get(player).containsKey("ToolHardness") && playerAttributes.get(player).get("ToolHardness")!=0.0)statFormat=String.format("%s§6\u26CF Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(player).get("ToolHardness"));
 		if(playerAttributes.get(player).containsKey("MiningFortune") && playerAttributes.get(player).get("MiningFortune")>=10.0)statFormat=IridiumColorAPI.process(String.format("%s§6\u2663 Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n", statFormat,playerAttributes.get(player).get("MiningFortune")));
 		
 		return statFormat;
+	}
+	public static void getUpdatedPlayerAttributes(Player p, HashMap<String, Double> attributes)
+	{
+		ArrayList<String> usedTalismanFamily = new ArrayList<>();
+		int talismans = 0;
+		for(ItemStack checkItem : p.getInventory()) {
+			if(checkItem == null)
+				continue;
+			ItemMeta meta = checkItem.getItemMeta();
+			if(meta == null)
+				continue;
+
+			PersistentDataContainer container = meta.getPersistentDataContainer();
+			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+			if(itemType < 100)
+			{
+				CustomAttributes.giveItemStats(checkItem,attributes);
+			}
+			else if(itemType == 200)
+			{
+				if(talismans > 4)
+					continue;
+				if(!container.has(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING))
+					continue;
+				String family = container.get(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING);
+				if(family == null)
+					continue;
+				if(usedTalismanFamily.contains(family))
+					continue;
+
+				CustomAttributes.giveItemStats(checkItem,attributes);
+				usedTalismanFamily.add(family);
+				talismans++;
+			}
+		}
+		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
+			if(checkItem == null)
+				continue;
+
+			ItemMeta meta = checkItem.getItemMeta();
+			if(meta == null)
+				continue;
+
+			PersistentDataContainer container = meta.getPersistentDataContainer();
+			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+			if(itemType > 100)
+				CustomAttributes.giveItemStats(checkItem,attributes);
+		}
+		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
+
+		if(attributes.get("Health") > attributes.get("MaxHealth"))
+			attributes.put("Health", attributes.get("MaxHealth"));
+		if(attributes.get("Mana") > attributes.get("MaxMana"))
+			attributes.put("Mana", attributes.get("MaxMana"));
+
+		for(AttributeModifier modifier : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(modifier);
+		}
+		if(attributes.containsKey("Speed")) {//Remove all speed modifiers except the speed stat.
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("GENERIC_MOVEMENT_SPEED",attributes.get("Speed"),
+					AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
+	}
+	public static void getUpdatedPlayerAttributes(Player p, HashMap<String, Double> attributes, boolean checkWeapon)
+	{
+		ArrayList<String> usedTalismanFamily = new ArrayList<>();
+		int talismans = 0;
+		for(ItemStack checkItem : p.getInventory()) {
+			if(checkItem == null)
+				continue;
+			ItemMeta meta = checkItem.getItemMeta();
+			if(meta == null)
+				continue;
+
+			PersistentDataContainer container = meta.getPersistentDataContainer();
+			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+			if(checkWeapon && itemType < 100)
+			{
+				CustomAttributes.giveItemStats(checkItem,attributes);
+			}
+			else if(itemType == 200)
+			{
+				if(talismans > 4)
+					continue;
+				if(!container.has(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING))
+					continue;
+
+				String family = container.get(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING);
+				if(family == null)
+					continue;
+
+				if(usedTalismanFamily.contains(family))
+					continue;
+
+				CustomAttributes.giveItemStats(checkItem,attributes);
+				usedTalismanFamily.add(family);
+				talismans++;
+			}
+		}
+		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
+			if(checkItem == null)
+				continue;
+
+			ItemMeta meta = checkItem.getItemMeta();
+			if(meta == null)
+				continue;
+
+			PersistentDataContainer container = meta.getPersistentDataContainer();
+			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+			if(itemType > 100)
+				CustomAttributes.giveItemStats(checkItem,attributes);
+		}
+		attributes.put("Health", Main.getAttributes().get(p).get("Health"));
+		attributes.put("Mana", Main.getAttributes().get(p).get("Mana"));
+		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
+
+		if(attributes.get("Health") > attributes.get("MaxHealth"))
+			attributes.put("Health", attributes.get("MaxHealth"));
+		if(attributes.get("Mana") > attributes.get("MaxMana"))
+			attributes.put("Mana", attributes.get("MaxMana"));
+		for(AttributeModifier modifier : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(modifier);
+		}
+		if(attributes.containsKey("Speed")) {//Remove all speed modifiers except the speed stat.
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("GENERIC_MOVEMENT_SPEED",attributes.get("Speed"),
+					AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
 	}
 	public static String getItemTypeIntToString(int lel)
 	{

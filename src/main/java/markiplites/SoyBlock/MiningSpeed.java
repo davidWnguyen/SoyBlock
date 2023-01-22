@@ -1,9 +1,17 @@
 package markiplites.SoyBlock;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
-import org.bukkit.Bukkit;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType;
+import com.jeff_media.customblockdata.CustomBlockData;
+import com.jeff_media.morepersistentdatatypes.DataType;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -20,18 +28,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType;
-import com.jeff_media.customblockdata.CustomBlockData;
-import com.jeff_media.morepersistentdatatypes.DataType;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
 
 public class MiningSpeed implements Listener{
     //Arrays that tell whether a player is mining a block
@@ -101,7 +100,9 @@ public class MiningSpeed implements Listener{
 		if(meta == null) return;
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 		
-		if(container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE) || container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE))
+		if(container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE)
+				|| container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE)
+				|| container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
 			event.setCancelled(true);
 		
 		if(container.has(new NamespacedKey(Main.getInstance(), "blockDurability"), PersistentDataType.DOUBLE))

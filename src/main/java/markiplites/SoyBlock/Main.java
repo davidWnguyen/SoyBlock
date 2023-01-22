@@ -1,10 +1,9 @@
 package markiplites.SoyBlock;
-import java.io.File;
-import java.util.HashMap;
 
 import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,10 +12,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.HashMap;
 
 public class Main extends JavaPlugin implements Listener{
 	private static Main instance;
@@ -38,15 +37,20 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new EntityHandling(), this);
 		Bukkit.getPluginManager().registerEvents(new blargySouls(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
-		// Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
-		// Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
-
-		blargySouls testItem = new blargySouls();
+		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
 		this.getCommand("sbgive").setExecutor(new Commands());
 		this.getCommand("sbgive").setTabCompleter(new CommandsTabCompletion());
+
+		for(World world : Bukkit.getWorlds())
+		{
+			world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+			world.setGameRule(GameRule.DO_INSOMNIA, false);
+			world.setGameRule(GameRule.KEEP_INVENTORY, true);
+			world.setGameRule(GameRule.NATURAL_REGENERATION, false);
+		}
 	}
 	@EventHandler
 	public void onHungerChange(FoodLevelChangeEvent event) {
@@ -60,33 +64,13 @@ public class Main extends JavaPlugin implements Listener{
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		//Standard Procedure to calculate stats
-		for(ItemStack checkItem : p.getInventory()) {
-			if(checkItem != null && checkItem.equals(p.getItemInHand())) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType < 100)
-				{
-					CustomAttributes.giveItemStats(checkItem,attributes);
-				}
-			}
-		}
-		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
-			if(checkItem != null) {
-				ItemMeta meta = checkItem.getItemMeta();
-				if(meta == null)
-					return;
-				PersistentDataContainer container = meta.getPersistentDataContainer();
-				int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-				if(itemType > 100)
-					CustomAttributes.giveItemStats(checkItem,attributes);
-			}
-		}
+		CustomAttributes.getUpdatedPlayerAttributes(p, attributes);
 		attributes.put("Health", attributes.get("MaxHealth"));
+		attributes.put("Mana", attributes.get("MaxMana"));
 		playerAttributes.put(p, attributes);
-	
+
+		ItemStack mainMenu = ItemListHandler.generateItem("SBMENU");
+		p.getInventory().setItem(8, mainMenu);
 	}
 	public static Main getInstance() {
 		return instance;
