@@ -72,7 +72,7 @@ public class HitDetection implements Listener {
 								attributes.put("Damage", customDamage);
 								attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
 
-								EntityHandling.projectileAttributes.put(shortbowArrow, attributes);
+								EntityHandling.projectileAttributes.put(shortbowArrow.getEntityId(), attributes);
 
 								double attackSpeed = Main.getAttributes().get(player).getOrDefault("AttackSpeed", 4.0);
 
@@ -118,15 +118,6 @@ public class HitDetection implements Listener {
 	        }
         }
     }
-	/*@EventHandler
-    public void PlayerInteract(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-        if (event.)
-        {
-        	
-        }
-	}*/
-    
     private Entity hitTraceResult(Player player) {
         double attackRange = Main.getAttributes().get(player).getOrDefault("AttackRange", 3.0);
         //List<Entity> entities = (List<Entity>) player.getWorld().getNearbyEntities(player.getLocation(), attackRange, attackRange, attackRange);

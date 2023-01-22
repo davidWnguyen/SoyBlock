@@ -1,23 +1,27 @@
 package markiplites.SoyBlock.ItemList;
 
+import markiplites.SoyBlock.CustomAttributes;
+import markiplites.SoyBlock.EntityHandling;
 import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.ItemClasses.Block;
 import markiplites.SoyBlock.ItemClasses.Chestplate;
 import markiplites.SoyBlock.ItemClasses.Sword;
 import markiplites.SoyBlock.ItemClasses.Talisman;
 import markiplites.SoyBlock.Main;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 
@@ -93,6 +97,7 @@ public class blargySouls implements Listener
 		attributes.put("moveSpeed", 0.5);
 		attributes.put("strengthBonusRaw", 100.0);
 		attributes.put("dexterityBonusRaw", 250.0);
+		attributes.put("intelligenceBonusRaw", 900.0);
 		attributes.put("itemType", 101.0);
 		attributes.put("rarity", 5.0);
 		Chestplate cp = new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
@@ -137,39 +142,82 @@ public class blargySouls implements Listener
 
 
 	@EventHandler
-	public void PlayerInteractAtEntityEvent(PlayerInteractEntityEvent e) {
+	public void PlayerInteract(PlayerInteractEvent e) {
 		if(e.getHand() != null && !e.getHand().equals(EquipmentSlot.HAND)) return; //fix double fire
 
 		ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
-		if(!item.equals(null)) {
-			ItemMeta meta = item.getItemMeta();
-			if(meta == null) return;
-			PersistentDataContainer p = meta.getPersistentDataContainer();
-			if(p == null) return;
-			String itemID = p.get(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING);
-			if(itemID == null) return;
-			switch(itemID) {
-				case "MURASAMA" -> murasama_ability(e);
-				
-			}
+		if(item == null)
+			return;
+
+		ItemMeta meta = item.getItemMeta();
+		if(meta == null)
+			return;
+
+		PersistentDataContainer p = meta.getPersistentDataContainer();
+		String itemID = p.get(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING);
+		if(itemID == null) return;
+
+		Action a = e.getAction();
+		boolean leftClick = a == Action.LEFT_CLICK_AIR || a == Action.LEFT_CLICK_BLOCK;
+		boolean rightClick = a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK;
+
+		switch(itemID) {
+			case "MURASAMA" -> {if(rightClick) murasama_ability(e,e.getPlayer());}
 		}
 	}
 
 
-	private void murasama_ability(PlayerInteractEntityEvent e) {
-		if(ability_cooldown.get("MURASAMA")) {
+	private void murasama_ability(PlayerInteractEvent e, Player p) {
+		if(!ability_cooldown.get("MURASAMA"))
+			{e.getPlayer().sendMessage("§4Ability on cooldown.");return;}
+
 		double currentMana = Main.getAttributes().get(e.getPlayer()).get("Mana");
-		if(currentMana - 25 >= 0) {
-			e.getPlayer().getWorld().spawnEntity(e.getRightClicked().getLocation(), EntityType.PRIMED_TNT);
-			Main.getAttributes().get(e.getPlayer()).replace("Mana", (currentMana - 25));
-			ability_cooldown.replace("MURASAMA", false);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace("MURASAMA", true);}, 20); //1 second delay
-		}
-		else {
-			e.getPlayer().sendMessage("§4You do not have enough mana for this!");
-		}
-		} else {
-			e.getPlayer().sendMessage("§4Ability on cooldown.");
-		}	
+		if(currentMana - 25 < 0)
+			{e.getPlayer().sendMessage("§4You do not have enough mana for this!");return;}
+
+		//PART 1
+		//Particle
+		Vector addVec = p.getEyeLocation().getDirection();
+		addVec.multiply(0.2);
+		p.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, p.getEyeLocation(),
+				1, addVec.getX(), addVec.getY(), addVec.getZ());
+		//Sound
+		p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_DESTROY, 1.0F, 1.0F);
+		//PART 2: Delayed slash
+		//HOLY SHIT
+		Location loc = p.getEyeLocation();
+		Vector forward = loc.getDirection();
+		loc.setYaw(loc.getYaw()+90.0F);
+		Vector right = loc.getDirection();
+		loc = p.getEyeLocation();
+		loc.setPitch(loc.getPitch()-90.0F);
+		Vector up = loc.getDirection();
+		//WHAT THE FUCK BOOOOOOOM
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
+			p.playSound(p.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.0F, 1.0F);
+
+			for(int i=-15;i<16;i++) {
+				final int finalI = i;
+				Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
+					Vector tmpForward = forward.clone().multiply(4.0 - Math.pow(Math.abs(finalI * 0.1), 2.1));
+					Vector tmpRight = right.clone().multiply(finalI * 0.15);
+					Vector tmpUp = up.clone().multiply(finalI * 0.07);
+					Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 70+finalI*3, 0), 1.2F);
+
+					Vector finalVec = new Vector();
+					finalVec.add(p.getEyeLocation().toVector());
+					finalVec.add(tmpForward);
+					finalVec.add(tmpRight);
+					finalVec.add(tmpUp);
+					p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 20, dustOptions);
+				},(int)((i+15)/6));
+			}
+
+			EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p,true)*3.5, true, 0);
+			}, 5);
+
+		Main.getAttributes().get(e.getPlayer()).replace("Mana", (currentMana - 25));
+		ability_cooldown.replace("MURASAMA", false);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace("MURASAMA", true);}, 60); //1 second delay
 	}
 }
