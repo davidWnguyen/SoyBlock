@@ -47,6 +47,7 @@ public class ClickableItems implements Listener {
 				case 1 -> {Menu_SBMainMenu(p);}
 			}
 			event.setCancelled(true);
+
         }
 	}
 	@EventHandler
