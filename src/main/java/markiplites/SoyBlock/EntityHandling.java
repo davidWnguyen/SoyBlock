@@ -1,7 +1,9 @@
 package markiplites.SoyBlock;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -22,10 +24,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
 
 public class EntityHandling implements Listener {
-	public static HashMap<LivingEntity, HashMap<String, Double>> entityAttributes = new HashMap<>();
-	public static HashMap<Entity, HashMap<String, Double>> projectileAttributes = new HashMap<>();
+	public static HashMap<Integer, HashMap<String, Double>> entityAttributes = new HashMap<>();
+	public static HashMap<Integer, HashMap<String, Double>> projectileAttributes = new HashMap<>();
 	public EntityHandling() {
 		init();
 	}
@@ -72,9 +75,10 @@ public class EntityHandling implements Listener {
 	//Deal Damage
 	public static void dealDamageToEntity(LivingEntity en, double damageDealt, boolean isCrit, int damageType){
 		en.damage(0.0);
-		if(entityAttributes.containsKey(en))
+		Integer id = en.getEntityId();
+		if(entityAttributes.containsKey(id))
 		{
-			double absorption = entityAttributes.get(en).getOrDefault("Absorption", 0.0);
+			double absorption = entityAttributes.get(id).getOrDefault("Absorption", 0.0);
 			damageDealt *= (100.0-absorption)/100.0;
 			String damageCharacter = damageType == 0 ? "⚔":"★";
 			String finaldamage = "";
@@ -96,15 +100,15 @@ public class EntityHandling implements Listener {
 				}
 			}
 			spawnIndicator(en.getLocation(), finaldamage, en);
-			entityAttributes.get(en).put("Health", entityAttributes.get(en).get("Health") - damageDealt);
-			if(entityAttributes.get(en).get("Health") > 0.0) {
-				en.setHealth(entityAttributes.get(en).get("Health")/entityAttributes.get(en).get("MaxHealth") * en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+			entityAttributes.get(id).put("Health", entityAttributes.get(id).get("Health") - damageDealt);
+			if(entityAttributes.get(id).get("Health") > 0.0) {
+				en.setHealth(entityAttributes.get(id).get("Health")/entityAttributes.get(id).get("MaxHealth") * en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 			}else {
 				en.setHealth(0.0);
 			}
 			resetIFrames(en);
 		}
-		else if(Main.getAttributes().containsKey(en))
+		else if(en instanceof Player && Main.getAttributes().containsKey(en))
 		{
 			double absorption = Main.getAttributes().get(en).getOrDefault("Absorption", 0.0);
 			damageDealt *= (100.0-absorption)/100.0;
@@ -142,7 +146,8 @@ public class EntityHandling implements Listener {
 				continue;
 			if (ent.getType() == EntityType.ARMOR_STAND)
 				continue;
-			if(entityAttributes.containsKey((LivingEntity)ent))
+			Integer id = ent.getEntityId();
+			if(entityAttributes.containsKey(id))
 				continue;
 			//Only give them randomized stats if they're not defined.
 			//Replace later with mob attribute system.
@@ -158,8 +163,7 @@ public class EntityHandling implements Listener {
 			attributes.put("StrengthScaling", 0.0);
 			attributes.put("Dexterity", 0.0);
 			attributes.put("DexterityScaling", 0.0);
-
-			entityAttributes.put((LivingEntity) ent, attributes);
+			entityAttributes.put(id, attributes);
 		}
 	}
 	@EventHandler
@@ -180,8 +184,13 @@ public class EntityHandling implements Listener {
 			attributes.put("Dexterity", 0.0);
 			attributes.put("DexterityScaling", 0.0);
 			
-			entityAttributes.put(event.getEntity(), attributes);
+			entityAttributes.put(event.getEntity().getEntityId(), attributes);
 		}
+	}
+	@EventHandler
+	public void onEntityRemoved(EntityRemoveFromWorldEvent event)
+	{
+		entityAttributes.remove(event.getEntity().getEntityId());
 	}
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event)
@@ -198,25 +207,25 @@ public class EntityHandling implements Listener {
 		double customDamage = damage;
 		Entity victim = e.getEntity();
 		if(damage == 0.0)
-		{
-			resetIFramesDelayed((LivingEntity)victim);
+			{resetIFramesDelayed((LivingEntity)victim);return;}
+		if(victim.getType() == EntityType.ARMOR_STAND)
 			return;
-		}
-		if(victim.getType() == EntityType.ARMOR_STAND) {
+		if(!(victim instanceof LivingEntity))
 			return;
-		}
-		if(victim instanceof LivingEntity && (entityAttributes.containsKey((LivingEntity)victim) ||(victim instanceof Player && Main.playerAttributes.containsKey((Player)victim))))
+
+		Integer id = victim.getEntityId();
+		if(entityAttributes.containsKey(id) || (victim instanceof Player && Main.playerAttributes.containsKey((Player)victim)) )
 		{
 			//Custom Damage Handling
 			if(e instanceof EntityDamageByEntityEvent)
 			{
 				Entity attacker = ((EntityDamageByEntityEvent)e).getDamager();
-				Entity inflictor = attacker;
+				Integer inflictorID = attacker.getEntityId();
 				//If the "attacker" is an arrow, make the attacker instead the shooter.
 				if(attacker instanceof Arrow && ((Arrow)attacker).getShooter() instanceof LivingEntity)
-				{
 					attacker = (Entity) ((Arrow)attacker).getShooter();
-				}
+
+				Integer attackerID = attacker.getEntityId();
 				if(attacker instanceof Player)
 				{
 					if(e.getCause() == DamageCause.ENTITY_ATTACK)
@@ -229,10 +238,10 @@ public class EntityHandling implements Listener {
 					}
 					else if(e.getCause() == DamageCause.PROJECTILE)
 					{
-						if(projectileAttributes.containsKey(inflictor))
+						if(projectileAttributes.containsKey(inflictorID))
 						{
-							customDamage = projectileAttributes.get(inflictor).getOrDefault("Damage", 0.0);
-							boolean critBoolean = (projectileAttributes.get(inflictor).getOrDefault("CriticalAttack", 0.0))==1.0;
+							customDamage = projectileAttributes.get(inflictorID).getOrDefault("Damage", 0.0);
+							boolean critBoolean = (projectileAttributes.get(inflictorID).getOrDefault("CriticalAttack", 0.0))==1.0;
 							dealDamageToEntity((LivingEntity)victim,customDamage, critBoolean, 0);
 						}
 						e.setDamage(0);
@@ -243,19 +252,20 @@ public class EntityHandling implements Listener {
 					}
 					//((Player)attacker).sendMessage(String.format("You dealt %.1f damage.", customDamage));
 				}
-				else if(attacker instanceof LivingEntity && entityAttributes.containsKey((LivingEntity)attacker) && (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.PROJECTILE))
+				else if(attacker instanceof LivingEntity && entityAttributes.containsKey(attackerID) && (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.PROJECTILE))
 				{
-					double baseDMG = entityAttributes.get((LivingEntity) attacker).getOrDefault("BaseDamage", 5.0);
+					double baseDMG = entityAttributes.get(attackerID).getOrDefault("BaseDamage", 5.0);
 					
-					double dex = entityAttributes.get((LivingEntity) attacker).getOrDefault("Dexterity", 0.0);
-					double dexScaling = entityAttributes.get((LivingEntity) attacker).getOrDefault("DexterityScaling", 0.0);
+					double dex = entityAttributes.get(attackerID).getOrDefault("Dexterity", 0.0);
+					double dexScaling = entityAttributes.get(attackerID).getOrDefault("DexterityScaling", 0.0);
 					
-					double str = entityAttributes.get((LivingEntity) attacker).getOrDefault("Strength", 0.0);
-					double strScaling = entityAttributes.get((LivingEntity) attacker).getOrDefault("StrengthScaling", 0.0);
+					double str = entityAttributes.get(attackerID).getOrDefault("Strength", 0.0);
+					double strScaling = entityAttributes.get(attackerID).getOrDefault("StrengthScaling", 0.0);
 					
-					double intel = entityAttributes.get((LivingEntity) attacker).getOrDefault("Intelligence", 0.0);
-					double intelScaling = entityAttributes.get((LivingEntity) attacker).getOrDefault("IntelligenceScaling", 0.0);
-					customDamage = baseDMG * Math.pow((1+(dex)/100.0), dexScaling) * Math.pow((1+(str)/100.0), strScaling) * Math.pow((1+(intel)/100.0), intelScaling);
+					double intel = entityAttributes.get(attackerID).getOrDefault("Intelligence", 0.0);
+					double intelScaling = entityAttributes.get(attackerID).getOrDefault("IntelligenceScaling", 0.0);
+					customDamage = baseDMG * Math.pow((1+(dex)/100.0), dexScaling) * Math.pow((1+(str)/100.0), strScaling)
+							* Math.pow((1+(intel)/100.0), intelScaling);
 					e.setDamage(0);
 					damage = 0;
 					resetIFrames((LivingEntity)victim);
@@ -286,19 +296,46 @@ public class EntityHandling implements Listener {
 			}
 			else//If victim is a mob
 			{
-				double absorption = entityAttributes.get((LivingEntity) victim).getOrDefault("Absorption", 0.0);
+				double absorption = entityAttributes.get(id).getOrDefault("Absorption", 0.0);
 				customDamage *= (100.0-absorption)/100.0;
 				
-				entityAttributes.get((LivingEntity)victim).put("Health", entityAttributes.get((LivingEntity)victim).get("Health") - customDamage);
+				entityAttributes.get(id).put("Health", entityAttributes.get(id).get("Health") - customDamage);
 				String finaldamage = String.format("§x§f§b§9§7§0§0- %.0f ⚔",customDamage);
 				spawnIndicator(victim.getLocation(), finaldamage, victim);
-				if(entityAttributes.get((LivingEntity)victim).get("Health") > 0.0) {
-					((LivingEntity) victim).setHealth(entityAttributes.get((LivingEntity)victim).get("Health")/entityAttributes.get((LivingEntity)victim).get("Health") *((LivingEntity) victim).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+				if(entityAttributes.get(id).get("Health") > 0.0) {
+					((LivingEntity) victim).setHealth(entityAttributes.get(id).get("Health")/entityAttributes.get(id).get("Health") *
+							((LivingEntity) victim).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 				}else {
 					((LivingEntity) victim).setHealth(0.0);
 				}
 				resetIFramesDelayed((LivingEntity)victim);
 			}
 		}
+	}
+	public static void dealAOEAngledDamage(Player p, double degrees, double range, double damageDealt, boolean isCrit, int damageType){
+		Vector angleVector = p.getLocation().getDirection();
+		Vector playerVector = p.getLocation().toVector();
+
+		for(Entity entity : p.getWorld().getEntities()) {
+			if (entity instanceof Player || entity.getType() == EntityType.ARMOR_STAND)
+				continue;
+			if(!(entity instanceof LivingEntity))
+				continue;
+			if (!entityAttributes.containsKey(entity.getEntityId()))
+				continue;
+
+			Vector targetLocation = entity.getLocation().toVector();
+			if (targetLocation.distance(playerVector) > range)
+				continue;
+
+			Vector targetVector = playerVector.clone().subtract(targetLocation).normalize();
+			if(getAngleBetweenVector(targetVector, angleVector) > degrees)
+				continue;
+
+			dealDamageToEntity((LivingEntity) entity, damageDealt, isCrit, damageType);
+		}
+	}
+	public static double getAngleBetweenVector(Vector vec1, Vector vec2){
+		return 180-(180/Math.PI*(Math.acos( vec1.dot(vec2)  / (vec1.length() * vec2.length() ))));
 	}
 }

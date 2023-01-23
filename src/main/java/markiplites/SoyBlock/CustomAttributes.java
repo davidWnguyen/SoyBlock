@@ -709,4 +709,22 @@ public class CustomAttributes implements Listener {
 			default -> {return "";}
 		}
 	}
+	public static double getDamageModified(Player player, boolean isCrit)
+	{
+		double baseDMG = Main.getAttributes().get(player).getOrDefault("BaseDamage", 5.0);
+		double dex = Main.getAttributes().get(player).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(player).get("Dexterity"), 0.0) : 0.0;
+		double dexScaling = Main.getAttributes().get(player).getOrDefault("DexterityScaling", 0.0);
+
+		double str = Main.getAttributes().get(player).containsKey("Strength") ? Math.max(Main.getAttributes().get(player).get("Strength"), 0.0) : 0.0;
+		double strScaling = Main.getAttributes().get(player).getOrDefault("StrengthScaling", 0.0);
+
+		double intel = Main.getAttributes().get(player).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(player).get("Intelligence"), 0.0) : 0.0;
+		double intelScaling = Main.getAttributes().get(player).getOrDefault("IntelligenceScaling", 0.0);
+		double customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) * Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
+
+		if (isCrit)
+			customDamage *= (Main.getAttributes().get(player).getOrDefault("CritDamage", 0.0)) + 1.35;
+
+		return customDamage;
+	}
 }

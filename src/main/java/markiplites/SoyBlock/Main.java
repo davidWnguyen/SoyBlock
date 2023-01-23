@@ -1,5 +1,8 @@
 package markiplites.SoyBlock;
 
+
+import com.comphenix.protocol.ProtocolLibrary;
+import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
@@ -10,8 +13,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import markiplites.SoyBlock.Lists.entityList;
 import markiplites.SoyBlock.Lists.itemList;
@@ -76,11 +81,15 @@ public class Main extends JavaPlugin implements Listener{
 		ItemStack mainMenu = ItemListHandler.generateItem("SBMENU");
 		p.getInventory().setItem(8, mainMenu);
 	}
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent e)
+	{
+		playerAttributes.remove(e.getPlayer());
+	}
 	public static Main getInstance() {
 		return instance;
 	}
 	public static HashMap<Player, HashMap<String, Double>> getAttributes() {
 		return playerAttributes;
 	}
-	
 }
