@@ -1,5 +1,7 @@
-package markiplites.SoyBlock.ItemList;
+package markiplites.SoyBlock.Lists;
 
+import markiplites.SoyBlock.Ent;
+import markiplites.SoyBlock.EntityHandling;
 import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.ItemClasses.Block;
 import markiplites.SoyBlock.ItemClasses.Chestplate;
@@ -7,10 +9,14 @@ import markiplites.SoyBlock.ItemClasses.Sword;
 import markiplites.SoyBlock.ItemClasses.Talisman;
 import markiplites.SoyBlock.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -28,17 +34,19 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.function.Predicate;
 
-public class blargySouls implements Listener
+public class itemList implements Listener
 {
 	private HashMap<String, Boolean> ability_cooldown = new HashMap<String, Boolean>();
 	
-	public blargySouls() {
+	public itemList() {
 		//cooldown booleans
 		ability_cooldown.put("MURASAMA", true);
-
+		ability_cooldown.put("JUMP_ROD", true);
 
 		init();
 	}
@@ -63,7 +71,7 @@ public class blargySouls implements Listener
 		
 		
 		attributes.put("baseDamage", 150.0);
-		attributes.put("baseAttacKSpeed", 1.0);
+		attributes.put("baseAttackSpeed", 1.0);
 		attributes.put("attackReachBonusRaw", 1.5);
 		attributes.put("critChance", 0.5);
 		attributes.put("moveSpeed", 0.1);
@@ -149,6 +157,21 @@ public class blargySouls implements Listener
 		Item jump_rod = new Item("JUMP_ROD", "Jump Rod", Material.STICK, attributes, "Move like a rabbit");
 		jump_rod.finalizeItem("JUMP_ROD");
 		
+		attributes.clear();
+		attributes.put("intelligenceBonusRaw", 1000000.0);
+		attributes.put("intelligenceScaling", 2.0);
+		attributes.put("itemType", 101.0);
+		Chestplate storm = new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
+		storm.finalizeItem("STORM_CP");
+
+		attributes.clear();
+		Item boss_spawner = new Item("SPAWNER", "Spawner", Material.STICK, attributes, "Spawns custom enemy");
+		boss_spawner.finalizeItem("SPAWNER");
+
+		attributes.put("intelligenceBonusRaw", 500.0);
+		attributes.put("intelligenceScaling", 1.4);
+		Item elden_bong = new Item("ELDEN_STAR", "Elden Star", Material.GOLDEN_SWORD, attributes, "Elden bong lol XD x3 :3333");
+		elden_bong.finalizeItem("ELDEN_STAR");
 	}
 
 
@@ -168,31 +191,86 @@ public class blargySouls implements Listener
 			switch(itemID) {
 				case "MURASAMA" -> murasama_ability(e);
 				case "JUMP_ROD" -> jump_ability(e);
+				case "SPAWNER" -> spawn_boss(e);
+				case "ELDEN_STAR" -> star_ability(e);
 			}
 		}
 	}
 
-	private void jump_ability(PlayerInteractEvent e) {
+	private void star_ability(PlayerInteractEvent e) {
+		Location loc = e.getPlayer().getLocation();
+		loc.setY(loc.getY()+5);
+		ArrayList<ArmorStand> projectiles = new ArrayList<>();
+		for(int i = 0;i < 15;i++) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
+				ArmorStand ent = (ArmorStand)e.getPlayer().getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+				ent.setVisible(false);
+				ent.setBasePlate(false);
+				ent.setCollidable(false);
+				ent.setArms(false);
+				ent.setSmall(false);
+				ent.setSilent(true);
+				ent.setCustomName("Armor Stand");
+				ent.setCustomNameVisible(false);
+				ent.setCanPickupItems(false);
+				ent.setGliding(false);
+				ent.setInvulnerable(true);
+				ent.setCustomNameVisible(true);
+				ent.setGravity(true);
+				projectiles.add(ent);
+				e.getPlayer().getWorld().playEffect(loc, Effect.BLAZE_SHOOT, 0, 30);
+			}, 10);
+		}
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getInstance(), () -> {
+			for(ArmorStand proj : projectiles) {
+				Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
+				Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(proj.getLocation(), 15, 15, 15, ignoreList);
+				if(!entities.isEmpty()) {
+					e.getPlayer().getWorld().spawnParticle(Particle.FLAME, proj.getLocation(), 0);
+					Entity closest = (Entity)entities.toArray()[0];
+					for(Entity ent : entities) {
+						if ( proj.getLocation().distance(ent.getLocation()) < proj.getLocation().distance(closest.getLocation()) ) {
+						closest = ent;
+						}
+					}
+					proj.setVelocity(closest.getLocation().subtract(proj.getLocation()).toVector().multiply(0.2));
+					Collection<Entity> check = e.getPlayer().getWorld().getNearbyEntities(proj.getLocation(), 0.5, 0.5, 0.5, ignoreList);
+					if(!check.isEmpty()) {
+						Entity ent = (Entity)check.toArray()[0];
+						double intel = Main.getAttributes().get(e.getPlayer()).getOrDefault("Intelligence", 1.0);
+						double intelScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("IntelligenceScaling", 1.0);
+						double damage = Main.getAttributes().get(e.getPlayer()).getOrDefault("BaseDamage", 5.0) * Math.pow((1 + intel)/100, intelScaling);
+						EntityHandling.dealDamageToEntity((LivingEntity)ent, damage, false, 1);
+						proj.remove();
+					}
+				}
+				else {
+					proj.remove();
+				}
+			}
+		}, 20, 1);
 
 	}
 
+	private void spawn_boss(PlayerInteractEvent e) {
+		Ent.spawnEnt("ZOMBIE_BOSS", traceToEntity(e).toLocation(e.getPlayer().getWorld()));
+	}
+
+	private void jump_ability(PlayerInteractEvent e) {
+		if(!check_ready(e.getPlayer(), "JUMP_ROD", 25.0, 10)) return;
+
+		Player p = e.getPlayer();
+		Vector vector = p.getEyeLocation().getDirection().normalize();
+		vector.multiply(1.01);
+		vector = p.getVelocity().add(vector);
+		p.setVelocity(vector.add(new Vector(0, 1, 0)));
+	}
 	private void murasama_ability(PlayerInteractEvent e) {
-		if(ability_cooldown.get("MURASAMA")) {
-		double currentMana = Main.getAttributes().get(e.getPlayer()).get("Mana");
-		if(currentMana - 25 >= 0) {
-			Vector vec = traceToEntity(e);
-			vec.add(new Vector(0, 0.5, 0));
-			e.getPlayer().getWorld().spawnEntity(vec.toLocation(e.getPlayer().getWorld()), EntityType.PRIMED_TNT);
-			Main.getAttributes().get(e.getPlayer()).replace("Mana", (currentMana - 25));
-			ability_cooldown.replace("MURASAMA", false);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace("MURASAMA", true);}, 20); //1 second delay
-		}
-		else {
-			e.getPlayer().sendMessage("§4You do not have enough mana for this!");
-		}
-		} else {
-			e.getPlayer().sendMessage("§4Ability on cooldown.");
-		}	
+		if(!check_ready(e.getPlayer(), "MURASAMA", 50.0, 20)) return;
+
+		Vector vec = traceToEntity(e);
+		vec.add(new Vector(0, 0.5, 0));
+		e.getPlayer().getWorld().spawnEntity(vec.toLocation(e.getPlayer().getWorld()), EntityType.PRIMED_TNT);
 	}
 
 	private Vector traceToEntity(PlayerInteractEvent e) {
@@ -224,4 +302,18 @@ public class blargySouls implements Listener
 
 		return null;
 	}
+
+
+
+	private boolean check_ready(Player p, String itemID, double manaCost, int delay) { //ability check / set x333
+		if(!ability_cooldown.get(itemID)) {p.sendMessage("§4Ability on cooldown."); return false;}
+		double currentMana = Main.getAttributes().get(p).get("Mana");
+		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
+		Main.getAttributes().get(p).replace("Mana", (currentMana - manaCost));
+		ability_cooldown.replace(itemID, false);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace(itemID, true);}, 20);
+		return true;
+	}	
+
+
 }
