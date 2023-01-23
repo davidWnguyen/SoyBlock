@@ -2,7 +2,6 @@ package markiplites.SoyBlock;
 
 
 import com.comphenix.protocol.ProtocolLibrary;
-import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;

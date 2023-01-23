@@ -1,6 +1,5 @@
 package markiplites.SoyBlock.Lists;
 
-import markiplites.SoyBlock.Ent;
 import markiplites.SoyBlock.EntityHandling;
 import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.ItemClasses.Block;
@@ -191,7 +190,6 @@ public class itemList implements Listener
 			switch(itemID) {
 				case "MURASAMA" -> murasama_ability(e);
 				case "JUMP_ROD" -> jump_ability(e);
-				case "SPAWNER" -> spawn_boss(e);
 				case "ELDEN_STAR" -> star_ability(e);
 			}
 		}
@@ -252,9 +250,6 @@ public class itemList implements Listener
 
 	}
 
-	private void spawn_boss(PlayerInteractEvent e) {
-		Ent.spawnEnt("ZOMBIE_BOSS", traceToEntity(e).toLocation(e.getPlayer().getWorld()));
-	}
 
 	private void jump_ability(PlayerInteractEvent e) {
 		if(!check_ready(e.getPlayer(), "JUMP_ROD", 25.0, 10)) return;
