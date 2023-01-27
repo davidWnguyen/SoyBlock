@@ -163,9 +163,6 @@ public class itemList implements Listener
 		Chestplate storm = new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
 		storm.finalizeItem("STORM_CP");
 
-		attributes.clear();
-		Item boss_spawner = new Item("SPAWNER", "Spawner", Material.STICK, attributes, "Spawns custom enemy");
-		boss_spawner.finalizeItem("SPAWNER");
 
 		attributes.put("intelligenceBonusRaw", 500.0);
 		attributes.put("intelligenceScaling", 1.4);
@@ -260,6 +257,7 @@ public class itemList implements Listener
 		vector = p.getVelocity().add(vector);
 		p.setVelocity(vector.add(new Vector(0, 1, 0)));
 	}
+	
 	private void murasama_ability(PlayerInteractEvent e) {
 		if(!check_ready(e.getPlayer(), "MURASAMA", 50.0, 20)) return;
 
