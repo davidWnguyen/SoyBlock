@@ -8,16 +8,22 @@ import org.bukkit.plugin.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
+import java.util.UUID;
+
 public class HUDTimer implements Listener {
 	public static void run(final Plugin plugin) {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,
 				() -> {
 					for(Player p : plugin.getServer().getOnlinePlayers()) {
-						double currentHealth = Main.getAttributes().get(p).get("Health");
-						double maxHealth = Main.getAttributes().get(p).get("MaxHealth");
-						double currentMana = Main.getAttributes().get(p).get("Mana");
-						double maxMana = Main.getAttributes().get(p).get("MaxMana");
-						double regeneration = maxHealth * 0.0003 * (1.0 + (Main.getAttributes().get(p).getOrDefault("RegenerationBonus", 0.0)));
+						UUID uuid = p.getUniqueId();
+						if(!Main.getAttributes().containsKey(uuid))
+							continue;
+
+						double currentHealth = Main.getAttributes().get(uuid).get("Health");
+						double maxHealth = Main.getAttributes().get(uuid).get("MaxHealth");
+						double currentMana = Main.getAttributes().get(uuid).get("Mana");
+						double maxMana = Main.getAttributes().get(uuid).get("MaxMana");
+						double regeneration = maxHealth * 0.0003 * (1.0 + (Main.getAttributes().get(uuid).getOrDefault("RegenerationBonus", 0.0)));
 
 						currentMana += maxMana * 0.0005;//regen 1% mana per second
 
@@ -28,11 +34,11 @@ public class HUDTimer implements Listener {
 						if(currentMana > maxMana)
 							currentMana = maxMana;
 
-						Main.getAttributes().get(p).put("Mana", currentMana);
-						Main.getAttributes().get(p).put("Health", currentHealth);
+						Main.getAttributes().get(uuid).put("Mana", currentMana);
+						Main.getAttributes().get(uuid).put("Health", currentHealth);
 
-						if(Main.getAttributes().get(p).get("Health") > 0.0) {
-							p.setHealth(Main.getAttributes().get(p).get("Health")/Main.getAttributes().get(p).get("MaxHealth") * p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+						if(Main.getAttributes().get(uuid).get("Health") > 0.0) {
+							p.setHealth(Main.getAttributes().get(uuid).get("Health")/Main.getAttributes().get(uuid).get("MaxHealth") * p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 						}else {
 							p.setHealth(0.0);
 						}

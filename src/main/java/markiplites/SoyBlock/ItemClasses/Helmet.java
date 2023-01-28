@@ -1,9 +1,11 @@
 package markiplites.SoyBlock.ItemClasses;
 
 import markiplites.SoyBlock.Item;
+import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -11,12 +13,11 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class Helmet extends Item
+public class Helmet extends Item implements Listener
 {
-	@SuppressWarnings("deprecation")
-	public Helmet(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, String cosmetic)
+	public Helmet(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, String cosmetic)
 	{
-		super(itemID,itemName,mat,attributes,lore);
+		super(itemID,itemName,mat,attributes,lore,100.0);
 		ItemMeta meta = getItemMeta();
 		ItemStack stack = getItemStack();
 		if(mat == Material.PLAYER_HEAD && cosmetic != null)
@@ -51,5 +52,6 @@ public class Helmet extends Item
 		super.setItemMeta(meta);
 		super.setItemStack(stack);
 		Bukkit.getLogger().info("Added Boots: " + itemID + " to item dictionary.");
+		this.finalizeItem(itemID);
 	}
 }

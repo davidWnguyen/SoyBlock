@@ -16,7 +16,7 @@ public class Item implements Listener
 {
 	private ItemMeta meta;
 	private ItemStack stack;
-	public Item(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore)
+	public Item(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, Double itemType)
 	{
 		if(mat == null)
 		{
@@ -27,14 +27,15 @@ public class Item implements Listener
 		meta = stack.getItemMeta();
 		if(meta == null) return;
 
+		attributes.put(attr.itemType, itemType);
+
 		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING, itemID);
 		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
 		
-		for(String attributeName : attributes.keySet()) {
+		for(attr attributeName : attributes.keySet()) {
 			double attributeValue = attributes.get(attributeName);
-			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), attributeName), PersistentDataType.DOUBLE, attributeValue);
+			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), attributeName.name()), PersistentDataType.DOUBLE, attributeValue);
 		}
-
 		meta.setDisplayName(IridiumColorAPI.process(itemName));
 
 		meta.setUnbreakable(true);

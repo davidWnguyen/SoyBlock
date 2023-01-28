@@ -1,6 +1,7 @@
 package markiplites.SoyBlock.ItemClasses;
 
 import markiplites.SoyBlock.Item;
+import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -12,9 +13,9 @@ import java.util.HashMap;
 
 public class Leggings extends Item
 {
-	public Leggings(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, String rgb)
+	public Leggings(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, String rgb)
 	{
-		super(itemID,itemName,mat,attributes,lore);
+		super(itemID,itemName,mat,attributes,lore,102.0);
 		ItemMeta meta = getItemMeta();
 		ItemStack stack = getItemStack();
 		if(rgb != null)
@@ -47,5 +48,6 @@ public class Leggings extends Item
 		super.setItemMeta(meta);
 		super.setItemStack(stack);
 		Bukkit.getLogger().info("Added Leggings: " + itemID + " to item dictionary.");
+		this.finalizeItem(itemID);
 	}
 }

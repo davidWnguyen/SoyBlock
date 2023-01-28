@@ -1,0 +1,33 @@
+package markiplites.SoyBlock;
+
+public enum attr {
+    baseDamage,
+    baseAttackSpeed,
+    attackSpeedBaseMult,
+    attackReachBonusRaw,
+    healthBonusRaw,
+    absorptionBonusRaw,
+    intelligenceBonusRaw,
+    intelligenceScaling,
+    strengthBonusRaw,
+    strengthScaling,
+    dexterityBonusRaw,
+    dexterityScaling,
+    critChance,
+    critDamage,
+    regenerationBonus,
+    moveSpeed,
+    miningSpeed,
+    miningHardness,
+    toolType,
+    miningFortune,
+    itemType,
+    rarity,
+    itemAction,
+    weaponType,
+    projectileSpeed,
+    blockDurability,
+    blockHardness,
+    blockTool,
+    blockExp
+}

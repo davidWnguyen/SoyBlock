@@ -1,6 +1,7 @@
 package markiplites.SoyBlock.ItemClasses;
 
 import markiplites.SoyBlock.Item;
+import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -12,9 +13,9 @@ import java.util.HashMap;
 
 public class Chestplate extends Item
 {
-	public Chestplate(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, String rgb)
+	public Chestplate(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, String rgb)
 	{
-		super(itemID,itemName,mat,attributes,lore);
+		super(itemID,itemName,mat,attributes,lore,101.0);
 
 		ItemMeta meta = getItemMeta();
 		ItemStack stack = getItemStack();
@@ -48,5 +49,6 @@ public class Chestplate extends Item
 		super.setItemMeta(meta);
 		super.setItemStack(stack);
 		Bukkit.getLogger().info("Added Chestplate: " + itemID + " to item dictionary.");
+		this.finalizeItem(itemID);
 	}
 }
