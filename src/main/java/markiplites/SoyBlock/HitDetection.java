@@ -5,15 +5,13 @@ import java.util.function.Predicate;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -28,9 +26,9 @@ public class HitDetection implements Listener {
 	
 	}
 	@EventHandler
-    public void PlayerAnimation(PlayerAnimationEvent event) {
+    public void PlayerAttack(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-        if (event.getAnimationType() == PlayerAnimationType.ARM_SWING)
+        if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)
         {
         	double baseDMG = Main.getAttributes().get(player).getOrDefault("BaseDamage", 5.0);
 	        if(baseDMG > 5.0)//fully charged & is weapon
@@ -50,6 +48,8 @@ public class HitDetection implements Listener {
 							Vector playerDirection = player.getLocation().getDirection();
 							Arrow shortbowArrow = player.launchProjectile(Arrow.class, playerDirection.multiply(projSpeed));
 							if (shortbowArrow != null) {
+								shortbowArrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+
 								HashMap<String, Double> attributes = new HashMap<>();
 
 								double dex = Main.getAttributes().get(player).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(player).get("Dexterity"), 0.0) : 0.0;

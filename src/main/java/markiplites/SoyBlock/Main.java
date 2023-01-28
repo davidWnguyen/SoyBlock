@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -85,5 +86,12 @@ public class Main extends JavaPlugin implements Listener{
 	}
 	public static HashMap<Player, HashMap<String, Double>> getAttributes() {
 		return playerAttributes;
+	}
+	public static Vector getRightVector(Location loc){Location temp = loc.clone();temp.setYaw(temp.getYaw()+90.0F); return temp.getDirection();}
+	public static Vector getUpVector(Location loc){Location temp = loc.clone();temp.setPitch(temp.getPitch()-90.0F);; return temp.getDirection();}
+
+	public enum ItemProperties{
+		weaponType,
+		itemAction
 	}
 }

@@ -149,10 +149,11 @@ public class EntityHandling implements Listener {
 			if(!(ent instanceof LivingEntity))
 				continue;
 			if (ent.getType() == EntityType.ARMOR_STAND)
-				continue;
+				{ent.remove();continue;}
 			Integer id = ent.getEntityId();
 			if(entityAttributes.containsKey(id))
 				continue;
+
 			//Only give them randomized stats if they're not defined.
 			//Replace later with mob attribute system.
 			int mobLevel = new Random().nextInt(10 - 1 + 1) + 1;
@@ -320,10 +321,8 @@ public class EntityHandling implements Listener {
 		Vector angleVector = p.getLocation().getDirection();
 		Vector playerVector = p.getLocation().toVector();
 
-		for(Entity entity : p.getWorld().getEntities()) {
+		for(LivingEntity entity : p.getWorld().getLivingEntities()) {
 			if (entity instanceof Player || entity.getType() == EntityType.ARMOR_STAND)
-				continue;
-			if(!(entity instanceof LivingEntity))
 				continue;
 			if (!entityAttributes.containsKey(entity.getEntityId()))
 				continue;
@@ -336,7 +335,7 @@ public class EntityHandling implements Listener {
 			if(getAngleBetweenVector(targetVector, angleVector) > degrees)
 				continue;
 
-			dealDamageToEntity((LivingEntity) entity, damageDealt, isCrit, damageType);
+			dealDamageToEntity(entity, damageDealt, isCrit, damageType);
 		}
 	}
 	public static double getAngleBetweenVector(Vector vec1, Vector vec2){

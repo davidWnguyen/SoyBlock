@@ -3,6 +3,7 @@ package markiplites.SoyBlock.ItemClasses;
 import com.jeff_media.morepersistentdatatypes.DataType;
 import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.Main;
+import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -14,9 +15,9 @@ import java.util.HashMap;
 
 public class Block extends Item implements Listener
 {
-	public Block(String itemID, String itemName, Material mat, HashMap<String, Double> attributes, String lore, ItemStack[] itemArray)
+	public Block(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, ItemStack[] itemArray)
 	{
-		super(itemID,itemName,mat,attributes,lore);
+		super(itemID,itemName,mat,attributes,lore,0.0);
 		ItemStack stack = super.getItemStack();
 		ItemMeta meta = super.getItemMeta();
 
@@ -27,5 +28,6 @@ public class Block extends Item implements Listener
 		super.setItemStack(stack);
 		//DO NOT ADD UUID ITEMS IN BLOCK LOOT
 		Bukkit.getLogger().info("Added Block: " + itemID + " to item dictionary.");
+		this.finalizeItem(itemID);
 	}
 }
