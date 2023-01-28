@@ -1,7 +1,7 @@
 package markiplites.SoyBlock;
 
+
 import com.comphenix.protocol.ProtocolLibrary;
-import markiplites.SoyBlock.ItemList.blargySouls;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -16,7 +16,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
+
+import markiplites.SoyBlock.Lists.entityList;
+import markiplites.SoyBlock.Lists.itemList;
 
 import java.io.File;
 import java.util.HashMap;
@@ -39,14 +41,16 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new CustomAttributes(), this);
 		Bukkit.getPluginManager().registerEvents(new HitDetection(), this);
 		Bukkit.getPluginManager().registerEvents(new EntityHandling(), this);
-		Bukkit.getPluginManager().registerEvents(new blargySouls(), this);
+		Bukkit.getPluginManager().registerEvents(new itemList(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
-		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		new entityList();
+		//Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
 		this.getCommand("sbgive").setExecutor(new Commands());
 		this.getCommand("sbgive").setTabCompleter(new CommandsTabCompletion());
+
 
 		for(World world : Bukkit.getWorlds())
 		{
@@ -54,6 +58,7 @@ public class Main extends JavaPlugin implements Listener{
 			world.setGameRule(GameRule.DO_INSOMNIA, false);
 			world.setGameRule(GameRule.KEEP_INVENTORY, true);
 			world.setGameRule(GameRule.NATURAL_REGENERATION, false);
+			world.setGameRule(GameRule.FALL_DAMAGE, false);
 		}
 	}
 	@EventHandler
@@ -66,7 +71,6 @@ public class Main extends JavaPlugin implements Listener{
 		Player p = e.getPlayer();
 		p.setHealth(p.getMaxHealth());
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
-		
 		//Standard Procedure to calculate stats
 		CustomAttributes.getUpdatedPlayerAttributes(p, attributes);
 		attributes.put("Health", attributes.get("MaxHealth"));

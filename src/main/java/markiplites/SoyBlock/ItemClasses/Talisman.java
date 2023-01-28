@@ -7,13 +7,12 @@ import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 
-public class Talisman extends Item implements Listener
+public class Talisman extends Item
 {
 	public Talisman(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, String family)
 	{

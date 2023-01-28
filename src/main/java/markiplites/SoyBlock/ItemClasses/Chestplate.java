@@ -5,14 +5,13 @@ import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.HashMap;
 
-public class Chestplate extends Item implements Listener
+public class Chestplate extends Item
 {
 	public Chestplate(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, String rgb)
 	{

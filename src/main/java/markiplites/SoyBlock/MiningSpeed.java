@@ -171,6 +171,7 @@ public class MiningSpeed implements Listener{
             }
         }
     }
+	@SuppressWarnings("deprecation")
     public void MiningBlock(BlockDamageEvent event, Block block) {
         Player p = event.getPlayer();
         for(Player player : playerMiningBlock) {
@@ -247,7 +248,7 @@ public class MiningSpeed implements Listener{
 							PersistentDataContainer customBlockData1 = new CustomBlockData(event.getBlock(), Main.getInstance());
 							if(customBlockData1.has(blockLootKey, DataType.ITEM_STACK_ARRAY))
 							{
-								double blockTool = customBlockData1.has(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) ? customBlockData1.get(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) : -1.0;
+								//double blockTool = customBlockData1.has(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) ? customBlockData1.get(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) : -1.0;
 								ItemStack[] blockLootID = customBlockData1.get(blockLootKey, DataType.ITEM_STACK_ARRAY);
 
 								double miningFortune = Main.getAttributes().get(p).getOrDefault("MiningFortune", 0.0);

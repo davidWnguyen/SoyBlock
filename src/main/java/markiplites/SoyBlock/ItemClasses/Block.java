@@ -7,13 +7,12 @@ import markiplites.SoyBlock.attr;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 
-public class Block extends Item implements Listener
+public class Block extends Item
 {
 	public Block(String itemID, String itemName, Material mat, HashMap<attr, Double> attributes, String lore, ItemStack[] itemArray)
 	{
