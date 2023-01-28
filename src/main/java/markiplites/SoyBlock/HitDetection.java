@@ -26,10 +26,10 @@ public class HitDetection implements Listener {
 	
 	}
 	@EventHandler
-    public void PlayerAttack(PlayerInteractEvent event) {
+	public void PlayerAnimation(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
-        if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)
-        {
+		if (event.getAnimationType() == PlayerAnimationType.ARM_SWING)
+		{
         	double baseDMG = Main.getAttributes().get(player).getOrDefault("BaseDamage", 5.0);
 	        if(baseDMG > 5.0)//fully charged & is weapon
 	        {
