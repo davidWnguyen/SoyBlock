@@ -8,12 +8,14 @@ import markiplites.SoyBlock.ItemClasses.Sword;
 import markiplites.SoyBlock.ItemClasses.Talisman;
 import markiplites.SoyBlock.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Effect;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustTransition;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -46,6 +48,7 @@ public class itemList implements Listener
 		//cooldown booleans
 		ability_cooldown.put("MURASAMA", true);
 		ability_cooldown.put("JUMP_ROD", true);
+		ability_cooldown.put("YAMATO", true);
 
 		init();
 	}
@@ -54,7 +57,7 @@ public class itemList implements Listener
 		HashMap<String, Double> attributes = new HashMap<>();
 		attributes.put("baseDamage", 1000.0);
 		attributes.put("baseAttackSpeed", 3.0);
-		attributes.put("attackReachBonusRaw", 5.0);
+		attributes.put("attackReachBonusRaw", 3.5);
 		attributes.put("critChance", 0.3);
 		attributes.put("moveSpeed", 0.5);
 		attributes.put("strengthScaling", 1.2);
@@ -163,11 +166,25 @@ public class itemList implements Listener
 		Chestplate storm = new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
 		storm.finalizeItem("STORM_CP");
 
-
+		attributes.clear();
 		attributes.put("intelligenceBonusRaw", 500.0);
 		attributes.put("intelligenceScaling", 1.4);
 		Item elden_bong = new Item("ELDEN_STAR", "Elden Star", Material.GOLDEN_SWORD, attributes, "Elden bong lol XD x3 :3333");
 		elden_bong.finalizeItem("ELDEN_STAR");
+
+		attributes.clear();
+		attributes.put("baseDamage", 150.0);
+		attributes.put("intelligenceBonusRaw", 500.0);
+		attributes.put("intelligenceScaling", 1.5);
+		attributes.put("strengthBonusRaw", 500.0);
+		attributes.put("strengthScaling", 1.4);
+		attributes.put("dexterityBonusRaw", 400.0);
+		attributes.put("dexterityScaling", 1.35);
+		attributes.put("attackReachBonusRaw", 7.5);
+		attributes.put("rarity", 6.0);
+		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
+		yamato.finalizeItem("YAMATO");
+
 	}
 
 
@@ -188,8 +205,36 @@ public class itemList implements Listener
 				case "MURASAMA" -> murasama_ability(e);
 				case "JUMP_ROD" -> jump_ability(e);
 				case "ELDEN_STAR" -> star_ability(e);
+				case "YAMATO" -> judgement_cut(e);
 			}
 		}
+	}
+
+	private void judgement_cut(PlayerInteractEvent e) {
+		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 10)) return;
+
+		Vector vec = traceToEntity(e, 15.0);
+		Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
+		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 3.1, 3.1, 3.1, ignoreList);
+		double intel = Main.getAttributes().get(e.getPlayer()).getOrDefault("Intelligence", 1.0);
+		double intelScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("IntelligenceScaling", 1.0);
+		double strength = Main.getAttributes().get(e.getPlayer()).getOrDefault("Strength", 1.0);
+		double strengthScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("StrengthScaling", 1.0);
+		double dex = Main.getAttributes().get(e.getPlayer()).getOrDefault("Dexterity", 1.0);
+		double dexScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("DexterityScaling", 1.0);
+		double damage = Main.getAttributes().get(e.getPlayer()).getOrDefault("BaseDamage", 5.0) * Math.pow((1 + intel)/100, intelScaling) * Math.pow((1 + strength)/100, strengthScaling) * Math.pow((1 + dex)/100, dexScaling);
+		Location loc = vec.toLocation(e.getPlayer().getWorld());
+		for(double i = 0; i < Math.PI*2;i += Math.PI/10) {
+			loc.add(Math.cos(i), Math.cos(i/2), Math.sin(i));
+			DustTransition dust = new DustTransition(Color.BLUE, Color.PURPLE, (float) 2.0);
+			loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), 0, 0, 0, 0, dust);
+		}
+
+		for(Entity entity : entities) {
+			EntityHandling.dealDamageToEntity((LivingEntity)entity, damage, false, 1);
+		}
+		double current_Y = e.getPlayer().getVelocity().getY();
+		e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(15).setY(current_Y));
 	}
 
 	private void star_ability(PlayerInteractEvent e) {
@@ -243,13 +288,13 @@ public class itemList implements Listener
 					proj.remove();
 				}
 			}
-		}, 20, 1);
+		}, 20, 5);
 
 	}
 
 
 	private void jump_ability(PlayerInteractEvent e) {
-		if(!check_ready(e.getPlayer(), "JUMP_ROD", 25.0, 10)) return;
+		if(!check_ready(e.getPlayer(), "JUMP_ROD", 25.0, 20)) return;
 
 		Player p = e.getPlayer();
 		Vector vector = p.getEyeLocation().getDirection().normalize();
@@ -257,22 +302,23 @@ public class itemList implements Listener
 		vector = p.getVelocity().add(vector);
 		p.setVelocity(vector.add(new Vector(0, 1, 0)));
 	}
-	
+
 	private void murasama_ability(PlayerInteractEvent e) {
 		if(!check_ready(e.getPlayer(), "MURASAMA", 50.0, 20)) return;
 
-		Vector vec = traceToEntity(e);
+		Vector vec = traceToEntity(e, Main.getAttributes().get(e.getPlayer()).getOrDefault("AttackRange", 2.5));
 		vec.add(new Vector(0, 0.5, 0));
 		e.getPlayer().getWorld().spawnEntity(vec.toLocation(e.getPlayer().getWorld()), EntityType.PRIMED_TNT);
 	}
 
-	private Vector traceToEntity(PlayerInteractEvent e) {
+
+	private Vector traceToEntity(PlayerInteractEvent e, double range) {
 		Player p = e.getPlayer();
 		Predicate<Entity> ignoreList = i -> (i != p && i instanceof LivingEntity && !i.isDead() && i.getType() != EntityType.ARMOR_STAND);
-		RayTraceResult trace = p.getWorld().rayTrace(p.getEyeLocation(), p.getEyeLocation().getDirection(), Main.getAttributes().get(p).getOrDefault("AttackRange", 3.0), FluidCollisionMode.NEVER, true, 0.5, ignoreList);
+		RayTraceResult trace = p.getWorld().rayTrace(p.getEyeLocation(), p.getEyeLocation().getDirection(), range, FluidCollisionMode.NEVER, true, 0.5, ignoreList);
 		if(trace == null ) {
 			Vector vec = p.getEyeLocation().getDirection().normalize();
-			vec.multiply(Main.getAttributes().get(p).getOrDefault("AttackRange", 3.0));
+			vec.multiply(range);
 			vec.add(p.getLocation().toVector());
 			return vec;
 		}
@@ -304,7 +350,7 @@ public class itemList implements Listener
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
 		Main.getAttributes().get(p).replace("Mana", (currentMana - manaCost));
 		ability_cooldown.replace(itemID, false);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace(itemID, true);}, 20);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace(itemID, true);}, delay);
 		return true;
 	}	
 

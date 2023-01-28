@@ -1,8 +1,6 @@
 package markiplites.SoyBlock.Lists;
 
-import java.util.HashMap;
 
-import org.bukkit.entity.EntityType;
 
 public class entityList {
     public entityList() {
@@ -10,8 +8,6 @@ public class entityList {
     }
 
     private void init() {
-        HashMap<String, Double> attributes = new HashMap<>();
 
-        
-   }
+    }
 }

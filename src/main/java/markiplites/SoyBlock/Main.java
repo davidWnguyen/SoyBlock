@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 
 import markiplites.SoyBlock.Lists.entityList;
 import markiplites.SoyBlock.Lists.itemList;
@@ -44,7 +43,7 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new itemList(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
 		new entityList();
-		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		//Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
