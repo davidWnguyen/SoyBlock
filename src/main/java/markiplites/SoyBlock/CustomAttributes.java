@@ -701,6 +701,7 @@ public class CustomAttributes implements Listener {
 			case 18 -> {return "DMR";}
 			case 19 -> {return "Shotgun";}
 			case 20 -> {return "Explosives";}
+			case 21 -> {return "Spell";}
 			case 100 -> {return "Helmet";}
 			case 101 -> {return "Chestplate";}
 			case 102 -> {return "Leggings";}

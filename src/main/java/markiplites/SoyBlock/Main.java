@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import markiplites.SoyBlock.Lists.entityList;
 import markiplites.SoyBlock.Lists.itemList;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new itemList(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
 		new entityList();
-		//Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
