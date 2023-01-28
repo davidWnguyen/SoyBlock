@@ -31,6 +31,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MiningSpeed implements Listener{
     //Arrays that tell whether a player is mining a block
@@ -146,13 +147,14 @@ public class MiningSpeed implements Listener{
             PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
             if(customBlockData.has(blockDurabilityKey, PersistentDataType.DOUBLE))
             {
+				UUID uuid = eventPlayer.getUniqueId();
             	double toolToUse = customBlockData.has(blockToolKey, PersistentDataType.DOUBLE) ? customBlockData.get(blockToolKey, PersistentDataType.DOUBLE) : -1.0;
-            	double toolUsed = Main.getAttributes().get(eventPlayer).getOrDefault("ToolID", -1.0);
+            	double toolUsed = Main.getAttributes().get(uuid).getOrDefault("ToolID", -1.0);
 
             	if(toolToUse == -1.0 || toolToUse == toolUsed)
             	{
                 	double blockHardness = customBlockData.has(blockHardnessKey, PersistentDataType.DOUBLE) ? customBlockData.get(blockHardnessKey, PersistentDataType.DOUBLE) : 0.0;
-                	double toolHardness = Main.getAttributes().get(eventPlayer).getOrDefault("ToolHardness", 0.0);
+                	double toolHardness = Main.getAttributes().get(uuid).getOrDefault("ToolHardness", 0.0);
                 	if(toolHardness >= blockHardness)
                 	{
                 		MiningBlock(event, event.getBlock());
@@ -220,8 +222,9 @@ public class MiningSpeed implements Listener{
 
     public void blockBreakingStages(BlockDamageEvent event, Player p, int stage, Block block)
     {
+		UUID uuid = p.getUniqueId();
 		final PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
-		double toolSpeed = Main.getAttributes().get(p).getOrDefault("MiningSpeed", 1.0);
+		double toolSpeed = Main.getAttributes().get(uuid).getOrDefault("MiningSpeed", 1.0);
 		long temporaryBreakTime = Math.round(customBlockData.get(blockDurabilityKey, PersistentDataType.DOUBLE) / 9.0 / toolSpeed);
 		BukkitScheduler scheduler = mainPlugin.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(mainPlugin, () -> {
@@ -251,7 +254,7 @@ public class MiningSpeed implements Listener{
 								//double blockTool = customBlockData1.has(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) ? customBlockData1.get(new NamespacedKey(Main.getInstance(), "blockTool"), PersistentDataType.DOUBLE) : -1.0;
 								ItemStack[] blockLootID = customBlockData1.get(blockLootKey, DataType.ITEM_STACK_ARRAY);
 
-								double miningFortune = Main.getAttributes().get(p).getOrDefault("MiningFortune", 0.0);
+								double miningFortune = Main.getAttributes().get(uuid).getOrDefault("MiningFortune", 0.0);
 
 								int blockExp = customBlockData1.has(blockExpKey, PersistentDataType.INTEGER) ? customBlockData1.get(blockExpKey, PersistentDataType.INTEGER) : 0;
 								p.giveExp(blockExp);

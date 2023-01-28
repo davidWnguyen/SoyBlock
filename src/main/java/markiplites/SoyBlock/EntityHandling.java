@@ -1,6 +1,7 @@
 package markiplites.SoyBlock;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
@@ -107,9 +108,10 @@ public class EntityHandling implements Listener {
 			}
 			resetIFrames(en);
 		}
-		else if(en instanceof Player && Main.getAttributes().containsKey(en))
+		else if(en instanceof Player && Main.getAttributes().containsKey(en.getUniqueId()))
 		{
-			double absorption = Main.getAttributes().get(en).getOrDefault("Absorption", 0.0);
+			UUID uuid = en.getUniqueId();
+			double absorption = Main.getAttributes().get(uuid).getOrDefault("Absorption", 0.0);
 			damageDealt *= (100.0-absorption)/100.0;
 			
 			String colorFormat = "§x§d§3§0§0§0§0";
@@ -126,9 +128,9 @@ public class EntityHandling implements Listener {
 			}
 			String finaldamage = String.format("%s - %.0f %s",colorFormat,damageDealt,damageCharacter);
 			spawnIndicator(en.getLocation(), finaldamage, en);
-			Main.getAttributes().get(en).put("Health", Main.getAttributes().get(en).get("Health") - damageDealt);
-			if(Main.getAttributes().get(en).get("Health") > 0.0) {
-				en.setHealth(Main.getAttributes().get(en).get("Health")/Main.getAttributes().get(en).get("MaxHealth") * en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+			Main.getAttributes().get(uuid).put("Health", Main.getAttributes().get(uuid).get("Health") - damageDealt);
+			if(Main.getAttributes().get(uuid).get("Health") > 0.0) {
+				en.setHealth(Main.getAttributes().get(uuid).get("Health")/Main.getAttributes().get(uuid).get("MaxHealth") * en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 			}else {
 				en.setHealth(0.0);
 			}
@@ -196,10 +198,10 @@ public class EntityHandling implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent event)
 	{
 		Player p = event.getEntity();
+		UUID uuid = p.getUniqueId();
+		Main.getAttributes().get(uuid).put("Health", Main.getAttributes().get(uuid).get("MaxHealth"));
 		
-		Main.getAttributes().get(p).put("Health", Main.getAttributes().get(p).get("MaxHealth"));
-		
-		p.setHealth(Main.getAttributes().get(p).get("Health")/Main.getAttributes().get(p).get("MaxHealth") * p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		p.setHealth(Main.getAttributes().get(uuid).get("Health")/Main.getAttributes().get(uuid).get("MaxHealth") * p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 	}
 	@EventHandler
 	public void onEntityDamageEvent(EntityDamageEvent e) {
@@ -214,7 +216,8 @@ public class EntityHandling implements Listener {
 			return;
 
 		Integer id = victim.getEntityId();
-		if(entityAttributes.containsKey(id) || (victim instanceof Player && Main.playerAttributes.containsKey((Player)victim)) )
+		UUID uuid = victim.getUniqueId();
+		if(entityAttributes.containsKey(id) || (victim instanceof Player && Main.playerAttributes.containsKey(uuid)) )
 		{
 			//Custom Damage Handling
 			if(e instanceof EntityDamageByEntityEvent)
@@ -254,18 +257,8 @@ public class EntityHandling implements Listener {
 				}
 				else if(attacker instanceof LivingEntity && entityAttributes.containsKey(attackerID) && (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.PROJECTILE))
 				{
-					double baseDMG = entityAttributes.get(attackerID).getOrDefault("BaseDamage", 5.0);
-					
-					double dex = entityAttributes.get(attackerID).getOrDefault("Dexterity", 0.0);
-					double dexScaling = entityAttributes.get(attackerID).getOrDefault("DexterityScaling", 0.0);
-					
-					double str = entityAttributes.get(attackerID).getOrDefault("Strength", 0.0);
-					double strScaling = entityAttributes.get(attackerID).getOrDefault("StrengthScaling", 0.0);
-					
-					double intel = entityAttributes.get(attackerID).getOrDefault("Intelligence", 0.0);
-					double intelScaling = entityAttributes.get(attackerID).getOrDefault("IntelligenceScaling", 0.0);
-					customDamage = baseDMG * Math.pow((1+(dex)/100.0), dexScaling) * Math.pow((1+(str)/100.0), strScaling)
-							* Math.pow((1+(intel)/100.0), intelScaling);
+					double critChance = entityAttributes.get(attackerID).getOrDefault("CritChance", 0.0);
+					customDamage = CustomAttributes.getDamageModified(attackerID, Math.random() < critChance);
 					e.setDamage(0);
 					damage = 0;
 					resetIFrames((LivingEntity)victim);
@@ -275,20 +268,20 @@ public class EntityHandling implements Listener {
 			//If Victim is a Player
 			if (victim instanceof Player)
 			{
-				double absorption = Main.getAttributes().get((Player) victim).getOrDefault("Absorption", 0.0);
+				double absorption = Main.getAttributes().get(uuid).getOrDefault("Absorption", 0.0);
 				customDamage *= (100.0-absorption)/100.0;
 				if(damage != 0)//Environmental stuff deals pctHP stuff
 				{
-					customDamage = Main.getAttributes().get((Player)victim).get("MaxHealth")/20.0 * damage;
+					customDamage = Main.getAttributes().get(uuid).get("MaxHealth")/20.0 * damage;
 					e.setDamage(0);
 				}
-				Main.getAttributes().get(victim).put("Health", Main.getAttributes().get((Player)victim).get("Health") - customDamage);
+				Main.getAttributes().get(uuid).put("Health", Main.getAttributes().get(uuid).get("Health") - customDamage);
 				
 				String finaldamage = String.format("§x§d§3§0§0§0§0- %.0f ❤",customDamage);
 				spawnIndicator(victim.getLocation(), finaldamage, victim);
-				if(Main.getAttributes().get((Player)victim).get("Health") > 0.0)
+				if(Main.getAttributes().get(uuid).get("Health") > 0.0)
 				{
-					((LivingEntity) victim).setHealth(Main.getAttributes().get((Player)victim).get("Health")/Main.getAttributes().get((Player)victim).get("MaxHealth") *((LivingEntity) victim).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+					((LivingEntity) victim).setHealth(Main.getAttributes().get(uuid).get("Health")/Main.getAttributes().get(uuid).get("MaxHealth") *((LivingEntity) victim).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 				}else{
 					((LivingEntity) victim).setHealth(0.0);
 				}

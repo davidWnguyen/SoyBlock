@@ -11,8 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -460,7 +464,7 @@ public class CustomAttributes implements Listener {
 	@EventHandler
 	public void onInventoryChange(PlayerItemHeldEvent e) { //works on item, not on armor
 		Player p = e.getPlayer();
-		HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 
 		if(p.getInventory().getItem(e.getNewSlot()) != null) {
@@ -469,28 +473,64 @@ public class CustomAttributes implements Listener {
 		}
 		new BukkitRunnable(){public void run(){//Start of Delay
 		getUpdatedPlayerAttributes(p, attributes, false);
-		playerAttributes.put(p, attributes);
+		playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
+	}
+	@EventHandler
+	public void onInventoryMoved(InventoryClickEvent e){
+		if(!(e.getWhoClicked() instanceof Player p))
+			return;
+		if(e.getAction() == InventoryAction.NOTHING)
+			return;
+		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
+		new BukkitRunnable(){public void run(){//Start of Delay
+			getUpdatedPlayerAttributes(p, attributes);
+			playerAttributes.put(p.getUniqueId(), attributes);
+		}}.runTaskLater(Main.getInstance(), 1);
+	}
+	@EventHandler
+	public void onPlayerOffhand(PlayerSwapHandItemsEvent e){
+		ItemStack offhand = e.getOffHandItem();
+
+		if(offhand == null)
+			return;
+		ItemMeta meta = offhand.getItemMeta();
+		if(meta == null)
+			return;
+
+		PersistentDataContainer container = meta.getPersistentDataContainer();
+		if (!(container.has(new NamespacedKey(Main.getInstance(), "canOffhand"), PersistentDataType.DOUBLE))) {
+			e.setCancelled(true);
+		}
 	}
 
 	@EventHandler
 	public void onArmorChange(ArmorEquipEvent e) {
 		Player p = e.getPlayer();
-		HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		new BukkitRunnable(){public void run(){//Start of Delay
 			getUpdatedPlayerAttributes(p, attributes);
-		playerAttributes.put(p, attributes);
+		playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
 	@EventHandler
 	public void onPickupEvent(EntityPickupItemEvent e) {
-		Entity entity = e.getEntity();
-		if(!(entity instanceof Player))
+		if(!(e.getEntity() instanceof Player p))
 			return;
 		ItemStack item = e.getItem().getItemStack();
 		updateItem(item);
+		new BukkitRunnable(){public void run(){
+			if(p.getInventory().getItemInMainHand().equals(item)) {
+				HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+				HashMap<String, Double> attributes = CustomAttributes.defaultStats();
+
+				getUpdatedPlayerAttributes(p, attributes);
+				playerAttributes.put(p.getUniqueId(), attributes);
+			}
+		}}.runTaskLater(Main.getInstance(), 1);
 	}
 	@EventHandler
 	public void onDropItemEvent(PlayerDropItemEvent e)
@@ -512,41 +552,41 @@ public class CustomAttributes implements Listener {
 			{e.setCancelled(true);return;}
 
 		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-		if(itemType == 200 || itemStack == p.getInventory().getItemInMainHand())
+		if(itemType == 200 || p.getInventory().getItemInMainHand().equals(itemStack))
 		{
-			HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+			HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 			HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 
 			new BukkitRunnable(){public void run(){//Start of Delay
 				getUpdatedPlayerAttributes(p, attributes);
-				playerAttributes.put(p, attributes);
+				playerAttributes.put(p.getUniqueId(), attributes);
 			}}.runTaskLater(Main.getInstance(), 1);
 		}
 	}
 	public static String getPlayerStatsFormat(Player player)
 	{
-		HashMap<Player, HashMap<String, Double>> playerAttributes = Main.getAttributes();
+		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		String statFormat = "";
-		
+		UUID uuid = player.getUniqueId();
 		//if(playerAttributes.get(player).containsKey("BaseDamage"))String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(player).get("BaseDamage"));
-		if(playerAttributes.get(player).containsKey("AttackSpeedBonus") && playerAttributes.get(player).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(player).get("AttackSpeedBonus")*100.0);
-		if(playerAttributes.get(player).containsKey("MaxHealth") && playerAttributes.get(player).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(player).get("MaxHealth"));
-		if(playerAttributes.get(player).containsKey("Absorption") && playerAttributes.get(player).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(player).get("Absorption"));
-		if(playerAttributes.get(player).containsKey("Intelligence") && playerAttributes.get(player).get("Intelligence")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(player).get("Intelligence"));
-		if(playerAttributes.get(player).containsKey("IntelligenceScaling") && playerAttributes.get(player).get("IntelligenceScaling")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence Scaling - §b(%.2f)\n", statFormat,playerAttributes.get(player).get("IntelligenceScaling"));
-		if(playerAttributes.get(player).containsKey("Strength") && playerAttributes.get(player).get("Strength")!=0.0)statFormat=String.format("%s§6\u01A9 Strength: §a§x§2§5§8§e§0§0%.0f\n", statFormat,playerAttributes.get(player).get("Strength"));
-		if(playerAttributes.get(player).containsKey("StrengthScaling") && playerAttributes.get(player).get("StrengthScaling")!=0.0)statFormat=String.format("%s§6\u01A9 Strength Scaling - §x§2§5§8§e§0§0 (%.2f)\n", statFormat,playerAttributes.get(player).get("StrengthScaling"));
-		if(playerAttributes.get(player).containsKey("Dexterity") && playerAttributes.get(player).get("Dexterity")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity: §a§x§d§8§0§0§6§8%.0f\n", statFormat,playerAttributes.get(player).get("Dexterity"));
-		if(playerAttributes.get(player).containsKey("DexterityScaling") && playerAttributes.get(player).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(player).get("DexterityScaling"));
+		if(playerAttributes.get(uuid).containsKey("AttackSpeedBonus") && playerAttributes.get(uuid).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(uuid).get("AttackSpeedBonus")*100.0);
+		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(uuid).get("MaxHealth"));
+		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(uuid).get("Absorption"));
+		if(playerAttributes.get(uuid).containsKey("Intelligence") && playerAttributes.get(uuid).get("Intelligence")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(uuid).get("Intelligence"));
+		if(playerAttributes.get(uuid).containsKey("IntelligenceScaling") && playerAttributes.get(uuid).get("IntelligenceScaling")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence Scaling - §b(%.2f)\n", statFormat,playerAttributes.get(uuid).get("IntelligenceScaling"));
+		if(playerAttributes.get(uuid).containsKey("Strength") && playerAttributes.get(uuid).get("Strength")!=0.0)statFormat=String.format("%s§6\u01A9 Strength: §a§x§2§5§8§e§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("Strength"));
+		if(playerAttributes.get(uuid).containsKey("StrengthScaling") && playerAttributes.get(uuid).get("StrengthScaling")!=0.0)statFormat=String.format("%s§6\u01A9 Strength Scaling - §x§2§5§8§e§0§0 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("StrengthScaling"));
+		if(playerAttributes.get(uuid).containsKey("Dexterity") && playerAttributes.get(uuid).get("Dexterity")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity: §a§x§d§8§0§0§6§8%.0f\n", statFormat,playerAttributes.get(uuid).get("Dexterity"));
+		if(playerAttributes.get(uuid).containsKey("DexterityScaling") && playerAttributes.get(uuid).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("DexterityScaling"));
 		
-		if(playerAttributes.get(player).containsKey("CritChance") && playerAttributes.get(player).get("CritChance")!=0.0)statFormat=String.format("%s§6\u2620 Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(player).get("CritChance")*100.0);
-		if(playerAttributes.get(player).containsKey("CritDamage") && playerAttributes.get(player).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(player).get("CritDamage")*100.0);
-		if(playerAttributes.get(player).containsKey("RegenerationBonus") && playerAttributes.get(player).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(player).get("RegenerationBonus")*100.0);
-		if(playerAttributes.get(player).containsKey("Speed") && playerAttributes.get(player).get("Speed")!=0.0)statFormat=String.format("%s§6\u2604 Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(player).get("Speed")*100.0);
+		if(playerAttributes.get(uuid).containsKey("CritChance") && playerAttributes.get(uuid).get("CritChance")!=0.0)statFormat=String.format("%s§6\u2620 Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritChance")*100.0);
+		if(playerAttributes.get(uuid).containsKey("CritDamage") && playerAttributes.get(uuid).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritDamage")*100.0);
+		if(playerAttributes.get(uuid).containsKey("RegenerationBonus") && playerAttributes.get(uuid).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("RegenerationBonus")*100.0);
+		if(playerAttributes.get(uuid).containsKey("Speed") && playerAttributes.get(uuid).get("Speed")!=0.0)statFormat=String.format("%s§6\u2604 Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("Speed")*100.0);
 		
-		if(playerAttributes.get(player).containsKey("MiningSpeed") && playerAttributes.get(player).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6\u26CF Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(player).get("MiningSpeed"));
-		if(playerAttributes.get(player).containsKey("ToolHardness") && playerAttributes.get(player).get("ToolHardness")!=0.0)statFormat=String.format("%s§6\u26CF Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(player).get("ToolHardness"));
-		if(playerAttributes.get(player).containsKey("MiningFortune") && playerAttributes.get(player).get("MiningFortune")>=10.0)statFormat=IridiumColorAPI.process(String.format("%s§6\u2663 Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n", statFormat,playerAttributes.get(player).get("MiningFortune")));
+		if(playerAttributes.get(uuid).containsKey("MiningSpeed") && playerAttributes.get(uuid).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6\u26CF Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("MiningSpeed"));
+		if(playerAttributes.get(uuid).containsKey("ToolHardness") && playerAttributes.get(uuid).get("ToolHardness")!=0.0)statFormat=String.format("%s§6\u26CF Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("ToolHardness"));
+		if(playerAttributes.get(uuid).containsKey("MiningFortune") && playerAttributes.get(uuid).get("MiningFortune")>=10.0)statFormat=IridiumColorAPI.process(String.format("%s§6\u2663 Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n", statFormat,playerAttributes.get(uuid).get("MiningFortune")));
 		
 		return statFormat;
 	}
@@ -563,7 +603,7 @@ public class CustomAttributes implements Listener {
 
 			PersistentDataContainer container = meta.getPersistentDataContainer();
 			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-			if(itemType < 100)
+			if(p.getInventory().getItemInMainHand().equals(checkItem) && itemType < 100)
 			{
 				CustomAttributes.giveItemStats(checkItem,attributes);
 			}
@@ -615,6 +655,7 @@ public class CustomAttributes implements Listener {
 	public static void getUpdatedPlayerAttributes(Player p, HashMap<String, Double> attributes, boolean checkWeapon)
 	{
 		ArrayList<String> usedTalismanFamily = new ArrayList<>();
+		UUID uuid = p.getUniqueId();
 		int talismans = 0;
 		for(ItemStack checkItem : p.getInventory()) {
 			if(checkItem == null)
@@ -625,7 +666,7 @@ public class CustomAttributes implements Listener {
 
 			PersistentDataContainer container = meta.getPersistentDataContainer();
 			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-			if(checkWeapon && itemType < 100)
+			if(checkWeapon && p.getInventory().getItemInMainHand().equals(checkItem) && itemType < 100)
 			{
 				CustomAttributes.giveItemStats(checkItem,attributes);
 			}
@@ -661,8 +702,8 @@ public class CustomAttributes implements Listener {
 			if(itemType > 100)
 				CustomAttributes.giveItemStats(checkItem,attributes);
 		}
-		attributes.put("Health", Main.getAttributes().get(p).get("Health"));
-		attributes.put("Mana", Main.getAttributes().get(p).get("Mana"));
+		attributes.put("Health", Main.getAttributes().get(uuid).get("Health"));
+		attributes.put("Mana", Main.getAttributes().get(uuid).get("Mana"));
 		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
 
 		if(attributes.get("Health") > attributes.get("MaxHealth"))
@@ -712,19 +753,42 @@ public class CustomAttributes implements Listener {
 	}
 	public static double getDamageModified(Player player, boolean isCrit)
 	{
-		double baseDMG = Main.getAttributes().get(player).getOrDefault("BaseDamage", 5.0);
-		double dex = Main.getAttributes().get(player).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(player).get("Dexterity"), 0.0) : 0.0;
-		double dexScaling = Main.getAttributes().get(player).getOrDefault("DexterityScaling", 0.0);
+		UUID uuid = player.getUniqueId();
+		double baseDMG = Main.getAttributes().get(uuid).getOrDefault("BaseDamage", 5.0);
+		double dex = Main.getAttributes().get(uuid).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(uuid).get("Dexterity"), 0.0) : 0.0;
+		double dexScaling = Main.getAttributes().get(uuid).getOrDefault("DexterityScaling", 0.0);
 
-		double str = Main.getAttributes().get(player).containsKey("Strength") ? Math.max(Main.getAttributes().get(player).get("Strength"), 0.0) : 0.0;
-		double strScaling = Main.getAttributes().get(player).getOrDefault("StrengthScaling", 0.0);
+		double str = Main.getAttributes().get(uuid).containsKey("Strength") ? Math.max(Main.getAttributes().get(uuid).get("Strength"), 0.0) : 0.0;
+		double strScaling = Main.getAttributes().get(uuid).getOrDefault("StrengthScaling", 0.0);
 
-		double intel = Main.getAttributes().get(player).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(player).get("Intelligence"), 0.0) : 0.0;
-		double intelScaling = Main.getAttributes().get(player).getOrDefault("IntelligenceScaling", 0.0);
-		double customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) * Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
+		double intel = Main.getAttributes().get(uuid).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(uuid).get("Intelligence"), 0.0) : 0.0;
+		double intelScaling = Main.getAttributes().get(uuid).getOrDefault("IntelligenceScaling", 0.0);
+		//damage formula
+		double customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) *
+				Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
 
 		if (isCrit)
-			customDamage *= (Main.getAttributes().get(player).getOrDefault("CritDamage", 0.0)) + 1.35;
+			customDamage *= (Main.getAttributes().get(uuid).getOrDefault("CritDamage", 0.0)) + 1.35;
+
+		return customDamage;
+	}
+	public static double getDamageModified(Integer attackerID, boolean isCrit)
+	{
+		double baseDMG = EntityHandling.entityAttributes.get(attackerID).getOrDefault("BaseDamage", 5.0);
+
+		double dex = EntityHandling.entityAttributes.get(attackerID).getOrDefault("Dexterity", 0.0);
+		double dexScaling = EntityHandling.entityAttributes.get(attackerID).getOrDefault("DexterityScaling", 0.0);
+
+		double str = EntityHandling.entityAttributes.get(attackerID).getOrDefault("Strength", 0.0);
+		double strScaling = EntityHandling.entityAttributes.get(attackerID).getOrDefault("StrengthScaling", 0.0);
+
+		double intel = EntityHandling.entityAttributes.get(attackerID).getOrDefault("Intelligence", 0.0);
+		double intelScaling = EntityHandling.entityAttributes.get(attackerID).getOrDefault("IntelligenceScaling", 0.0);
+		double customDamage = baseDMG * Math.pow((1+(dex)/100.0), dexScaling) * Math.pow((1+(str)/100.0), strScaling)
+				* Math.pow((1+(intel)/100.0), intelScaling);
+
+		if (isCrit)
+			customDamage *= (EntityHandling.entityAttributes.get(attackerID).getOrDefault("CritDamage", 0.0)) + 1.35;
 
 		return customDamage;
 	}

@@ -1,5 +1,6 @@
 package markiplites.SoyBlock;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import org.bukkit.FluidCollisionMode;
@@ -28,9 +29,10 @@ public class HitDetection implements Listener {
 	@EventHandler
 	public void PlayerAnimation(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
+		UUID id = player.getUniqueId();
 		if (event.getAnimationType() == PlayerAnimationType.ARM_SWING)
 		{
-        	double baseDMG = Main.getAttributes().get(player).getOrDefault("BaseDamage", 5.0);
+        	double baseDMG = Main.getAttributes().get(id).getOrDefault("BaseDamage", 5.0);
 	        if(baseDMG > 5.0)//fully charged & is weapon
 	        {
 	        	if(player.getCooldown(player.getInventory().getItemInMainHand().getType()) == 0)
@@ -52,29 +54,16 @@ public class HitDetection implements Listener {
 
 								HashMap<String, Double> attributes = new HashMap<>();
 
-								double dex = Main.getAttributes().get(player).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(player).get("Dexterity"), 0.0) : 0.0;
-								double dexScaling = Main.getAttributes().get(player).getOrDefault("DexterityScaling", 0.0);
-
-								double str = Main.getAttributes().get(player).containsKey("Strength") ? Math.max(Main.getAttributes().get(player).get("Strength"), 0.0) : 0.0;
-								double strScaling = Main.getAttributes().get(player).getOrDefault("StrengthScaling", 0.0);
-
-								double intel = Main.getAttributes().get(player).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(player).get("Intelligence"), 0.0) : 0.0;
-								double intelScaling = Main.getAttributes().get(player).getOrDefault("IntelligenceScaling", 0.0);
-								double customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) * Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
-
-								double critChance = Main.getAttributes().get(player).getOrDefault("CritChance", 0.0);
-								boolean critBoolean = false;
-								if (Math.random() < critChance) {
-									critBoolean = true;
-									customDamage *= (Main.getAttributes().get(player).getOrDefault("CritDamage", 0.0)) + 1.35;
-								}
+								double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
+								boolean critBoolean = Math.random() < critChance;
+								double customDamage = CustomAttributes.getDamageModified(player, critBoolean);
 
 								attributes.put("Damage", customDamage);
 								attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
 
 								EntityHandling.projectileAttributes.put(shortbowArrow.getEntityId(), attributes);
 
-								double attackSpeed = Main.getAttributes().get(player).getOrDefault("AttackSpeed", 4.0);
+								double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 
 								player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
 							}
@@ -83,26 +72,13 @@ public class HitDetection implements Listener {
 						{
 							LivingEntity victim = (LivingEntity) hitTraceResult(player);
 							if (victim != null) {
-								double dex = Main.getAttributes().get(player).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(player).get("Dexterity"), 0.0) : 0.0;
-								double dexScaling = Main.getAttributes().get(player).getOrDefault("DexterityScaling", 0.0);
-
-								double str = Main.getAttributes().get(player).containsKey("Strength") ? Math.max(Main.getAttributes().get(player).get("Strength"), 0.0) : 0.0;
-								double strScaling = Main.getAttributes().get(player).getOrDefault("StrengthScaling", 0.0);
-
-								double intel = Main.getAttributes().get(player).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(player).get("Intelligence"), 0.0) : 0.0;
-								double intelScaling = Main.getAttributes().get(player).getOrDefault("IntelligenceScaling", 0.0);
-								double customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) * Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
-
-								double critChance = Main.getAttributes().get(player).getOrDefault("CritChance", 0.0);
-								boolean critBoolean = false;
-								if (Math.random() < critChance) {
-									critBoolean = true;
-									customDamage *= (Main.getAttributes().get(player).getOrDefault("CritDamage", 0.0)) + 1.35;
-								}
+								double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
+								boolean critBoolean = Math.random() < critChance;
+								double customDamage = CustomAttributes.getDamageModified(player, critBoolean);
 
 								EntityHandling.dealDamageToEntity(victim, customDamage, critBoolean, 0);
 
-								double attackSpeed = Main.getAttributes().get(player).getOrDefault("AttackSpeed", 4.0);
+								double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 
 								player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
 							} else {
@@ -119,7 +95,7 @@ public class HitDetection implements Listener {
         }
     }
     private Entity hitTraceResult(Player player) {
-        double attackRange = Main.getAttributes().get(player).getOrDefault("AttackRange", 3.0);
+        double attackRange = Main.getAttributes().get(player.getUniqueId()).getOrDefault("AttackRange", 3.0);
         //List<Entity> entities = (List<Entity>) player.getWorld().getNearbyEntities(player.getLocation(), attackRange, attackRange, attackRange);
         //^ will be used for cleaving
         Location goFuckYourself = player.getEyeLocation();

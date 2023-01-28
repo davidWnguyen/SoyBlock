@@ -26,18 +26,18 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public class itemList implements Listener
 {
-	private HashMap<String, Boolean> ability_cooldown = new HashMap<String, Boolean>();
+	private final HashMap<String, Boolean> ability_cooldown = new HashMap<String, Boolean>();
 	
 	public itemList() {
 		//cooldown booleans
 		ability_cooldown.put("MURASAMA", true);
 		ability_cooldown.put("JUMP_ROD", true);
 		ability_cooldown.put("YAMATO", true);
-
 		init();
 	}
 	public void init() {
@@ -53,7 +53,7 @@ public class itemList implements Listener
 		attributes.put(attr.strengthBonusRaw, 100.0);
 		attributes.put(attr.dexterityBonusRaw, 250.0);
 		attributes.put(attr.rarity, 6.0);
-		Sword murasama = new Sword("MURASAMA", "Murasama", Material.IRON_SWORD, attributes, "fuck da media!");
+		new Sword("MURASAMA", "Murasama", Material.IRON_SWORD, attributes, "fuck da media!");
 
 		attributes.clear();
 
@@ -70,7 +70,6 @@ public class itemList implements Listener
 		attributes.put(attr.itemType, 1.0);
 		attributes.put(attr.rarity, 1.0);
 		Sword nigger = new Sword("NIGGER", "Nigger", Material.WOODEN_SWORD, attributes, "niggar get out of china niggar :3333");
-		nigger.finalizeItem("NIGGER");
 
 		attributes.clear();
 
@@ -80,8 +79,7 @@ public class itemList implements Listener
 		attributes.put(attr.miningFortune, 20.0);
 		attributes.put(attr.itemType, 5.0);
 		attributes.put(attr.rarity, 6.0);
-		Drill minor = new Drill("MINOR", "Minor", Material.PRISMARINE_SHARD, attributes, "smiley face");
-		minor.finalizeItem("MINOR");
+		new Drill("MINOR", "Minor", Material.PRISMARINE_SHARD, attributes, "smiley face");
 
 		attributes.clear();
 
@@ -92,7 +90,6 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 6.0);
 		ItemStack[] blockLoot = {nigger.getItemStack().clone(),nigger.getItemStack().clone(),nigger.getItemStack().clone()};
 		Block steel_block = new Block("STEEL_BLOCK", "Steel Block", Material.IRON_BLOCK, attributes, "i am a dwarf and diggy dig hole :###",blockLoot);
-		steel_block.finalizeItem("STEEL_BLOCK");
 
 		attributes.clear();
 		attributes.put(attr.critChance, 0.3);
@@ -104,7 +101,6 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 5.0);
 		Chestplate cp = new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
 				Material.LEATHER_CHESTPLATE, attributes, "carry on my wayward son","2 195 228");
-		cp.finalizeItem("chestplateOfDoom");
 
 		attributes.clear();
 		attributes.put(attr.regenerationBonus, 100.0);
@@ -113,7 +109,6 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 3.0);
 		Talisman talismanExample = new Talisman("soulRing", "<GRADIENT:02e494>Soules Ring</GRADIENT:0252e4>",
 				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
-		talismanExample.finalizeItem("soulRing");
 
 		attributes.clear();
 		attributes.put(attr.regenerationBonus, 500.0);
@@ -122,7 +117,6 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 4.0);
 		Talisman talismanExample2 = new Talisman("soulRingRare", "<GRADIENT:02e494>Darkest Soules Ring</GRADIENT:0252e4>",
 				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
-		talismanExample2.finalizeItem("soulRingRare");
 
 		attributes.clear();
 		attributes.put(attr.moveSpeed, 1.0);
@@ -131,7 +125,6 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 5.0);
 		Talisman talismanExample3 = new Talisman("waterAffinityFeather", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
 				Material.FEATHER, attributes, "Gives bonus swag.","waterAffinity");
-		talismanExample3.finalizeItem("waterAffinityFeather");
 
 		attributes.clear();
 		attributes.put(attr.itemAction, 1.0);
@@ -152,25 +145,21 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 2.0);
 		Bow sploch = new Bow("SPLOCH", "<GRADIENT:cc00ff>SPLOCH! goes the bug</GRADIENT:6666ff>",
 				Material.FISHING_ROD, attributes, "<SOLID:0066ff>Primary Attack: Shoots out an arrow at high velocity.");
-		sploch.finalizeItem("SPLOCH");
 
 		attributes.clear();
 		attributes.put(attr.moveSpeed, 0.15);
 		attributes.put(attr.intelligenceBonusRaw, 100.0);
 		Spell jump_rod = new Spell("JUMP_ROD", "Jump Rod", Material.STICK, attributes, "Move like a rabbit");
-		jump_rod.finalizeItem("JUMP_ROD");
 		
 		attributes.clear();
 		attributes.put(attr.intelligenceBonusRaw, 1000000.0);
 		attributes.put(attr.intelligenceScaling, 2.0);
 		Chestplate storm = new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
-		storm.finalizeItem("STORM_CP");
 
 		attributes.clear();
 		attributes.put(attr.intelligenceBonusRaw, 500.0);
 		attributes.put(attr.intelligenceScaling, 1.4);
 		Spell elden_bong = new Spell("ELDEN_STAR", "Elden Star", Material.GOLDEN_SWORD, attributes, "Elden bong lol XD x3 :3333");
-		elden_bong.finalizeItem("ELDEN_STAR");
 
 		attributes.clear();
 		attributes.put(attr.baseDamage, 150.0);
@@ -183,8 +172,6 @@ public class itemList implements Listener
 		attributes.put(attr.attackReachBonusRaw, 7.5);
 		attributes.put(attr.rarity, 6.0);
 		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
-		yamato.finalizeItem("YAMATO");
-
 	}
 
 
@@ -218,37 +205,41 @@ public class itemList implements Listener
 	private void judgement_cut(PlayerInteractEvent e) {
 		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 10)) return;
 
+		Player p = e.getPlayer();
 		Vector vec = traceToEntity(e, 15.0);
 		Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
 		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 3.1, 3.1, 3.1, ignoreList);
-		double intel = Main.getAttributes().get(e.getPlayer()).getOrDefault("Intelligence", 1.0);
-		double intelScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("IntelligenceScaling", 1.0);
-		double strength = Main.getAttributes().get(e.getPlayer()).getOrDefault("Strength", 1.0);
-		double strengthScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("StrengthScaling", 1.0);
-		double dex = Main.getAttributes().get(e.getPlayer()).getOrDefault("Dexterity", 1.0);
-		double dexScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("DexterityScaling", 1.0);
-		double damage = Main.getAttributes().get(e.getPlayer()).getOrDefault("BaseDamage", 5.0) * Math.pow((1 + intel)/100, intelScaling) * Math.pow((1 + strength)/100, strengthScaling) * Math.pow((1 + dex)/100, dexScaling);
 		Location loc = vec.toLocation(e.getPlayer().getWorld());
-		for(double i = 0; i < Math.PI*2;i += Math.PI/10) {
-			loc.add(Math.cos(i), Math.cos(i/2), Math.sin(i));
-			DustTransition dust = new DustTransition(Color.BLUE, Color.PURPLE, (float) 2.0);
-			loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), 0, 0, 0, 0, dust);
-		}
 
-		for(Entity entity : entities) {
-			EntityHandling.dealDamageToEntity((LivingEntity)entity, damage, false, 1);
+		for(double i = 0;i <= Math.PI;i += Math.PI/15) {
+			double radius = Math.sin(i);
+			double y = Math.cos(i);
+			for(double j = 0;j < Math.PI*2;j+= Math.PI / 15) {
+				Location temp = loc.clone();
+				double x = Math.cos(j) * radius;
+				double z = Math.sin(j) * radius;
+				temp.add(5*x, 5*y, 5*z);
+				Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255-((int)Math.round(i*20.0)), 0, 255), 3.0f);
+				loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 1, 0.0, 0.0, 0.0, dust);
+			}
 		}
-		double current_Y = e.getPlayer().getVelocity().getY();
-		e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(15).setY(current_Y));
+		for(Entity entity : entities) {
+			loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
+			EntityHandling.dealDamageToEntity((LivingEntity)entity, CustomAttributes.getDamageModified(p, false), false, 1);
+		}
+		Vector speed = p.getLocation().getDirection().multiply(1.15);
+		speed = p.getVelocity().add(speed);
+		p.setVelocity(speed.add(new Vector(0, 0.001, 0)));
 	}
 
 	private void star_ability(PlayerInteractEvent e) {
-		Location loc = e.getPlayer().getLocation();
+		Player p = e.getPlayer();
+		Location loc = p.getLocation();
 		loc.setY(loc.getY()+5);
 		ArrayList<ArmorStand> projectiles = new ArrayList<>();
 		for(int i = 0;i < 15;i++) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
-				ArmorStand ent = (ArmorStand)e.getPlayer().getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+				ArmorStand ent = (ArmorStand)p.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
 				ent.setVisible(false);
 				ent.setBasePlate(false);
 				ent.setCollidable(false);
@@ -263,15 +254,15 @@ public class itemList implements Listener
 				ent.setCustomNameVisible(true);
 				ent.setGravity(true);
 				projectiles.add(ent);
-				e.getPlayer().getWorld().playEffect(loc, Effect.BLAZE_SHOOT, 0, 30);
+				p.getWorld().playEffect(loc, Effect.BLAZE_SHOOT, 0, 30);
 			}, 10);
 		}
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getInstance(), () -> {
 			for(ArmorStand proj : projectiles) {
-				Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
-				Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(proj.getLocation(), 15, 15, 15, ignoreList);
+				Predicate<Entity> ignoreList = f -> (f != p && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
+				Collection<Entity> entities = p.getWorld().getNearbyEntities(proj.getLocation(), 15, 15, 15, ignoreList);
 				if(!entities.isEmpty()) {
-					e.getPlayer().getWorld().spawnParticle(Particle.FLAME, proj.getLocation(), 0);
+					p.getWorld().spawnParticle(Particle.FLAME, proj.getLocation(), 0);
 					Entity closest = (Entity)entities.toArray()[0];
 					for(Entity ent : entities) {
 						if ( proj.getLocation().distance(ent.getLocation()) < proj.getLocation().distance(closest.getLocation()) ) {
@@ -279,13 +270,10 @@ public class itemList implements Listener
 						}
 					}
 					proj.setVelocity(closest.getLocation().subtract(proj.getLocation()).toVector().multiply(0.2));
-					Collection<Entity> check = e.getPlayer().getWorld().getNearbyEntities(proj.getLocation(), 0.5, 0.5, 0.5, ignoreList);
+					Collection<Entity> check = p.getWorld().getNearbyEntities(proj.getLocation(), 0.5, 0.5, 0.5, ignoreList);
 					if(!check.isEmpty()) {
 						Entity ent = (Entity)check.toArray()[0];
-						double intel = Main.getAttributes().get(e.getPlayer()).getOrDefault("Intelligence", 1.0);
-						double intelScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("IntelligenceScaling", 1.0);
-						double damage = Main.getAttributes().get(e.getPlayer()).getOrDefault("BaseDamage", 5.0) * Math.pow((1 + intel)/100, intelScaling);
-						EntityHandling.dealDamageToEntity((LivingEntity)ent, damage, false, 1);
+						EntityHandling.dealDamageToEntity((LivingEntity)ent, CustomAttributes.getDamageModified(p, false), false, 1);
 						proj.remove();
 					}
 				}
@@ -367,12 +355,14 @@ public class itemList implements Listener
 			vec.setY(Double.parseDouble(f.format(vec.getY())));
 			vec.setZ(Double.parseDouble(f.format(vec.getZ())));
 			BlockFace face = trace.getHitBlockFace();
-			if(face == BlockFace.WEST) vec.add(new Vector(-0.5, 0, 0));
-			else if(face == BlockFace.EAST) vec.add(new Vector(0.5, 0, 0));
-			else if(face == BlockFace.UP) vec.add(new Vector(0, 0.5, 0));
-			else if(face == BlockFace.DOWN) vec.add(new Vector(0, -0.5, 0));
-			else if(face == BlockFace.SOUTH) vec.add(new Vector(0, 0, .05));
-			else if(face == BlockFace.NORTH) vec.add(new Vector(0, 0, -0.5));
+			switch(face){
+				case WEST -> vec.add(new Vector(-0.5, 0, 0));
+				case EAST -> vec.add(new Vector(0.5, 0, 0));
+				case UP -> vec.add(new Vector(0, 0.5, 0));
+				case DOWN -> vec.add(new Vector(0, -0.5, 0));
+				case SOUTH -> vec.add(new Vector(0, 0, .05));
+				case NORTH -> vec.add(new Vector(0, 0, -0.5));
+			}
 			return vec;
 		}
 
@@ -383,9 +373,11 @@ public class itemList implements Listener
 
 	private boolean check_ready(Player p, String itemID, double manaCost, int delay) { //ability check / set x333
 		if(!ability_cooldown.get(itemID)) {p.sendMessage("§4Ability on cooldown."); return false;}
-		double currentMana = Main.getAttributes().get(p).get("Mana");
+		UUID uuid = p.getUniqueId();
+
+		double currentMana = Main.getAttributes().get(uuid).get("Mana");
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
-		Main.getAttributes().get(p).replace("Mana", (currentMana - manaCost));
+		Main.getAttributes().get(uuid).replace("Mana", (currentMana - manaCost));
 		ability_cooldown.replace(itemID, false);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace(itemID, true);}, delay);
 		return true;

@@ -41,7 +41,7 @@ public class ClickableItems implements Listener {
 
     		int itemActionType =  (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE));
 			switch (itemActionType) {
-				case 1 -> {Menu_SBMainMenu(p);}
+				case 1 -> Menu_SBMainMenu(p);
 			}
 			event.setCancelled(true);
 
@@ -68,7 +68,7 @@ public class ClickableItems implements Listener {
 		int itemActionType = (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE));
 
 		switch (itemActionType) {
-			case 1 -> {Menu_SBMainMenu((Player)p);}
+			case 1 -> Menu_SBMainMenu((Player)p);
 		}
 		e.setResult(Event.Result.DENY);
 	}
