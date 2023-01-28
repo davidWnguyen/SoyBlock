@@ -76,7 +76,7 @@ public class itemList implements Listener
 		attributes.put("baseAttackSpeed", 1.0);
 		attributes.put("attackReachBonusRaw", 1.5);
 		attributes.put("critChance", 0.5);
-		attributes.put("moveSpeed", 0.1);
+		attributes.put("moveSpeed", -0.1);
 		attributes.put("strengthScaling", 1.5);
 		attributes.put("dexterityScaling", 0.9);
 		attributes.put("strengthBonusRaw", 75.0);
@@ -174,6 +174,7 @@ public class itemList implements Listener
 
 		attributes.clear();
 		attributes.put("baseDamage", 150.0);
+		attributes.put("moveSpeed", 0.25);
 		attributes.put("intelligenceBonusRaw", 500.0);
 		attributes.put("intelligenceScaling", 1.5);
 		attributes.put("strengthBonusRaw", 500.0);
@@ -182,7 +183,7 @@ public class itemList implements Listener
 		attributes.put("dexterityScaling", 1.35);
 		attributes.put("attackReachBonusRaw", 7.5);
 		attributes.put("rarity", 6.0);
-		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
+		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "ABILITY: Judgement C");
 		yamato.finalizeItem("YAMATO");
 
 	}
@@ -224,17 +225,25 @@ public class itemList implements Listener
 		double dexScaling = Main.getAttributes().get(e.getPlayer()).getOrDefault("DexterityScaling", 1.0);
 		double damage = Main.getAttributes().get(e.getPlayer()).getOrDefault("BaseDamage", 5.0) * Math.pow((1 + intel)/100, intelScaling) * Math.pow((1 + strength)/100, strengthScaling) * Math.pow((1 + dex)/100, dexScaling);
 		Location loc = vec.toLocation(e.getPlayer().getWorld());
-		for(double i = 0; i < Math.PI*2;i += Math.PI/10) {
-			loc.add(Math.cos(i), Math.cos(i/2), Math.sin(i));
-			DustTransition dust = new DustTransition(Color.BLUE, Color.PURPLE, (float) 2.0);
-			loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), 0, 0, 0, 0, dust);
+
+		for(double i = 0;i <= Math.PI;i += Math.PI/10) {
+			double radius = Math.sin(i);
+			double y = Math.cos(i);
+			for(double j = 0;j < Math.PI*2;j+= Math.PI / 10) {
+				double x = Math.cos(j) * radius;
+				double z = Math.sin(j) * radius;
+				loc.add(x, y, z);
+				DustTransition dust = new DustTransition(Color.BLUE, Color.PURPLE, (float) 2.0);
+				loc.getWorld().spawnParticle(Particle.REDSTONE, loc.clone(), 1, 0.0, 0.0, 0.0, dust);
+			}
 		}
 
 		for(Entity entity : entities) {
 			EntityHandling.dealDamageToEntity((LivingEntity)entity, damage, false, 1);
 		}
-		double current_Y = e.getPlayer().getVelocity().getY();
-		e.getPlayer().setVelocity(e.getPlayer().getVelocity().multiply(15).setY(current_Y));
+		Vector speed = e.getPlayer().getLocation().getDirection().multiply(1.15);
+		speed = e.getPlayer().getVelocity().add(speed);
+		e.getPlayer().setVelocity(speed.add(new Vector(0, 0.001, 0)));
 	}
 
 	private void star_ability(PlayerInteractEvent e) {
@@ -297,7 +306,7 @@ public class itemList implements Listener
 		if(!check_ready(e.getPlayer(), "JUMP_ROD", 25.0, 20)) return;
 
 		Player p = e.getPlayer();
-		Vector vector = p.getEyeLocation().getDirection().normalize();
+		Vector vector = p.getEyeLocation().getDirection();
 		vector.multiply(1.01);
 		vector = p.getVelocity().add(vector);
 		p.setVelocity(vector.add(new Vector(0, 1, 0)));
