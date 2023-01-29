@@ -1,24 +1,20 @@
 package markiplites.SoyBlock.Lists;
 
 import markiplites.SoyBlock.*;
+import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.ItemClasses.*;
 import org.bukkit.*;
-import org.bukkit.Particle.DustTransition;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -31,7 +27,7 @@ import java.util.function.Predicate;
 
 public class itemList implements Listener
 {
-	private final HashMap<String, Boolean> ability_cooldown = new HashMap<String, Boolean>();
+	private final HashMap<String, Boolean> ability_cooldown = new HashMap<>();
 	
 	public itemList() {
 		//cooldown booleans
@@ -89,7 +85,7 @@ public class itemList implements Listener
 		attributes.put(attr.blockExp, 5.0);
 		attributes.put(attr.rarity, 6.0);
 		ItemStack[] blockLoot = {nigger.getItemStack().clone(),nigger.getItemStack().clone(),nigger.getItemStack().clone()};
-		Block steel_block = new Block("STEEL_BLOCK", "Steel Block", Material.IRON_BLOCK, attributes, "i am a dwarf and diggy dig hole :###",blockLoot);
+		new Block("STEEL_BLOCK", "Steel Block", Material.IRON_BLOCK, attributes, "i am a dwarf and diggy dig hole :###",blockLoot);
 
 		attributes.clear();
 		attributes.put(attr.critChance, 0.3);
@@ -99,7 +95,7 @@ public class itemList implements Listener
 		attributes.put(attr.intelligenceBonusRaw, 900.0);
 		attributes.put(attr.itemType, 101.0);
 		attributes.put(attr.rarity, 5.0);
-		Chestplate cp = new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
+		new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
 				Material.LEATHER_CHESTPLATE, attributes, "carry on my wayward son","2 195 228");
 
 		attributes.clear();
@@ -107,7 +103,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, 300.0);
 		attributes.put(attr.itemType, 200.0);
 		attributes.put(attr.rarity, 3.0);
-		Talisman talismanExample = new Talisman("soulRing", "<GRADIENT:02e494>Soules Ring</GRADIENT:0252e4>",
+		new Talisman("soulRing", "<GRADIENT:02e494>Soules Ring</GRADIENT:0252e4>",
 				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
 
 		attributes.clear();
@@ -115,7 +111,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, 800.0);
 		attributes.put(attr.itemType, 200.0);
 		attributes.put(attr.rarity, 4.0);
-		Talisman talismanExample2 = new Talisman("soulRingRare", "<GRADIENT:02e494>Darkest Soules Ring</GRADIENT:0252e4>",
+		new Talisman("soulRingRare", "<GRADIENT:02e494>Darkest Soules Ring</GRADIENT:0252e4>",
 				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
 
 		attributes.clear();
@@ -123,7 +119,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, -100.0);
 		attributes.put(attr.itemType, 200.0);
 		attributes.put(attr.rarity, 5.0);
-		Talisman talismanExample3 = new Talisman("waterAffinityFeather", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
+		new Talisman("waterAffinityFeather", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
 				Material.FEATHER, attributes, "Gives bonus swag.","waterAffinity");
 
 		attributes.clear();
@@ -143,23 +139,23 @@ public class itemList implements Listener
 		attributes.put(attr.projectileSpeed, 2.0);
 		attributes.put(attr.itemType, 1.0);
 		attributes.put(attr.rarity, 2.0);
-		Bow sploch = new Bow("SPLOCH", "<GRADIENT:cc00ff>SPLOCH! goes the bug</GRADIENT:6666ff>",
+		new Bow("SPLOCH", "<GRADIENT:cc00ff>SPLOCH! goes the bug</GRADIENT:6666ff>",
 				Material.FISHING_ROD, attributes, "<SOLID:0066ff>Primary Attack: Shoots out an arrow at high velocity.");
 
 		attributes.clear();
 		attributes.put(attr.moveSpeed, 0.15);
 		attributes.put(attr.intelligenceBonusRaw, 100.0);
-		Spell jump_rod = new Spell("JUMP_ROD", "Jump Rod", Material.STICK, attributes, "Move like a rabbit");
+		new Spell("JUMP_ROD", "Jump Rod", Material.STICK, attributes, "Move like a rabbit");
 		
 		attributes.clear();
 		attributes.put(attr.intelligenceBonusRaw, 1000000.0);
 		attributes.put(attr.intelligenceScaling, 2.0);
-		Chestplate storm = new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
+		new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
 
 		attributes.clear();
 		attributes.put(attr.intelligenceBonusRaw, 500.0);
 		attributes.put(attr.intelligenceScaling, 1.4);
-		Spell elden_bong = new Spell("ELDEN_STAR", "Elden Star", Material.GOLDEN_SWORD, attributes, "Elden bong lol XD x3 :3333");
+		new Spell("ELDEN_STAR", "Elden Star", Material.GOLDEN_SWORD, attributes, "Elden bong lol XD x3 :3333");
 
 		attributes.clear();
 		attributes.put(attr.baseDamage, 150.0);
@@ -171,7 +167,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityScaling, 1.35);
 		attributes.put(attr.attackReachBonusRaw, 7.5);
 		attributes.put(attr.rarity, 6.0);
-		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
+		new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
 	}
 
 
@@ -219,7 +215,7 @@ public class itemList implements Listener
 				double x = Math.cos(j) * radius;
 				double z = Math.sin(j) * radius;
 				temp.add(5*x, 5*y, 5*z);
-				Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255-((int)Math.round(i*20.0)), 0, 255), 3.0f);
+				Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255-((int)Math.round(i*81)), 0, 255), 3.0f);
 				loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 1, 0.0, 0.0, 0.0, dust);
 			}
 		}
@@ -236,52 +232,91 @@ public class itemList implements Listener
 		Player p = e.getPlayer();
 		Location loc = p.getLocation();
 		loc.setY(loc.getY()+5);
-		ArrayList<ArmorStand> projectiles = new ArrayList<>();
-		for(int i = 0;i < 15;i++) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
-				ArmorStand ent = (ArmorStand)p.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
-				ent.setVisible(false);
-				ent.setBasePlate(false);
-				ent.setCollidable(false);
-				ent.setArms(false);
-				ent.setSmall(false);
-				ent.setSilent(true);
-				ent.setCustomName("Armor Stand");
-				ent.setCustomNameVisible(false);
-				ent.setCanPickupItems(false);
-				ent.setGliding(false);
-				ent.setInvulnerable(true);
-				ent.setCustomNameVisible(true);
-				ent.setGravity(true);
-				projectiles.add(ent);
-				p.getWorld().playEffect(loc, Effect.BLAZE_SHOOT, 0, 30);
-			}, 10);
-		}
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getInstance(), () -> {
-			for(ArmorStand proj : projectiles) {
-				Predicate<Entity> ignoreList = f -> (f != p && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
-				Collection<Entity> entities = p.getWorld().getNearbyEntities(proj.getLocation(), 15, 15, 15, ignoreList);
-				if(!entities.isEmpty()) {
-					p.getWorld().spawnParticle(Particle.FLAME, proj.getLocation(), 0);
-					Entity closest = (Entity)entities.toArray()[0];
-					for(Entity ent : entities) {
-						if ( proj.getLocation().distance(ent.getLocation()) < proj.getLocation().distance(closest.getLocation()) ) {
-						closest = ent;
+		ArrayList<Snowball> projectiles = new ArrayList<>();
+		Snowball mainStar = p.launchProjectile(Snowball.class, p.getLocation().getDirection().multiply(0.2));
+		final double damageDealt = CustomAttributes.getDamageModified(p,false)*0.1;
+		mainStar.setGravity(false);
+		mainStar.setItem(new ItemStack(Material.GLOWSTONE));
+		mainStar.getWorld().playSound(mainStar.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST_FAR, 1.0f,1.0f);
+
+		Predicate<Entity> ignoreList = f -> (f != p && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
+		new BukkitRunnable() {
+			int timerCount = 0;
+			@Override
+			public void run() {
+				if(timerCount > 20)
+				{
+					for(Snowball star : projectiles) {
+						star.remove();
+					}
+					mainStar.remove();
+					cancel();
+					return;
+				}
+				if(mainStar == null)
+				{
+					for(Snowball star : projectiles) {
+						star.remove();
+					}
+					cancel();
+					return;
+				}
+
+				Location starLocation = mainStar.getLocation();
+
+				mainStar.getWorld().spawnParticle(Particle.GLOW, starLocation, 0);
+				mainStar.getWorld().playSound(starLocation, Sound.ENTITY_BLAZE_SHOOT, 1.0f,1.0f);
+
+				for(int i = 0;i<4;i++) {
+					//Shoot out stars from each cardinal direction (from main star)
+					Location temp = starLocation.clone();
+					temp.setYaw(temp.getYaw()+(90.0F*i));
+					temp.setPitch(0.0f);
+
+					Snowball subStar = p.launchProjectile(Snowball.class, temp.getDirection());
+					subStar.teleport(temp);
+					subStar.setItem(new ItemStack(Material.GLOWSTONE_DUST));
+					subStar.setGravity(false);
+
+					projectiles.add(subStar);
+
+					HashMap<String,Double> projAttrib = new HashMap<>();
+					projAttrib.put("Damage", damageDealt);
+					projAttrib.put("DamageType", 1.0);
+					EntityHandling.projectileAttributes.put(subStar.getEntityId(), projAttrib);
+				}
+
+				for(Snowball star : projectiles)
+				{
+					if(star == null)
+						{projectiles.remove(star);continue;}
+
+					Location subStarLocation = star.getLocation();
+					p.getWorld().spawnParticle(Particle.GLOW, star.getLocation(), 3);
+
+					Collection<Entity> entities = p.getWorld().getNearbyEntities(subStarLocation, 6, 6, 6, ignoreList);
+					if(!entities.isEmpty()) {
+						Entity closest = (Entity) entities.toArray()[0];
+						for (Entity ent : entities) {
+							if (subStarLocation.distance(ent.getLocation()) < subStarLocation.distance(closest.getLocation())) {
+								closest = ent;
+							}
 						}
-					}
-					proj.setVelocity(closest.getLocation().subtract(proj.getLocation()).toVector().multiply(0.2));
-					Collection<Entity> check = p.getWorld().getNearbyEntities(proj.getLocation(), 0.5, 0.5, 0.5, ignoreList);
-					if(!check.isEmpty()) {
-						Entity ent = (Entity)check.toArray()[0];
-						EntityHandling.dealDamageToEntity((LivingEntity)ent, CustomAttributes.getDamageModified(p, false), false, 1);
-						proj.remove();
+
+						double baseSpeed = star.getVelocity().length()*0.3;
+						Vector endResult = subStarLocation.toVector().subtract(closest.getLocation().toVector());
+						Vector projVector = endResult.add(star.getVelocity()).normalize();
+						double[] angles = new double[2];
+						Main.VectorAngles(projVector, angles);
+						double newSpeed = -(baseSpeed*3.1);
+						projVector.multiply(newSpeed);
+						star.setVelocity(projVector);
+						star.setRotation((float)angles[0],(float)angles[1]);
 					}
 				}
-				else {
-					proj.remove();
-				}
+				timerCount++;
 			}
-		}, 20, 5);
+		}.runTaskTimer(Main.getInstance(), 1L, 5L);
 
 	}
 
@@ -330,7 +365,7 @@ public class itemList implements Listener
 					finalVec.add(tmpRight);
 					finalVec.add(tmpUp);
 					p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 20, dustOptions);
-				}, (int) ((i + 15) / 6));
+				}, (i + 15) / 6);
 			}
 
 			EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p, true) * 3.5, true, 0);
@@ -379,7 +414,7 @@ public class itemList implements Listener
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
 		Main.getAttributes().get(uuid).replace("Mana", (currentMana - manaCost));
 		ability_cooldown.replace(itemID, false);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {ability_cooldown.replace(itemID, true);}, delay);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> ability_cooldown.replace(itemID, true), delay);
 		return true;
 	}	
 

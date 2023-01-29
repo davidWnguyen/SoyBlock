@@ -8,20 +8,13 @@ import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
@@ -204,6 +197,32 @@ public class EntityHandling implements Listener {
 		p.setHealth(Main.getAttributes().get(uuid).get("Health")/Main.getAttributes().get(uuid).get("MaxHealth") * p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 	}
 	@EventHandler
+	public void onProjectileCollide(ProjectileHitEvent e){
+		Projectile i = e.getEntity();
+		if(i == null)
+			return;
+		Entity v = e.getHitEntity();
+		if(!(v instanceof LivingEntity))
+			return;
+
+		ProjectileSource s = i.getShooter();
+		//Mobs cannot hit eachother, and player cannot hit eachother.
+		if(s instanceof Mob && v instanceof Mob)
+			return;
+		if(s instanceof Player && v instanceof Player)
+			return;
+
+		Integer projID = i.getEntityId();
+		if(projectileAttributes.containsKey(projID))
+		{
+			Double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
+			int damageType = (int) Math.round(projectileAttributes.get(projID).getOrDefault("DamageType", 0.0));
+			boolean critBoolean = (projectileAttributes.get(projID).getOrDefault("CriticalAttack", 0.0))==1.0;
+			dealDamageToEntity((LivingEntity)v,customDamage, critBoolean, damageType);
+			resetIFrames((LivingEntity)v);
+		}
+	}
+	@EventHandler
 	public void onEntityDamageEvent(EntityDamageEvent e) {
 		double damage = e.getDamage();
 		double customDamage = damage;
@@ -233,20 +252,6 @@ public class EntityHandling implements Listener {
 				{
 					if(e.getCause() == DamageCause.ENTITY_ATTACK)
 					{
-						e.setDamage(0);
-						e.setCancelled(true);
-						resetIFramesDelayed((LivingEntity)victim);
-						resetIFrames((LivingEntity)victim);
-				        return;
-					}
-					else if(e.getCause() == DamageCause.PROJECTILE)
-					{
-						if(projectileAttributes.containsKey(inflictorID))
-						{
-							customDamage = projectileAttributes.get(inflictorID).getOrDefault("Damage", 0.0);
-							boolean critBoolean = (projectileAttributes.get(inflictorID).getOrDefault("CriticalAttack", 0.0))==1.0;
-							dealDamageToEntity((LivingEntity)victim,customDamage, critBoolean, 0);
-						}
 						e.setDamage(0);
 						e.setCancelled(true);
 						resetIFramesDelayed((LivingEntity)victim);

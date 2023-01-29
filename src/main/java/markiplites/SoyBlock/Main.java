@@ -1,13 +1,9 @@
 package markiplites.SoyBlock;
 
-
-import com.comphenix.protocol.ProtocolLibrary;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,11 +26,6 @@ public class Main extends JavaPlugin implements Listener{
 	private static Main instance;
 	ItemListHandler itemListHandler;
 	public static HashMap<UUID, HashMap<String, Double>> playerAttributes = new HashMap<>();
-	
-	FileConfiguration weaponConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "weaponConfig.yml"));
-	FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "armorConfig.yml"));
-	FileConfiguration blockConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "blockConfig.yml"));
-	FileConfiguration toolConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "toolConfig.yml"));
 	
 	@Override
 	public void onEnable() {
@@ -97,6 +88,33 @@ public class Main extends JavaPlugin implements Listener{
 	}
 	public static Vector getRightVector(Location loc){Location temp = loc.clone();temp.setYaw(temp.getYaw()+90.0F); return temp.getDirection();}
 	public static Vector getUpVector(Location loc){Location temp = loc.clone();temp.setPitch(temp.getPitch()-90.0F);; return temp.getDirection();}
+	public static void VectorAngles(Vector forward, double[] angle)
+	{
+		double tmp, yaw, pitch;
+
+		if (forward.getX() == 0 && forward.getY() == 0)
+		{
+			yaw = 0;
+			if (forward.getZ() > 0)
+				pitch = 270;
+			else
+				pitch = 90;
+		}
+		else
+		{
+			yaw = (Math.atan2(forward.getY(), forward.getX()) * 180 / Math.PI);
+			if (yaw < 0)
+				yaw += 360;
+
+			tmp =  Math.sqrt(forward.getX()*forward.getX() + forward.getY()*forward.getY());
+			pitch = (Math.atan2(-forward.getZ(), tmp) * 180 / Math.PI);
+			if (pitch < 0)
+				pitch += 360;
+		}
+
+		angle[0] = pitch;
+		angle[1] = yaw;
+	}
 
 	public enum ItemProperties{
 		weaponType,
