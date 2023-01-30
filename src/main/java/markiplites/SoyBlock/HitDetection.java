@@ -56,12 +56,12 @@ public class HitDetection implements Listener {
 
 								double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
 								boolean critBoolean = Math.random() < critChance;
-								double customDamage = CustomAttributes.getDamageModified(player, critBoolean);
+								double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
 
 								attributes.put("Damage", customDamage);
 								attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
 
-								EntityHandling.projectileAttributes.put(shortbowArrow.getEntityId(), attributes);
+								EntityHandling.projectileAttributes.put(shortbowArrow.getUniqueId(), attributes);
 
 								double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 
@@ -74,7 +74,7 @@ public class HitDetection implements Listener {
 							if (victim != null) {
 								double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
 								boolean critBoolean = Math.random() < critChance;
-								double customDamage = CustomAttributes.getDamageModified(player, critBoolean);
+								double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
 
 								EntityHandling.dealDamageToEntity(victim, customDamage, critBoolean, 0);
 

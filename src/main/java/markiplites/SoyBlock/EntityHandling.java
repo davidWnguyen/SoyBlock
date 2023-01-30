@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -20,8 +22,10 @@ import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
 public class EntityHandling implements Listener {
-	public static HashMap<Integer, HashMap<String, Double>> entityAttributes = new HashMap<>();
-	public static HashMap<Integer, HashMap<String, Double>> projectileAttributes = new HashMap<>();
+	public static HashMap<UUID, HashMap<String, Double>> entityAttributes = new HashMap<>();
+	public static HashMap<UUID, HashMap<String, Double>> projectileAttributes = new HashMap<>();
+	public static HashMap<UUID, String> customNames = new HashMap<>();
+	public static HashMap<Integer, Boolean> spawned = new HashMap<>(); 
 	public EntityHandling() {
 		init();
 	}
@@ -67,8 +71,10 @@ public class EntityHandling implements Listener {
 	}
 	//Deal Damage
 	public static void dealDamageToEntity(LivingEntity en, double damageDealt, boolean isCrit, int damageType){
+		
 		en.damage(0.0);
-		Integer id = en.getEntityId();
+		UUID id = en.getUniqueId();
+		
 		if(entityAttributes.containsKey(id))
 		{
 			double absorption = entityAttributes.get(id).getOrDefault("Absorption", 0.0);
@@ -96,6 +102,7 @@ public class EntityHandling implements Listener {
 			entityAttributes.get(id).put("Health", entityAttributes.get(id).get("Health") - damageDealt);
 			if(entityAttributes.get(id).get("Health") > 0.0) {
 				en.setHealth(entityAttributes.get(id).get("Health")/entityAttributes.get(id).get("MaxHealth") * en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+				if(customNames.get(id) != null) setNameHealth(en);
 			}else {
 				en.setHealth(0.0);
 			}
@@ -140,7 +147,7 @@ public class EntityHandling implements Listener {
 				continue;
 			if (ent.getType() == EntityType.ARMOR_STAND)
 				{ent.remove();continue;}
-			Integer id = ent.getEntityId();
+			UUID id = ent.getUniqueId();
 			if(entityAttributes.containsKey(id))
 				continue;
 
@@ -164,13 +171,14 @@ public class EntityHandling implements Listener {
 	@EventHandler
 	public void onEntitySpawn(CreatureSpawnEvent event)
 	{
+		
 		if(event.getEntityType() != EntityType.ARMOR_STAND)
 		{//Implement configs for mobs later, now will just have static randomized levels.
 			int mobLevel = new Random().nextInt(10 - 1 + 1) + 1;
 			HashMap<String, Double> attributes = new HashMap<>();
 			attributes.put("BaseDamage", 5.0 + (mobLevel*2));
 			attributes.put("Health", 40.0 + (mobLevel*10));
-			attributes.put("MaxHealth", 40.0 + (mobLevel*10));
+			attributes.put("MaxHealth", attributes.get("Health"));
 			//attributes.put("Absorption", 0.0 + (mobLevel*2.0));
 			attributes.put("Intelligence", 0.0);
 			attributes.put("IntelligenceScaling", 0.0);
@@ -178,14 +186,16 @@ public class EntityHandling implements Listener {
 			attributes.put("StrengthScaling", 0.0);
 			attributes.put("Dexterity", 0.0);
 			attributes.put("DexterityScaling", 0.0);
-			
-			entityAttributes.put(event.getEntity().getEntityId(), attributes);
+			setNameHealth(event.getEntity());
+			entityAttributes.put(event.getEntity().getUniqueId(), attributes);
 		}
 	}
 	@EventHandler
 	public void onEntityRemoved(EntityRemoveFromWorldEvent event)
 	{
-		entityAttributes.remove(event.getEntity().getEntityId());
+		if(entityAttributes.containsKey(event.getEntity().getUniqueId())) entityAttributes.get(event.getEntity().getUniqueId()).replace("Health", entityAttributes.get(event.getEntity().getUniqueId()).get("MaxHealth"));
+		entityAttributes.remove(event.getEntity().getUniqueId());
+		customNames.remove(event.getEntity().getUniqueId());
 	}
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event)
@@ -234,20 +244,19 @@ public class EntityHandling implements Listener {
 		if(!(victim instanceof LivingEntity))
 			return;
 
-		Integer id = victim.getEntityId();
 		UUID uuid = victim.getUniqueId();
-		if(entityAttributes.containsKey(id) || (victim instanceof Player && Main.playerAttributes.containsKey(uuid)) )
+		if(entityAttributes.containsKey(uuid) || (victim instanceof Player && Main.playerAttributes.containsKey(uuid)) )
 		{
 			//Custom Damage Handling
 			if(e instanceof EntityDamageByEntityEvent)
 			{
 				Entity attacker = ((EntityDamageByEntityEvent)e).getDamager();
-				Integer inflictorID = attacker.getEntityId();
+				UUID inflictorID = attacker.getUniqueId();
 				//If the "attacker" is an arrow, make the attacker instead the shooter.
 				if(attacker instanceof Arrow && ((Arrow)attacker).getShooter() instanceof LivingEntity)
 					attacker = (Entity) ((Arrow)attacker).getShooter();
 
-				Integer attackerID = attacker.getEntityId();
+				UUID attackerID = attacker.getUniqueId();
 				if(attacker instanceof Player)
 				{
 					if(e.getCause() == DamageCause.ENTITY_ATTACK)
@@ -294,14 +303,14 @@ public class EntityHandling implements Listener {
 			}
 			else//If victim is a mob
 			{
-				double absorption = entityAttributes.get(id).getOrDefault("Absorption", 0.0);
+				double absorption = entityAttributes.get(uuid).getOrDefault("Absorption", 0.0);
 				customDamage *= (100.0-absorption)/100.0;
 				
-				entityAttributes.get(id).put("Health", entityAttributes.get(id).get("Health") - customDamage);
+				entityAttributes.get(uuid).put("Health", entityAttributes.get(uuid).get("Health") - customDamage);
 				String finaldamage = String.format("§x§f§b§9§7§0§0- %.0f ⚔",customDamage);
 				spawnIndicator(victim.getLocation(), finaldamage, victim);
-				if(entityAttributes.get(id).get("Health") > 0.0) {
-					((LivingEntity) victim).setHealth(entityAttributes.get(id).get("Health")/entityAttributes.get(id).get("Health") *
+				if(entityAttributes.get(uuid).get("Health") > 0.0) {
+					((LivingEntity) victim).setHealth(entityAttributes.get(uuid).get("Health")/entityAttributes.get(uuid).get("Health") *
 							((LivingEntity) victim).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 				}else {
 					((LivingEntity) victim).setHealth(0.0);
@@ -317,7 +326,7 @@ public class EntityHandling implements Listener {
 		for(LivingEntity entity : p.getWorld().getLivingEntities()) {
 			if (entity instanceof Player || entity.getType() == EntityType.ARMOR_STAND)
 				continue;
-			if (!entityAttributes.containsKey(entity.getEntityId()))
+			if (!entityAttributes.containsKey(entity.getUniqueId()))
 				continue;
 
 			Vector targetLocation = entity.getLocation().toVector();
@@ -333,5 +342,20 @@ public class EntityHandling implements Listener {
 	}
 	public static double getAngleBetweenVector(Vector vec1, Vector vec2){
 		return 180-(180/Math.PI*(Math.acos( vec1.dot(vec2)  / (vec1.length() * vec2.length() ))));
+	}
+	public static void putEntityAttributes(UUID uuid, HashMap<String, Double> attributes, String customName) {
+		entityAttributes.put(uuid, attributes);
+		customNames.put(uuid, customName);
+	}
+	public static void setNameHealth(Entity ent) {
+		UUID entityID = ent.getUniqueId();
+		String color = "";
+		if(entityAttributes.get(entityID).get("Health") >= (entityAttributes.get(entityID).get("MaxHealth")*0.66))
+			color = "44E90B"; //green
+		else if(entityAttributes.get(entityID).get("Health") >= entityAttributes.get(entityID).get("MaxHealth")*0.33)
+			color = "E9DB0B"; //yellow
+		else
+			color = "EF320E"; //red
+		ent.setCustomName(customNames.get(entityID).toString() + ": " + IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
 	}
 }
