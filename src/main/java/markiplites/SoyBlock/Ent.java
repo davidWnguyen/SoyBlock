@@ -14,7 +14,7 @@ import com.iridium.iridiumcolorapi.IridiumColorAPI;
 public class Ent {
     static HashMap<String, HashMap<String, Double>> entityAttributes = new HashMap<>();
     static HashMap<String, EntityType> models = new HashMap<>();
-    static HashMap<String, String> names = new HashMap<>();
+    public static HashMap<String, String> names = new HashMap<>();
     public Ent(String entityID, String entityName, EntityType model, HashMap<String, Double> attributes) {
         entityAttributes.put(entityID, attributes);
         models.put(entityID, model);
@@ -25,8 +25,8 @@ public class Ent {
     public static Entity spawnCustomEntity(String entityID, Location loc) {
         if(entityAttributes.containsKey(entityID) && models.containsKey(entityID) && names.containsKey(entityID)) {
             Entity ent = loc.getWorld().spawnEntity(loc, models.get(entityID));
-            EntityHandling.spawned.put(ent.getEntityId(), true);
             EntityHandling.putEntityAttributes(ent.getUniqueId(), entityAttributes.get(entityID), names.get(entityID));
+            EntityHandling.entityAttributes.get(ent.getUniqueId()).replace("Health", EntityHandling.entityAttributes.get(ent.getUniqueId()).get("MaxHealth")); //im mad at myself
             EntityHandling.setNameHealth(ent);
             return ent;
         }
