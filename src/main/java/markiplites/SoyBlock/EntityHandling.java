@@ -186,7 +186,6 @@ public class EntityHandling implements Listener {
 			attributes.put("StrengthScaling", 0.0);
 			attributes.put("Dexterity", 0.0);
 			attributes.put("DexterityScaling", 0.0);
-			setNameHealth(event.getEntity());
 			entityAttributes.put(event.getEntity().getUniqueId(), attributes);
 		}
 	}
@@ -222,7 +221,7 @@ public class EntityHandling implements Listener {
 		if(s instanceof Player && v instanceof Player)
 			return;
 
-		Integer projID = i.getEntityId();
+		UUID projID = i.getUniqueId();
 		if(projectileAttributes.containsKey(projID))
 		{
 			Double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
