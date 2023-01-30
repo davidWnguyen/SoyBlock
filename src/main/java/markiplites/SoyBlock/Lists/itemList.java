@@ -249,7 +249,7 @@ public class itemList implements Listener
 		loc.setY(loc.getY()+5);
 		ArrayList<Snowball> projectiles = new ArrayList<>();
 		Snowball mainStar = p.launchProjectile(Snowball.class, p.getLocation().getDirection().multiply(0.2));
-		final double damageDealt = CustomAttributes.getDamageModified(p,false)*0.1;
+		final double damageDealt = CustomAttributes.getDamageModified(p.getUniqueId(),false)*0.1;
 		mainStar.setGravity(false);
 		mainStar.setItem(new ItemStack(Material.GLOWSTONE));
 		mainStar.getWorld().playSound(mainStar.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST_FAR, 1.0f,1.0f);
@@ -298,7 +298,7 @@ public class itemList implements Listener
 					HashMap<String,Double> projAttrib = new HashMap<>();
 					projAttrib.put("Damage", damageDealt);
 					projAttrib.put("DamageType", 1.0);
-					EntityHandling.projectileAttributes.put(subStar.getEntityId(), projAttrib);
+					EntityHandling.projectileAttributes.put(subStar.getUniqueId(), projAttrib);
 				}
 
 				for(Snowball star : projectiles)
