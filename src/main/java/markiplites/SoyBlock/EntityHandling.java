@@ -1,4 +1,5 @@
 package markiplites.SoyBlock;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -25,7 +27,6 @@ public class EntityHandling implements Listener {
 	public static HashMap<UUID, HashMap<String, Double>> entityAttributes = new HashMap<>();
 	public static HashMap<UUID, HashMap<String, Double>> projectileAttributes = new HashMap<>();
 	public static HashMap<UUID, String> customNames = new HashMap<>();
-	public static HashMap<Integer, Boolean> spawned = new HashMap<>(); 
 	public EntityHandling() {
 		init();
 	}
@@ -170,29 +171,28 @@ public class EntityHandling implements Listener {
 	}
 	@EventHandler
 	public void onEntitySpawn(CreatureSpawnEvent event)
-	{
-		
+	{	
 		if(event.getEntityType() != EntityType.ARMOR_STAND)
 		{//Implement configs for mobs later, now will just have static randomized levels.
-			int mobLevel = new Random().nextInt(10 - 1 + 1) + 1;
-			HashMap<String, Double> attributes = new HashMap<>();
-			attributes.put("BaseDamage", 5.0 + (mobLevel*2));
-			attributes.put("Health", 40.0 + (mobLevel*10));
-			attributes.put("MaxHealth", attributes.get("Health"));
-			//attributes.put("Absorption", 0.0 + (mobLevel*2.0));
-			attributes.put("Intelligence", 0.0);
-			attributes.put("IntelligenceScaling", 0.0);
-			attributes.put("Strength", 0.0);
-			attributes.put("StrengthScaling", 0.0);
-			attributes.put("Dexterity", 0.0);
-			attributes.put("DexterityScaling", 0.0);
-			entityAttributes.put(event.getEntity().getUniqueId(), attributes);
+				int mobLevel = new Random().nextInt(10 - 1 + 1) + 1;
+				HashMap<String, Double> attributes = new HashMap<>();
+				attributes.put("BaseDamage", 5.0 + (mobLevel*2));
+				attributes.put("Health", 40.0 + (mobLevel*10));
+				attributes.put("MaxHealth", attributes.get("Health"));
+				//attributes.put("Absorption", 0.0 + (mobLevel*2.0));
+				attributes.put("Intelligence", 0.0);
+				attributes.put("IntelligenceScaling", 0.0);
+				attributes.put("Strength", 0.0);
+				attributes.put("StrengthScaling", 0.0);
+				attributes.put("Dexterity", 0.0);
+				attributes.put("DexterityScaling", 0.0);
+				entityAttributes.put(event.getEntity().getUniqueId(), attributes);
 		}
+		
 	}
 	@EventHandler
 	public void onEntityRemoved(EntityRemoveFromWorldEvent event)
 	{
-		if(entityAttributes.containsKey(event.getEntity().getUniqueId())) entityAttributes.get(event.getEntity().getUniqueId()).replace("Health", entityAttributes.get(event.getEntity().getUniqueId()).get("MaxHealth"));
 		entityAttributes.remove(event.getEntity().getUniqueId());
 		customNames.remove(event.getEntity().getUniqueId());
 	}

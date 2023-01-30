@@ -153,6 +153,7 @@ public class itemList implements Listener
 		new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
 
 		attributes.clear();
+		attributes.put(attr.baseDamage, 15.0);
 		attributes.put(attr.intelligenceBonusRaw, 500.0);
 		attributes.put(attr.intelligenceScaling, 1.4);
 		new Spell("ELDEN_STAR", "Elden Star", Material.GOLDEN_SWORD, attributes, "Elden bong lol XD x3 :3333");
@@ -205,9 +206,14 @@ public class itemList implements Listener
 			case "ELDEN_STAR" -> {if(rightClick) star_ability(e);}
 			case "YAMATO" -> {if(rightClick) judgement_cut(e);}
 			case "SPAWNER" -> {if(rightClick) spawn(e);}
+			case "NIGGER" -> {if(rightClick) kill(e);}
 		}
 	}
 
+	private void kill(PlayerInteractEvent e) {
+		e.getPlayer().sendMessage("NIGGER: Killed you.");
+		EntityHandling.dealDamageToEntity(e.getPlayer(), Main.getAttributes().get(e.getPlayer().getUniqueId()).get("MaxHealth"), false, 1);
+	}
 	private void spawn(PlayerInteractEvent e) {
 		Vector vec = traceToEntity(e, 10.0);
 		Ent.spawnCustomEntity("ZOMBIE_KING", vec.toLocation(e.getPlayer().getWorld()));
