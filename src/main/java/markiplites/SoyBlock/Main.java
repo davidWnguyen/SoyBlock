@@ -47,7 +47,7 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new itemList(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
 		new entityList();
-		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		//Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 		//Timers
 		HUDTimer.run(instance);
 		//Commands

@@ -172,6 +172,15 @@ public class itemList implements Listener
 		attributes.put(attr.attackReachBonusRaw, 7.5);
 		attributes.put(attr.rarity, 6.0);
 		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
+		
+		attributes.clear();
+		new Spell("SPAWNER", "Spawner", Material.STICK, attributes, "zmb");
+
+		attributes.put(attr.baseDamage, 15.0);
+		attributes.put(attr.attackReachBonusRaw, 2.1);
+		attributes.put(attr.strengthBonusRaw, 10.0);
+		attributes.put(attr.dexterityBonusRaw, 15.0);
+		new Sword("DIAMONDSWORD", "Sword", Material.DIAMOND_SWORD, attributes, "Do you like my sword, sword?");
 	}
 
 
@@ -199,7 +208,13 @@ public class itemList implements Listener
 			case "JUMP_ROD" -> {if(rightClick) jump_ability(e);}
 			case "ELDEN_STAR" -> {if(rightClick) star_ability(e);}
 			case "YAMATO" -> {if(rightClick) judgement_cut(e);}
+			case "SPAWNER" -> {if(rightClick) spawn(e);}
 		}
+	}
+
+	private void spawn(PlayerInteractEvent e) {
+		Vector vec = traceToEntity(e, 10.0);
+		Ent.spawnCustomEntity("ZOMBIE_KING", vec.toLocation(e.getPlayer().getWorld()));
 	}
 
 	private void judgement_cut(PlayerInteractEvent e) {
@@ -225,7 +240,7 @@ public class itemList implements Listener
 		}
 		for(Entity entity : entities) {
 			loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
-			EntityHandling.dealDamageToEntity((LivingEntity)entity, CustomAttributes.getDamageModified(p, false), false, 1);
+			EntityHandling.dealDamageToEntity((LivingEntity)entity, CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
 		}
 		Vector speed = p.getLocation().getDirection().multiply(1.15);
 		speed = p.getVelocity().add(speed);
@@ -273,7 +288,7 @@ public class itemList implements Listener
 					Collection<Entity> check = p.getWorld().getNearbyEntities(proj.getLocation(), 0.5, 0.5, 0.5, ignoreList);
 					if(!check.isEmpty()) {
 						Entity ent = (Entity)check.toArray()[0];
-						EntityHandling.dealDamageToEntity((LivingEntity)ent, CustomAttributes.getDamageModified(p, false), false, 1);
+						EntityHandling.dealDamageToEntity((LivingEntity)ent, CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
 						proj.remove();
 					}
 				}
@@ -333,7 +348,7 @@ public class itemList implements Listener
 				}, (int) ((i + 15) / 6));
 			}
 
-			EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p, true) * 3.5, true, 0);
+			EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p.getUniqueId(), true) * 3.5, true, 0);
 		}, 5);
 	}
 

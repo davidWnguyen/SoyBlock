@@ -2,6 +2,8 @@ package markiplites.SoyBlock;
 
 import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
+
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -751,45 +753,43 @@ public class CustomAttributes implements Listener {
 			default -> {return "";}
 		}
 	}
-	public static double getDamageModified(Player player, boolean isCrit)
+	public static double getDamageModified(UUID uuid, boolean isCrit)
 	{
-		UUID uuid = player.getUniqueId();
-		double baseDMG = Main.getAttributes().get(uuid).getOrDefault("BaseDamage", 5.0);
-		double dex = Main.getAttributes().get(uuid).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(uuid).get("Dexterity"), 0.0) : 0.0;
-		double dexScaling = Main.getAttributes().get(uuid).getOrDefault("DexterityScaling", 0.0);
+		double customDamage = 0.0;
+		if(Bukkit.getPlayer(uuid) != null) { //if uuid belongs to a player
+			double baseDMG = Main.getAttributes().get(uuid).getOrDefault("BaseDamage", 5.0);
+			double dex = Main.getAttributes().get(uuid).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(uuid).get("Dexterity"), 0.0) : 0.0;
+			double dexScaling = Main.getAttributes().get(uuid).getOrDefault("DexterityScaling", 0.0);
 
-		double str = Main.getAttributes().get(uuid).containsKey("Strength") ? Math.max(Main.getAttributes().get(uuid).get("Strength"), 0.0) : 0.0;
-		double strScaling = Main.getAttributes().get(uuid).getOrDefault("StrengthScaling", 0.0);
+			double str = Main.getAttributes().get(uuid).containsKey("Strength") ? Math.max(Main.getAttributes().get(uuid).get("Strength"), 0.0) : 0.0;
+			double strScaling = Main.getAttributes().get(uuid).getOrDefault("StrengthScaling", 0.0);
 
-		double intel = Main.getAttributes().get(uuid).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(uuid).get("Intelligence"), 0.0) : 0.0;
-		double intelScaling = Main.getAttributes().get(uuid).getOrDefault("IntelligenceScaling", 0.0);
-		//damage formula
-		double customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) *
-				Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
+			double intel = Main.getAttributes().get(uuid).containsKey("Intelligence") ? Math.max(Main.getAttributes().get(uuid).get("Intelligence"), 0.0) : 0.0;
+			double intelScaling = Main.getAttributes().get(uuid).getOrDefault("IntelligenceScaling", 0.0);
+			//damage formula
+			customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) *
+					Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
 
-		if (isCrit)
-			customDamage *= (Main.getAttributes().get(uuid).getOrDefault("CritDamage", 0.0)) + 1.35;
+			if (isCrit)
+				customDamage *= (Main.getAttributes().get(uuid).getOrDefault("CritDamage", 0.0)) + 1.35;
+		}
+		else {
+			double baseDMG = EntityHandling.entityAttributes.get(uuid).getOrDefault("BaseDamage", 5.0);
+			double dex = EntityHandling.entityAttributes.get(uuid).getOrDefault("Dexterity", 0.0);
+			double dexScaling = EntityHandling.entityAttributes.get(uuid).getOrDefault("DexterityScaling", 0.0);
 
-		return customDamage;
-	}
-	public static double getDamageModified(Integer attackerID, boolean isCrit)
-	{
-		double baseDMG = EntityHandling.entityAttributes.get(attackerID).getOrDefault("BaseDamage", 5.0);
+			double str = EntityHandling.entityAttributes.get(uuid).getOrDefault("Strength", 0.0);
+			double strScaling = EntityHandling.entityAttributes.get(uuid).getOrDefault("StrengthScaling", 0.0);
 
-		double dex = EntityHandling.entityAttributes.get(attackerID).getOrDefault("Dexterity", 0.0);
-		double dexScaling = EntityHandling.entityAttributes.get(attackerID).getOrDefault("DexterityScaling", 0.0);
+			double intel = EntityHandling.entityAttributes.get(uuid).getOrDefault("Intelligence", 0.0);
+			double intelScaling = EntityHandling.entityAttributes.get(uuid).getOrDefault("IntelligenceScaling", 0.0);
+			//damage formula
+			customDamage = baseDMG * Math.pow((1 + (dex) / 100.0), dexScaling) *
+					Math.pow((1 + (str) / 100.0), strScaling) * Math.pow((1 + (intel) / 100.0), intelScaling);
 
-		double str = EntityHandling.entityAttributes.get(attackerID).getOrDefault("Strength", 0.0);
-		double strScaling = EntityHandling.entityAttributes.get(attackerID).getOrDefault("StrengthScaling", 0.0);
-
-		double intel = EntityHandling.entityAttributes.get(attackerID).getOrDefault("Intelligence", 0.0);
-		double intelScaling = EntityHandling.entityAttributes.get(attackerID).getOrDefault("IntelligenceScaling", 0.0);
-		double customDamage = baseDMG * Math.pow((1+(dex)/100.0), dexScaling) * Math.pow((1+(str)/100.0), strScaling)
-				* Math.pow((1+(intel)/100.0), intelScaling);
-
-		if (isCrit)
-			customDamage *= (EntityHandling.entityAttributes.get(attackerID).getOrDefault("CritDamage", 0.0)) + 1.35;
-
+			if (isCrit)
+				customDamage *= (EntityHandling.entityAttributes.get(uuid).getOrDefault("CritDamage", 0.0)) + 1.35;
+		}
 		return customDamage;
 	}
 }
