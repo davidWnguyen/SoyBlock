@@ -317,6 +317,7 @@ public class itemList implements Listener
 								closest = ent;
 							}
 						}
+
 						double baseSpeed = star.getVelocity().length()*0.3;
 						Vector endResult = subStarLocation.toVector().subtract(closest.getLocation().toVector());
 						Vector projVector = endResult.add(star.getVelocity()).normalize();
