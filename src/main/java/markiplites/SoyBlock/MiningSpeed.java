@@ -180,12 +180,7 @@ public class MiningSpeed implements Listener{
               if(player == event.getPlayer()) {
 				  if(p.hasPotionEffect(PotionEffectType.SLOW_DIGGING)) {
 					  p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 3, 255, true));
-                  
-                  /*PlayerConnection connection = p.getHandle().playerConnection;
-                  @SuppressWarnings("deprecation")
-                  PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.fromId(PotionEffectType.SLOW_DIGGING.getId()), Integer.MAX_VALUE, 255, true, false));
-                  connection.sendPacket(entityEffect);
-					*/
+
 					  PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EFFECT);
 					  potionPacket.getIntegers().write(0, p.getEntityId())
 							  .write(1, Integer.MAX_VALUE);
@@ -226,6 +221,7 @@ public class MiningSpeed implements Listener{
 		final PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
 		double toolSpeed = Main.getAttributes().get(uuid).getOrDefault("MiningSpeed", 1.0);
 		long temporaryBreakTime = Math.round(customBlockData.get(blockDurabilityKey, PersistentDataType.DOUBLE) / 9.0 / toolSpeed);
+		blockBreakEffect(p, event.getBlock().getLocation().toVector(), stage);
 		BukkitScheduler scheduler = mainPlugin.getServer().getScheduler();
 		scheduler.scheduleSyncDelayedTask(mainPlugin, () -> {
 			boolean foundPlayer = false;
@@ -236,7 +232,6 @@ public class MiningSpeed implements Listener{
 					foundPlayer = true;
 					if(blockBeingMined.get(i) == block)
 					{
-						blockBreakEffect(p, event.getBlock().getLocation().toVector(), stage);
 						if(stage < 9)
 						{
 							blockBreakingStages(event, p, stage + 1, block);

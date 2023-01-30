@@ -2,20 +2,18 @@ package markiplites.SoyBlock;
 
 import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
-
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -484,12 +482,45 @@ public class CustomAttributes implements Listener {
 			return;
 		if(e.getAction() == InventoryAction.NOTHING)
 			return;
+		if(e.getSlot() == 40)
+		{
+			ItemStack item = e.getCursor();
+			if(item != null) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					PersistentDataContainer container = meta.getPersistentDataContainer();
+					if (!(container.has(new NamespacedKey(Main.getInstance(), "canOffhand"), PersistentDataType.DOUBLE))) {
+						p.getWorld().dropItem(p.getLocation(),item);
+						e.setCancelled(true);
+						return;
+					}
+				}
+			}
+		}
+
+
 		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		new BukkitRunnable(){public void run(){//Start of Delay
 			getUpdatedPlayerAttributes(p, attributes);
 			playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
+	}
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onInventoryClose(InventoryCloseEvent e) {
+		ItemStack offhand = e.getPlayer().getInventory().getItemInOffHand();
+		if(offhand.getType()== Material.AIR || offhand == null) {
+			return;
+		}
+		ItemMeta meta = offhand.getItemMeta();
+		if (meta == null)
+			return;
+
+		PersistentDataContainer container = meta.getPersistentDataContainer();
+		if (!(container.has(new NamespacedKey(Main.getInstance(), "canOffhand"), PersistentDataType.DOUBLE))) {
+			e.getPlayer().getInventory().setItemInOffHand(null);
+			e.getPlayer().getWorld().dropItem(e.getPlayer().getLocation(), offhand);
+		}
 	}
 	@EventHandler
 	public void onPlayerOffhand(PlayerSwapHandItemsEvent e){
@@ -554,7 +585,7 @@ public class CustomAttributes implements Listener {
 			{e.setCancelled(true);return;}
 
 		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-		if(itemType == 200 || p.getInventory().getItemInMainHand().equals(itemStack))
+		if(itemType == 200 || (itemType > 0 && itemType < 100))
 		{
 			HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 			HashMap<String, Double> attributes = CustomAttributes.defaultStats();

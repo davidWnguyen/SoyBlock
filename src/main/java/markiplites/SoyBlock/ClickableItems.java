@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -66,11 +65,11 @@ public class ClickableItems implements Listener {
 			return;
 
 		int itemActionType = (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE));
-
+		e.setCancelled(true);
+		p.closeInventory();
 		switch (itemActionType) {
 			case 1 -> Menu_SBMainMenu((Player)p);
 		}
-		e.setResult(Event.Result.DENY);
 	}
 	@EventHandler
 	public void onPlayerSwapHands(PlayerSwapHandItemsEvent e)
