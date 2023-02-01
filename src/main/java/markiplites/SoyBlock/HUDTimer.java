@@ -25,7 +25,7 @@ public class HUDTimer implements Listener {
 						double maxMana = Main.getAttributes().get(uuid).get("MaxMana");
 						double regeneration = maxHealth * 0.0003 * (1.0 + (Main.getAttributes().get(uuid).getOrDefault("RegenerationBonus", 0.0)));
 
-						currentMana += maxMana * 0.0005;//regen 1% mana per second
+						currentMana += maxMana * 0.00075;//regen 1% mana per second
 
 						currentHealth += regeneration;//regen .6% health per second (times those bonuses or smth)
 

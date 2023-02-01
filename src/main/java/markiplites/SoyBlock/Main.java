@@ -67,11 +67,12 @@ public class Main extends JavaPlugin implements Listener{
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		//Standard Procedure to calculate stats
 		new BukkitRunnable(){public void run(){
-			CustomAttributes.getUpdatedPlayerAttributes(p, attributes);
+			CustomAttributes.getUpdatedPlayerAttributes(p, attributes, false);
 			playerAttributes.put(p.getUniqueId(), attributes);
 			attributes.put("Health", attributes.get("MaxHealth"));
 			attributes.put("Mana", attributes.get("MaxMana"));
 		}}.runTaskLater(Main.getInstance(), 10);
+		
 		ItemStack mainMenu = ItemListHandler.generateItem("SBMENU");
 		p.getInventory().setItem(8, mainMenu);
 	}

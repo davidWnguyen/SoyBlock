@@ -159,6 +159,7 @@ public class ClickableItems implements Listener {
 				ItemListHandler.getItemForDisplay(Material.ENCHANTED_BOOK),
 				1,
 				click -> {
+					skills(player);
 					return true; // returning true will cancel the click event and stop taking the item
 				},
 				IridiumColorAPI.process("<SOLID:ff9999>Skills"),
@@ -183,4 +184,93 @@ public class ClickableItems implements Listener {
 		));
 		gui.show(player);
 	}
+private static void skills(Player p) {
+	String[] guiSetup = {
+		"bbbbbbbbb",
+		"b       b",
+		"b  fch  b",
+		"b       b",
+		"bbbbbbbbb"
+	};
+	InventoryGui gui = new InventoryGui(Main.getInstance(), p, "Soyblock Main Menu", guiSetup);
+	gui.setFiller(new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1)); // fill the empty slots with this
+
+	gui.addElement(new StaticGuiElement('c',
+	ItemListHandler.getItemForDisplay(Material.IRON_SWORD),
+	Math.min(Skills.getLevel(p.getUniqueId(), "Combat"), 64),
+	click -> {
+		combat_menu(p);
+		return true; // returning true will cancel the click event and stop taking the item
+	},
+	IridiumColorAPI.process("<SOLID:1652C3>Combat Skill Menu"),
+	String.format("+%d Base Damage", (5 * (Skills.getLevel(p.getUniqueId(), "Combat")-1)))
+	));
+
+	gui.addElement(new StaticGuiElement('f',
+	ItemListHandler.getItemForDisplay(Material.SPRUCE_SAPLING),
+	Math.min(Skills.getLevel(p.getUniqueId(), "Foraging"), 64),
+	click -> {
+		return true; // returning true will cancel the click event and stop taking the item
+	},
+	IridiumColorAPI.process("<SOLID:0C8536>Foraging Skill Menu")
+	));
+
+	gui.addElement(new StaticGuiElement('h',
+	ItemListHandler.getItemForDisplay(Material.BREWING_STAND),
+	Math.min(Skills.getLevel(p.getUniqueId(), "Alchemy"), 64),
+	click -> {
+		return true; // returning true will cancel the click event and stop taking the item
+	},
+	IridiumColorAPI.process("<SOLID:C0D9F1>Alchemy Skill Menu")
+	));
+
+	gui.addElement(new StaticGuiElement('b',
+	ItemListHandler.getItemForDisplay(Material.BLACK_STAINED_GLASS_PANE),
+	1,
+	click -> {
+		return true; // returning true will cancel the click event and stop taking the item
+	},
+	IridiumColorAPI.process("")
+	));
+
+	gui.show(p);
 }
+
+
+	private static void combat_menu(Player p) {
+		String[] guiSetup = {
+			"bbbbbbbbb",
+			"b       b",
+			"b   n   b",
+			"b       b",
+			"bbbbbbbbb"
+		};
+		InventoryGui gui = new InventoryGui(Main.getInstance(), p, "Soyblock Main Menu", guiSetup);
+		gui.setFiller(new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1)); // fill the empty slots with this
+		
+		gui.addElement(new StaticGuiElement('b',
+		ItemListHandler.getItemForDisplay(Material.BLACK_STAINED_GLASS_PANE),
+		1,
+		click -> {
+			return true; // returning true will cancel the click event and stop taking the item
+		},
+		IridiumColorAPI.process("")
+		));
+
+		gui.addElement(new StaticGuiElement('n',
+		ItemListHandler.getItemForDisplay(Material.WOODEN_SWORD),
+		1,
+		click -> {
+			return true; // returning true will cancel the click event and stop taking the item
+		},
+		IridiumColorAPI.process("<SOLID:846D49>NIGGER!!!!!")
+		));
+
+		gui.show(p);
+	}
+
+
+
+
+}
+

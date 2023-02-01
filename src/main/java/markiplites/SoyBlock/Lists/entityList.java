@@ -7,12 +7,14 @@ import org.bukkit.entity.EntityType;
 import markiplites.SoyBlock.Ent;
 
 public class entityList {
-    HashMap<String, Double> attributes = new HashMap<>();
+    
     public entityList() {
         init();
     }
 
     private void init() {
+        HashMap<String, Double> attributes = new HashMap<>();
+        
         attributes.put("Health", 250.0);
         attributes.put("BaseDamage", 75.0);
         attributes.put("MaxHealth", 250.0);
@@ -23,6 +25,9 @@ public class entityList {
         attributes.put("StrengthScaling", 1.1);
         attributes.put("Dexterity", 15.0);
         attributes.put("DexterityScaling", 1.0);
+        attributes.put("CombatExp", 20.0);
         new Ent("ZOMBIE_KING", "Zombie King", EntityType.ZOMBIE, attributes);
+
+        new Ent("SKELETON_KING", "Skeleton King", EntityType.SKELETON, attributes);
     }
 }

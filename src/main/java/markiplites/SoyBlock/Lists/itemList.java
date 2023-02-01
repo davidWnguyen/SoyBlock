@@ -27,13 +27,9 @@ import java.util.function.Predicate;
 
 public class itemList implements Listener
 {
-	private final HashMap<String, Boolean> ability_cooldown = new HashMap<>();
+	private final HashMap<UUID, HashMap<String, Boolean>> ability_cooldown = new HashMap<>();
 	
 	public itemList() {
-		//cooldown booleans
-		ability_cooldown.put("MURASAMA", true);
-		ability_cooldown.put("JUMP_ROD", true);
-		ability_cooldown.put("YAMATO", true);
 		init();
 	}
 	public void init() {
@@ -148,8 +144,10 @@ public class itemList implements Listener
 		new Spell("JUMP_ROD", "Jump Rod", Material.STICK, attributes, "Move like a rabbit");
 		
 		attributes.clear();
-		attributes.put(attr.intelligenceBonusRaw, 1000000.0);
-		attributes.put(attr.intelligenceScaling, 2.0);
+		attributes.put(attr.intelligenceBonusRaw, 150.0);
+		attributes.put(attr.intelligenceScaling, 1.3);
+		attributes.put(attr.absorptionBonusRaw, 15.0);
+		attributes.put(attr.healthBonusRaw, 250.0);
 		new Chestplate("STORM_CP", "Storm Chestplate", Material.LEATHER_CHESTPLATE, attributes, "I am the storm that is approaching. Provoking, black clouds in isolation. I am reclaimour on my name!! Born in flames, I have been blessed. My family chest is a demon of death!!!!", "9 170 189");
 
 		attributes.clear();
@@ -171,7 +169,9 @@ public class itemList implements Listener
 		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
 		
 		attributes.clear();
-		new Spell("SPAWNER", "Spawner", Material.STICK, attributes, "zmb");
+		new Spell("SPAWNER_ZOMBIEKING", "Spawn Zombie_King", Material.STICK, attributes, "zmb");
+
+		new Spell("SPAWNER_SKELETONKING", "Spawn Skeleton_King", Material.STICK, attributes, ":skull: meme");
 
 		attributes.put(attr.baseDamage, 15.0);
 		attributes.put(attr.attackReachBonusRaw, 2.1);
@@ -205,18 +205,21 @@ public class itemList implements Listener
 			case "JUMP_ROD" -> {if(rightClick) jump_ability(e);}
 			case "ELDEN_STAR" -> {if(rightClick) star_ability(e);}
 			case "YAMATO" -> {if(rightClick) judgement_cut(e);}
-			case "SPAWNER" -> {if(rightClick) spawn(e);}
+			case "SPAWNER_ZOMBIEKING" -> {if(rightClick) spawn(e, "ZOMBIE_KING");}
+			case "SPAWNER_SKELETONKING" -> {if(rightClick) spawn(e, "SKELETON_KING");}
 			case "NIGGER" -> {if(rightClick) kill(e);}
 		}
 	}
 
+
 	private void kill(PlayerInteractEvent e) {
 		e.getPlayer().sendMessage("NIGGER: Killed you.");
-		EntityHandling.dealDamageToEntity(e.getPlayer(), Main.getAttributes().get(e.getPlayer().getUniqueId()).get("MaxHealth"), false, 1);
+		EntityHandling.dealDamageToEntity(e.getPlayer(), null, Main.getAttributes().get(e.getPlayer().getUniqueId()).get("MaxHealth"), false, 1);
 	}
-	private void spawn(PlayerInteractEvent e) {
+
+	private void spawn(PlayerInteractEvent e, String id) {
 		Vector vec = traceToEntity(e, 10.0);
-		Ent.spawnCustomEntity("ZOMBIE_KING", vec.toLocation(e.getPlayer().getWorld()));
+		Ent.spawnCustomEntity(id, vec.toLocation(e.getPlayer().getWorld()));
 	}
 
 	private void judgement_cut(PlayerInteractEvent e) {
@@ -235,18 +238,18 @@ public class itemList implements Listener
 				Location temp = loc.clone();
 				double x = Math.cos(j) * radius;
 				double z = Math.sin(j) * radius;
-				temp.add(5*x, 5*y, 5*z);
+				temp.add(3*x, 3*y, 3*z);
 				Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255-((int)Math.round(i*81)), 0, 255), 3.0f);
 				loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 1, 0.0, 0.0, 0.0, dust);
 			}
 		}
 		for(Entity entity : entities) {
 			loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
-			EntityHandling.dealDamageToEntity((LivingEntity)entity, CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
+			EntityHandling.dealDamageToEntity((LivingEntity)entity, p, CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
 		}
-		Vector speed = p.getLocation().getDirection().multiply(1.15);
+		Vector speed = p.getLocation().getDirection().multiply(1.05).setY(0);
 		speed = p.getVelocity().add(speed);
-		p.setVelocity(speed.add(new Vector(0, 0.001, 0)));
+		p.setVelocity(speed.add(new Vector(0, 0.15, 0)));
 	}
 
 	private void star_ability(PlayerInteractEvent e) {
@@ -428,14 +431,20 @@ public class itemList implements Listener
 
 
 	private boolean check_ready(Player p, String itemID, double manaCost, int delay) { //ability check / set x333
-		if(!ability_cooldown.get(itemID)) {p.sendMessage("§4Ability on cooldown."); return false;}
 		UUID uuid = p.getUniqueId();
+		if(!ability_cooldown.containsKey(uuid) || !ability_cooldown.get(uuid).containsKey(itemID)) {
+			HashMap<String, Boolean> map = new HashMap<>();
+			map.put(itemID, true);
+			ability_cooldown.put(uuid, map);
+		}
+		
+		if(!ability_cooldown.get(uuid).get(itemID)) {p.sendMessage("§4Ability on cooldown."); return false;}
 
 		double currentMana = Main.getAttributes().get(uuid).get("Mana");
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
 		Main.getAttributes().get(uuid).replace("Mana", (currentMana - manaCost));
-		ability_cooldown.replace(itemID, false);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> ability_cooldown.replace(itemID, true), delay);
+		ability_cooldown.get(uuid).replace(itemID, false);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> ability_cooldown.get(uuid).replace(itemID, true), delay);
 		return true;
 	}	
 

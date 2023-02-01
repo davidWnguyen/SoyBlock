@@ -502,7 +502,7 @@ public class CustomAttributes implements Listener {
 		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		new BukkitRunnable(){public void run(){//Start of Delay
-			getUpdatedPlayerAttributes(p, attributes);
+			getUpdatedPlayerAttributes(p, attributes, false);
 			playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
@@ -545,7 +545,7 @@ public class CustomAttributes implements Listener {
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		new BukkitRunnable(){public void run(){//Start of Delay
-			getUpdatedPlayerAttributes(p, attributes);
+			getUpdatedPlayerAttributes(p, attributes, false);
 		playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
@@ -560,7 +560,7 @@ public class CustomAttributes implements Listener {
 				HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 				HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 
-				getUpdatedPlayerAttributes(p, attributes);
+				getUpdatedPlayerAttributes(p, attributes, false);
 				playerAttributes.put(p.getUniqueId(), attributes);
 			}
 		}}.runTaskLater(Main.getInstance(), 1);
@@ -591,7 +591,7 @@ public class CustomAttributes implements Listener {
 			HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 
 			new BukkitRunnable(){public void run(){//Start of Delay
-				getUpdatedPlayerAttributes(p, attributes);
+				getUpdatedPlayerAttributes(p, attributes, false);
 				playerAttributes.put(p.getUniqueId(), attributes);
 			}}.runTaskLater(Main.getInstance(), 1);
 		}
@@ -601,7 +601,7 @@ public class CustomAttributes implements Listener {
 		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		String statFormat = "";
 		UUID uuid = player.getUniqueId();
-		//if(playerAttributes.get(player).containsKey("BaseDamage"))String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(player).get("BaseDamage"));
+		if(playerAttributes.get(uuid).containsKey("BaseDamage"))String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("BaseDamage"));
 		if(playerAttributes.get(uuid).containsKey("AttackSpeedBonus") && playerAttributes.get(uuid).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(uuid).get("AttackSpeedBonus")*100.0);
 		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(uuid).get("MaxHealth"));
 		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(uuid).get("Absorption"));
@@ -623,68 +623,7 @@ public class CustomAttributes implements Listener {
 		
 		return statFormat;
 	}
-	public static void getUpdatedPlayerAttributes(Player p, HashMap<String, Double> attributes)
-	{
-		ArrayList<String> usedTalismanFamily = new ArrayList<>();
-		int talismans = 0;
-		for(ItemStack checkItem : p.getInventory()) {
-			if(checkItem == null)
-				continue;
-			ItemMeta meta = checkItem.getItemMeta();
-			if(meta == null)
-				continue;
-
-			PersistentDataContainer container = meta.getPersistentDataContainer();
-			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-			if(p.getInventory().getItemInMainHand().equals(checkItem) && itemType < 100)
-			{
-				CustomAttributes.giveItemStats(checkItem,attributes);
-			}
-			else if(itemType == 200)
-			{
-				if(talismans > 4)
-					continue;
-				if(!container.has(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING))
-					continue;
-				String family = container.get(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING);
-				if(family == null)
-					continue;
-				if(usedTalismanFamily.contains(family))
-					continue;
-
-				CustomAttributes.giveItemStats(checkItem,attributes);
-				usedTalismanFamily.add(family);
-				talismans++;
-			}
-		}
-		for(ItemStack checkItem: p.getEquipment().getArmorContents()) {
-			if(checkItem == null)
-				continue;
-
-			ItemMeta meta = checkItem.getItemMeta();
-			if(meta == null)
-				continue;
-
-			PersistentDataContainer container = meta.getPersistentDataContainer();
-			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
-			if(itemType > 100)
-				CustomAttributes.giveItemStats(checkItem,attributes);
-		}
-		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
-
-		if(attributes.get("Health") > attributes.get("MaxHealth"))
-			attributes.put("Health", attributes.get("MaxHealth"));
-		if(attributes.get("Mana") > attributes.get("MaxMana"))
-			attributes.put("Mana", attributes.get("MaxMana"));
-
-		for(AttributeModifier modifier : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
-			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(modifier);
-		}
-		if(attributes.containsKey("Speed")) {//Remove all speed modifiers except the speed stat.
-			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("GENERIC_MOVEMENT_SPEED",attributes.get("Speed"),
-					AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-		}
-	}
+	
 	public static void getUpdatedPlayerAttributes(Player p, HashMap<String, Double> attributes, boolean checkWeapon)
 	{
 		ArrayList<String> usedTalismanFamily = new ArrayList<>();
@@ -735,14 +674,9 @@ public class CustomAttributes implements Listener {
 			if(itemType > 100)
 				CustomAttributes.giveItemStats(checkItem,attributes);
 		}
-		attributes.put("Health", Main.getAttributes().get(uuid).get("Health"));
-		attributes.put("Mana", Main.getAttributes().get(uuid).get("Mana"));
+
 		attributes.put("MaxMana", attributes.get("MaxMana") + attributes.get("Intelligence"));
 
-		if(attributes.get("Health") > attributes.get("MaxHealth"))
-			attributes.put("Health", attributes.get("MaxHealth"));
-		if(attributes.get("Mana") > attributes.get("MaxMana"))
-			attributes.put("Mana", attributes.get("MaxMana"));
 		for(AttributeModifier modifier : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(modifier);
 		}
@@ -750,7 +684,13 @@ public class CustomAttributes implements Listener {
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("GENERIC_MOVEMENT_SPEED",attributes.get("Speed"),
 					AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
+		
+		if(attributes.containsKey("BaseDamage"))
+			attributes.replace("BaseDamage", (5.0 * (Skills.getLevel(p.getUniqueId(), "Combat"))-1) + attributes.get("BaseDamage"));
+
 	}
+
+
 	public static String getItemTypeIntToString(int lel)
 	{
 		switch (lel) {
