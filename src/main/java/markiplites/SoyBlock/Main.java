@@ -18,7 +18,6 @@ import markiplites.SoyBlock.Lists.itemList;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -67,18 +66,23 @@ public class Main extends JavaPlugin implements Listener{
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		//Standard Procedure to calculate stats
 		new BukkitRunnable(){public void run(){
-			CustomAttributes.getUpdatedPlayerAttributes(p, attributes);
+			CustomAttributes.getUpdatedPlayerAttributes(p, attributes, true);
 			playerAttributes.put(p.getUniqueId(), attributes);
 			attributes.put("Health", attributes.get("MaxHealth"));
 			attributes.put("Mana", attributes.get("MaxMana"));
 		}}.runTaskLater(Main.getInstance(), 10);
+		
 		ItemStack mainMenu = ItemListHandler.generateItem("SBMENU");
 		p.getInventory().setItem(8, mainMenu);
 	}
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e)
 	{
-		playerAttributes.remove(e.getPlayer().getUniqueId());
+		UUID id = e.getPlayer().getUniqueId();
+		Skills.skillLevels.remove(id);
+		Skills.skillExperience.remove(id);
+		itemList.ability_cooldown.remove(id);
+		playerAttributes.remove(id);
 	}
 	public static Main getInstance() {
 		return instance;

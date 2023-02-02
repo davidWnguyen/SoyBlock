@@ -76,7 +76,7 @@ public class HitDetection implements Listener {
 								boolean critBoolean = Math.random() < critChance;
 								double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
 
-								EntityHandling.dealDamageToEntity(victim, customDamage, critBoolean, 0);
+								EntityHandling.dealDamageToEntity(victim, player, customDamage, critBoolean, 0);
 
 								double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 

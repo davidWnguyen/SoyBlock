@@ -71,7 +71,7 @@ public class EntityHandling implements Listener {
 
 	}
 	//Deal Damage
-	public static void dealDamageToEntity(LivingEntity en, double damageDealt, boolean isCrit, int damageType){
+	public static void dealDamageToEntity(LivingEntity en, LivingEntity damager, double damageDealt, boolean isCrit, int damageType){
 		
 		en.damage(0.0);
 		UUID id = en.getUniqueId();
@@ -106,6 +106,7 @@ public class EntityHandling implements Listener {
 				if(customNames.get(id) != null) setNameHealth(en);
 			}else {
 				en.setHealth(0.0);
+				Bukkit.getServer().getPluginManager().callEvent(new EntityDamageByEntityEvent(damager, en, DamageCause.CUSTOM, -1.0));
 			}
 			resetIFrames(en);
 		}
@@ -197,12 +198,19 @@ public class EntityHandling implements Listener {
 		customNames.remove(event.getEntity().getUniqueId());
 	}
 	@EventHandler
+	public void onEntityDeath(EntityDeathEvent e) {
+		UUID id = e.getEntity().getUniqueId();
+		if(Ent.nameTags.containsKey(id)){
+			Ent.nameTags.get(id).remove();
+			Ent.nameTags.remove(id);
+		}
+	}
+	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event)
 	{
 		Player p = event.getEntity();
 		UUID uuid = p.getUniqueId();
 		Main.getAttributes().get(uuid).put("Health", Main.getAttributes().get(uuid).get("MaxHealth"));
-		
 		p.setHealth(Main.getAttributes().get(uuid).get("Health")/Main.getAttributes().get(uuid).get("MaxHealth") * p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 	}
 	@EventHandler
@@ -227,15 +235,21 @@ public class EntityHandling implements Listener {
 			Double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
 			int damageType = (int) Math.round(projectileAttributes.get(projID).getOrDefault("DamageType", 0.0));
 			boolean critBoolean = (projectileAttributes.get(projID).getOrDefault("CriticalAttack", 0.0))==1.0;
-			dealDamageToEntity((LivingEntity)v,customDamage, critBoolean, damageType);
+			if((LivingEntity)s instanceof LivingEntity)
+				dealDamageToEntity((LivingEntity)v, (LivingEntity) s, customDamage, critBoolean, damageType);
+			else
+				dealDamageToEntity((LivingEntity)v, null, customDamage, critBoolean, damageType);
 			resetIFrames((LivingEntity)v);
 		}
 	}
 	@EventHandler
 	public void onEntityDamageEvent(EntityDamageEvent e) {
+		
 		double damage = e.getDamage();
+		if(damage == -1.0) return;
 		double customDamage = damage;
 		Entity victim = e.getEntity();
+		
 		if(damage == 0.0)
 			{resetIFramesDelayed((LivingEntity)victim);return;}
 		if(victim.getType() == EntityType.ARMOR_STAND)
@@ -317,8 +331,18 @@ public class EntityHandling implements Listener {
 				resetIFramesDelayed((LivingEntity)victim);
 			}
 		}
+
 	}
-	public static void dealAOEAngledDamage(Player p, double degrees, double range, double damageDealt, boolean isCrit, int damageType){
+
+	@EventHandler
+	public static void entityHitByEntity(EntityDamageByEntityEvent e) {
+		if(e.getDamage() == -1.0 && e.getCause().equals(DamageCause.CUSTOM) && e.getEntity().isDead()) {
+			if((Player)e.getDamager() instanceof Player && entityAttributes.get(e.getEntity().getUniqueId()).containsKey("CombatExp")) {
+				Skills.addSkillExp(((Player)e.getDamager()).getUniqueId(), "Combat", entityAttributes.get(e.getEntity().getUniqueId()).get("CombatExp"));
+			}
+		}
+	}
+	public static void dealAOEAngledDamage(Player p, double degrees, double range, double damageDealt, boolean isCrit, int damageType) {
 		Vector angleVector = p.getLocation().getDirection();
 		Vector playerVector = p.getLocation().toVector();
 
@@ -336,7 +360,7 @@ public class EntityHandling implements Listener {
 			if(getAngleBetweenVector(targetVector, angleVector) > degrees)
 				continue;
 
-			dealDamageToEntity(entity, damageDealt, isCrit, damageType);
+			dealDamageToEntity(entity, p, damageDealt, isCrit, damageType);
 		}
 	}
 	public static double getAngleBetweenVector(Vector vec1, Vector vec2){
@@ -348,13 +372,15 @@ public class EntityHandling implements Listener {
 	}
 	public static void setNameHealth(Entity ent) {
 		UUID entityID = ent.getUniqueId();
-		String color = "";
+
+		String color;
 		if(entityAttributes.get(entityID).get("Health") >= (entityAttributes.get(entityID).get("MaxHealth")*0.66))
 			color = "44E90B"; //green
 		else if(entityAttributes.get(entityID).get("Health") >= entityAttributes.get(entityID).get("MaxHealth")*0.33)
 			color = "E9DB0B"; //yellow
 		else
 			color = "EF320E"; //red
-		ent.setCustomName(customNames.get(entityID).toString() + ": " + IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
+		if(Ent.nameTags.containsKey(entityID))
+			Ent.nameTags.get(entityID).setCustomName(customNames.get(entityID) + ": " + IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
 	}
 }
