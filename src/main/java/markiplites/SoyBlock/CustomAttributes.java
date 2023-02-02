@@ -502,7 +502,7 @@ public class CustomAttributes implements Listener {
 		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		new BukkitRunnable(){public void run(){//Start of Delay
-			getUpdatedPlayerAttributes(p, attributes, false);
+			getUpdatedPlayerAttributes(p, attributes, true);
 			playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
@@ -545,7 +545,7 @@ public class CustomAttributes implements Listener {
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 		
 		new BukkitRunnable(){public void run(){//Start of Delay
-			getUpdatedPlayerAttributes(p, attributes, false);
+			getUpdatedPlayerAttributes(p, attributes, true);
 		playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
 	}
@@ -560,7 +560,7 @@ public class CustomAttributes implements Listener {
 				HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 				HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 
-				getUpdatedPlayerAttributes(p, attributes, false);
+				getUpdatedPlayerAttributes(p, attributes, true);
 				playerAttributes.put(p.getUniqueId(), attributes);
 			}
 		}}.runTaskLater(Main.getInstance(), 1);
@@ -601,7 +601,7 @@ public class CustomAttributes implements Listener {
 		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
 		String statFormat = "";
 		UUID uuid = player.getUniqueId();
-		if(playerAttributes.get(uuid).containsKey("BaseDamage"))String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("BaseDamage"));
+		if(playerAttributes.get(uuid).containsKey("BaseDamage"))statFormat=String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("BaseDamage"));
 		if(playerAttributes.get(uuid).containsKey("AttackSpeedBonus") && playerAttributes.get(uuid).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(uuid).get("AttackSpeedBonus")*100.0);
 		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(uuid).get("MaxHealth"));
 		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(uuid).get("Absorption"));
@@ -686,8 +686,22 @@ public class CustomAttributes implements Listener {
 		}
 		
 		if(attributes.containsKey("BaseDamage"))
-			attributes.replace("BaseDamage", (5.0 * (Skills.getLevel(p.getUniqueId(), "Combat"))-1) + attributes.get("BaseDamage"));
+			attributes.replace("BaseDamage", (5.0 * (Skills.getLevel(uuid, "Combat"))-1) + attributes.get("BaseDamage"));
 
+		//Check for maximums
+		HashMap<String, Double> attr = Main.getAttributes().get(uuid);
+
+		if(attr == null) return;
+
+		if(attr.containsKey("Health") && attr.get("Health") > attributes.get("MaxHealth"))
+			attributes.put("Health", attributes.get("MaxHealth"));
+		else
+			attributes.put("Health", attr.get("Health"));
+
+		if(attr.containsKey("Mana") && attr.get("Mana") > attributes.get("MaxMana"))
+			attributes.put("Mana", attributes.get("MaxMana"));
+		else
+			attributes.put("Mana", attr.get("Mana"));
 	}
 
 

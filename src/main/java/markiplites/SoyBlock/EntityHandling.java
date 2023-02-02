@@ -199,10 +199,10 @@ public class EntityHandling implements Listener {
 	}
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
-		for(Entity ent : e.getEntity().getPassengers()) {
-			if(ent instanceof ArmorStand) {
-				ent.remove();
-			}
+		UUID id = e.getEntity().getUniqueId();
+		if(Ent.nameTags.containsKey(id)){
+			Ent.nameTags.get(id).remove();
+			Ent.nameTags.remove(id);
 		}
 	}
 	@EventHandler
@@ -373,33 +373,14 @@ public class EntityHandling implements Listener {
 	public static void setNameHealth(Entity ent) {
 		UUID entityID = ent.getUniqueId();
 
-		for(Entity e : ent.getPassengers()) {
-			if(e instanceof ArmorStand) {
-				e.remove();
-			}
-		}
-			String color = "";
-			if(entityAttributes.get(entityID).get("Health") >= (entityAttributes.get(entityID).get("MaxHealth")*0.66))
-				color = "44E90B"; //green
-			else if(entityAttributes.get(entityID).get("Health") >= entityAttributes.get(entityID).get("MaxHealth")*0.33)
-				color = "E9DB0B"; //yellow
-			else
-				color = "EF320E"; //red
-			ArmorStand hologram = (ArmorStand) ent.getWorld().spawnEntity(new Location(ent.getWorld(), 0, 0, 0), EntityType.ARMOR_STAND);
-			hologram.setVisible(false);
-			hologram.setBasePlate(false);
-			hologram.setCollidable(false);
-			hologram.setArms(false);
-			hologram.setSmall(true);
-			hologram.setSilent(true);
-			hologram.setCanPickupItems(false);
-			hologram.setGliding(true);
-			hologram.setLeftLegPose(EulerAngle.ZERO.add(180, 0, 0));
-			hologram.setRightLegPose(EulerAngle.ZERO.add(180, 0, 0));
-			hologram.setInvulnerable(true);
-			hologram.setCustomNameVisible(true);
-			hologram.setCustomName(customNames.get(entityID).toString() + ": " + IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
-			hologram.setGravity(false); 
-			ent.addPassenger(hologram);
+		String color;
+		if(entityAttributes.get(entityID).get("Health") >= (entityAttributes.get(entityID).get("MaxHealth")*0.66))
+			color = "44E90B"; //green
+		else if(entityAttributes.get(entityID).get("Health") >= entityAttributes.get(entityID).get("MaxHealth")*0.33)
+			color = "E9DB0B"; //yellow
+		else
+			color = "EF320E"; //red
+		if(Ent.nameTags.containsKey(entityID))
+			Ent.nameTags.get(entityID).setCustomName(customNames.get(entityID) + ": " + IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
 	}
 }

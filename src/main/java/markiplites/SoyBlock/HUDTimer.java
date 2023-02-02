@@ -1,5 +1,7 @@
 package markiplites.SoyBlock;
 
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -8,9 +10,11 @@ import org.bukkit.plugin.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class HUDTimer implements Listener {
+	public static HashMap<UUID, String> playerStatusCooldown = new HashMap<>();
 	public static void run(final Plugin plugin) {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,
 				() -> {
@@ -43,7 +47,16 @@ public class HUDTimer implements Listener {
 							p.setHealth(0.0);
 						}
 
-						p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder("§c❤ " + String.format("%.0f", currentHealth) + "/" + String.format("%.0f", maxHealth) +"       §b★ " + String.format("%.0f", currentMana) + "/" + String.format("%.0f", maxMana)).create() );
+						StringBuilder sb = new StringBuilder();
+
+						sb.append("§c❤ ").append(String.format("%.0f", currentHealth)).append("/").append(String.format("%.0f", maxHealth));
+						sb.append("    §b★ ").append(String.format("%.0f", currentMana)).append("/").append(String.format("%.0f", maxMana));
+
+						if(playerStatusCooldown.containsKey(uuid))
+							sb.append("    ").append(playerStatusCooldown.get(uuid));
+
+						BaseComponent[] message = new ComponentBuilder(sb.toString()).create();
+						p.spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
 					}
 				}, 0, 1);
 	}

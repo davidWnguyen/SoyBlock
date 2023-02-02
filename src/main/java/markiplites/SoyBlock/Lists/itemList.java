@@ -1,5 +1,6 @@
 package markiplites.SoyBlock.Lists;
 
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import markiplites.SoyBlock.*;
 import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.ItemClasses.*;
@@ -19,15 +20,12 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class itemList implements Listener
 {
-	private final HashMap<UUID, HashMap<String, Boolean>> ability_cooldown = new HashMap<>();
+	public static final HashMap<UUID, HashMap<String, Double>> ability_cooldown = new HashMap<>();
 	
 	public itemList() {
 		init();
@@ -223,7 +221,7 @@ public class itemList implements Listener
 	}
 
 	private void judgement_cut(PlayerInteractEvent e) {
-		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 10)) return;
+		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 0.5)) return;
 
 		Player p = e.getPlayer();
 		Vector vec = traceToEntity(e, 15.0);
@@ -253,6 +251,8 @@ public class itemList implements Listener
 	}
 
 	private void star_ability(PlayerInteractEvent e) {
+		if(!check_ready(e.getPlayer(), "ELDEN_STAR", 30.0, 2.5)) return;
+
 		Player p = e.getPlayer();
 		Location loc = p.getLocation();
 		loc.setY(loc.getY()+5);
@@ -346,7 +346,7 @@ public class itemList implements Listener
 
 
 	private void jump_ability(PlayerInteractEvent e) {
-		if(!check_ready(e.getPlayer(), "JUMP_ROD", 25.0, 20)) return;
+		if(!check_ready(e.getPlayer(), "JUMP_ROD", 20.0, 0.75)) return;
 
 		Player p = e.getPlayer();
 		Vector vector = p.getEyeLocation().getDirection();
@@ -356,7 +356,7 @@ public class itemList implements Listener
 	}
 
 	private void murasama_ability(PlayerInteractEvent e, Player p) {
-		if (!check_ready(e.getPlayer(), "MURASAMA", 100.0, 20)) return;
+		if (!check_ready(e.getPlayer(), "MURASAMA", 100.0, 2.0)) return;
 		//PART 1
 		//Particle
 		Vector addVec = p.getEyeLocation().getDirection();
@@ -430,21 +430,26 @@ public class itemList implements Listener
 
 
 
-	private boolean check_ready(Player p, String itemID, double manaCost, int delay) { //ability check / set x333
+	private boolean check_ready(Player p, String itemID, double manaCost, double delay) { //ability check / set x333
 		UUID uuid = p.getUniqueId();
 		if(!ability_cooldown.containsKey(uuid) || !ability_cooldown.get(uuid).containsKey(itemID)) {
-			HashMap<String, Boolean> map = new HashMap<>();
-			map.put(itemID, true);
+			HashMap<String, Double> map = new HashMap<>();
+			map.put(itemID, (double)System.currentTimeMillis());
 			ability_cooldown.put(uuid, map);
 		}
 		
-		if(!ability_cooldown.get(uuid).get(itemID)) {p.sendMessage("§4Ability on cooldown."); return false;}
+		if(System.currentTimeMillis() < ability_cooldown.get(uuid).get(itemID)) {
+			HUDTimer.playerStatusCooldown.put(uuid, String.format("§4Cooldown: %.2fs",
+					(ability_cooldown.get(uuid).get(itemID)-System.currentTimeMillis())/1000.0));
+
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {HUDTimer.playerStatusCooldown.remove(uuid);},15);
+			return false;
+		}
 
 		double currentMana = Main.getAttributes().get(uuid).get("Mana");
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
 		Main.getAttributes().get(uuid).replace("Mana", (currentMana - manaCost));
-		ability_cooldown.get(uuid).replace(itemID, false);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> ability_cooldown.get(uuid).replace(itemID, true), delay);
+		ability_cooldown.get(uuid).replace(itemID, (1000.0*delay) + System.currentTimeMillis());
 		return true;
 	}	
 

@@ -203,7 +203,8 @@ private static void skills(Player p) {
 		return true; // returning true will cancel the click event and stop taking the item
 	},
 	IridiumColorAPI.process("<SOLID:1652C3>Combat Skill Menu"),
-	String.format("+%d Base Damage", (5 * (Skills.getLevel(p.getUniqueId(), "Combat")-1)))
+	String.format("+%d Base Damage", (5 * (Skills.getLevel(p.getUniqueId(), "Combat")-1))),
+	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Combat"),Skills.getRequiredEXP(p.getUniqueId(), "Combat", 1))
 	));
 
 	gui.addElement(new StaticGuiElement('f',
