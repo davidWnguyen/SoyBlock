@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class HUDTimer implements Listener {
-	public static HashMap<UUID, String> playerStatusCooldown = new HashMap<>();
+	public static HashMap<UUID, Double> playerStatusCooldown = new HashMap<>();
 	public static void run(final Plugin plugin) {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,
 				() -> {
@@ -52,9 +52,15 @@ public class HUDTimer implements Listener {
 						sb.append("§c❤ ").append(String.format("%.0f", currentHealth)).append("/").append(String.format("%.0f", maxHealth));
 						sb.append("    §b★ ").append(String.format("%.0f", currentMana)).append("/").append(String.format("%.0f", maxMana));
 
-						if(playerStatusCooldown.containsKey(uuid))
-							sb.append("    ").append(playerStatusCooldown.get(uuid));
-
+						if(playerStatusCooldown.containsKey(uuid)) {
+							if(playerStatusCooldown.get(uuid) > System.currentTimeMillis()) {
+								sb.append("    ").append(String.format("§4Cooldown: %.2fs",
+										(playerStatusCooldown.get(uuid) - System.currentTimeMillis()) / 1000.0));
+							}
+							else {
+								playerStatusCooldown.remove(uuid);
+							}
+						}
 						BaseComponent[] message = new ComponentBuilder(sb.toString()).create();
 						p.spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
 					}

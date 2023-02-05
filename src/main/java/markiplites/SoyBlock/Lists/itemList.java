@@ -72,16 +72,6 @@ public class itemList implements Listener
 		new Drill("MINOR", "Minor", Material.PRISMARINE_SHARD, attributes, "smiley face");
 
 		attributes.clear();
-
-		attributes.put(attr.blockDurability, 40.0);
-		attributes.put(attr.blockHardness, 5.0);
-		attributes.put(attr.blockTool, 1.0);
-		attributes.put(attr.blockExp, 5.0);
-		attributes.put(attr.rarity, 6.0);
-		ItemStack[] blockLoot = {nigger.getItemStack().clone(),nigger.getItemStack().clone(),nigger.getItemStack().clone()};
-		new Block("STEEL_BLOCK", "Steel Block", Material.IRON_BLOCK, attributes, "i am a dwarf and diggy dig hole :###",blockLoot);
-
-		attributes.clear();
 		attributes.put(attr.critChance, 0.3);
 		attributes.put(attr.moveSpeed, 0.5);
 		attributes.put(attr.strengthBonusRaw, 100.0);
@@ -176,6 +166,32 @@ public class itemList implements Listener
 		attributes.put(attr.strengthBonusRaw, 10.0);
 		attributes.put(attr.dexterityBonusRaw, 15.0);
 		new Sword("DIAMONDSWORD", "Sword", Material.DIAMOND_SWORD, attributes, "Do you like my sword, sword?");
+
+		attributes.clear();
+
+		attributes.put(attr.baseDamage, 35.0);
+		attributes.put(attr.attackReachBonusRaw, 3.0);
+		attributes.put(attr.baseAttackSpeed, 1.0);
+		attributes.put(attr.strengthBonusRaw, 15.0);
+		attributes.put(attr.strengthScaling, 0.9);
+		attributes.put(attr.toolType, 2.0);
+		attributes.put(attr.miningSpeed, 6.0);
+		attributes.put(attr.miningHardness, 4.0);
+		attributes.put(attr.miningFortune, 30.0);
+		new Axe("NETHERITE_AXE", "Netherite Axe", Material.NETHERITE_AXE, attributes, "");
+
+		attributes.clear();
+
+		attributes.put(attr.baseDamage, 10.0);
+		attributes.put(attr.attackReachBonusRaw, 3.0);
+		attributes.put(attr.baseAttackSpeed, 4.0);
+		attributes.put(attr.dexterityBonusRaw, 15.0);
+		attributes.put(attr.dexterityScaling, 0.9);
+		attributes.put(attr.toolType, 3.0);
+		attributes.put(attr.miningSpeed, 5.0);
+		attributes.put(attr.miningHardness, 4.0);
+		attributes.put(attr.miningFortune, 30.0);
+		new Hoe("NETHERITE_HOE", "Netherite Hoe", Material.NETHERITE_HOE, attributes, "");
 	}
 
 
@@ -226,21 +242,29 @@ public class itemList implements Listener
 		Player p = e.getPlayer();
 		Vector vec = traceToEntity(e, 15.0);
 		Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
-		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 3.1, 3.1, 3.1, ignoreList);
+		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 4.1, 4.1, 4.1, ignoreList);
 		Location loc = vec.toLocation(e.getPlayer().getWorld());
 
-		for(double i = 0;i <= Math.PI;i += Math.PI/15) {
-			double radius = Math.sin(i);
-			double y = Math.cos(i);
-			for(double j = 0;j < Math.PI*2;j+= Math.PI / 15) {
-				Location temp = loc.clone();
-				double x = Math.cos(j) * radius;
-				double z = Math.sin(j) * radius;
-				temp.add(3*x, 3*y, 3*z);
-				Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255-((int)Math.round(i*81)), 0, 255), 3.0f);
-				loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 1, 0.0, 0.0, 0.0, dust);
+		//Run particles multithreaded so performance doesn't suck ass
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				int particleCount = 40;
+				for (double i = 0; i <= Math.PI; i += Math.PI / particleCount) {
+					double radius = Math.sin(i);
+					double y = Math.cos(i);
+					for (double j = 0; j < Math.PI * 2; j += Math.PI / particleCount) {
+						Location temp = loc.clone();
+						double x = Math.cos(j) * radius;
+						double z = Math.sin(j) * radius;
+						temp.add(4 * x, 4 * y, 4 * z);
+						Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255 - ((int) Math.round(i * 81)), 0, 255), 1.0f);
+						loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 0, 0.0, 0.0, 0.0, dust);
+					}
+				}
 			}
-		}
+		}.runTaskAsynchronously(Main.getInstance());
+
 		for(Entity entity : entities) {
 			loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
 			EntityHandling.dealDamageToEntity((LivingEntity)entity, p, CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
@@ -439,8 +463,7 @@ public class itemList implements Listener
 		}
 		
 		if(System.currentTimeMillis() < ability_cooldown.get(uuid).get(itemID)) {
-			HUDTimer.playerStatusCooldown.put(uuid, String.format("§4Cooldown: %.2fs",
-					(ability_cooldown.get(uuid).get(itemID)-System.currentTimeMillis())/1000.0));
+			HUDTimer.playerStatusCooldown.put(uuid, ability_cooldown.get(uuid).get(itemID));
 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {HUDTimer.playerStatusCooldown.remove(uuid);},15);
 			return false;

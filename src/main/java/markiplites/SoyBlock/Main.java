@@ -1,5 +1,6 @@
 package markiplites.SoyBlock;
 
+import markiplites.SoyBlock.Lists.blockList;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -37,7 +38,8 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getPluginManager().registerEvents(new itemList(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
 		new entityList();
-		//Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		new blockList();
+		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
 		//Timers
 		HUDTimer.run(instance);
 		//Commands

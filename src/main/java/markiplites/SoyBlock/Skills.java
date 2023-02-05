@@ -19,6 +19,7 @@ public class Skills {
             HashMap<String, Double> map = new HashMap<>();
             map.put("Combat", 0.0);
             map.put("Foraging", 0.0);
+            map.put("Mining", 0.0);
             map.put("Alchemy", 0.0);
             skillExperience.put(id, map);
         }
@@ -28,6 +29,7 @@ public class Skills {
             HashMap<String, Integer> map = new HashMap<>();
             map.put("Combat", 1);
             map.put("Foraging", 1);
+            map.put("Mining", 1);
             map.put("Alchemy", 1);
             skillLevels.put(id, map);
         }
