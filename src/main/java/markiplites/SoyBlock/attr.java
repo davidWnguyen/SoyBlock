@@ -29,5 +29,7 @@ public enum attr {
     blockDurability,
     blockHardness,
     blockTool,
-    blockExp
+    blockExp,
+    blockRegenerationTime,
+    stackable
 }

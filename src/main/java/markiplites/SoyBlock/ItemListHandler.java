@@ -3,6 +3,7 @@ package markiplites.SoyBlock;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -22,12 +23,15 @@ public class ItemListHandler {
 
 	public static ItemStack generateItem(String itemName)
 	{
+		if(!itemMap.containsKey(itemName))
+			{Bukkit.getLogger().info("Failure to clone "+itemName);return null;}
+
 		ItemStack item = itemMap.get(itemName).clone();
 		if(item == null)
 			return null;
 		ItemMeta meta = item.getItemMeta();
 
-		boolean isStackable = meta.getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "stackable"), PersistentDataType.STRING) &&
+		boolean isStackable = meta.getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "stackable"), PersistentDataType.DOUBLE) &&
 				(meta.getPersistentDataContainer().get(new NamespacedKey(Main.getInstance(), "stackable"), PersistentDataType.DOUBLE) == 1.0);
 		if(!isStackable) {
 			String itemUUID = UUID.randomUUID().toString();

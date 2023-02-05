@@ -27,73 +27,73 @@ public class HitDetection implements Listener {
 	
 	}
 	@EventHandler
-	public void PlayerAnimation(PlayerAnimationEvent event) {
+	public void PlayerLeftClick(PlayerAnimationEvent event) {
+		if (event.getAnimationType() != PlayerAnimationType.ARM_SWING)
+			return;
+
 		Player player = event.getPlayer();
-		UUID id = player.getUniqueId();
-		if (event.getAnimationType() == PlayerAnimationType.ARM_SWING)
-		{
-        	double baseDMG = Main.getAttributes().get(id).getOrDefault("BaseDamage", 5.0);
-	        if(baseDMG > 5.0)//fully charged & is weapon
-	        {
-	        	if(player.getCooldown(player.getInventory().getItemInMainHand().getType()) == 0)
-	        	{
-	        		ItemMeta meta = player.getInventory().getItemInMainHand().getItemMeta();
-	        		if(meta == null)
-	        			return;
-	        		PersistentDataContainer container = meta.getPersistentDataContainer();
-	        		if(container == null)
-	        			return;
-	        		int weaponType = container.has(new NamespacedKey(Main.getInstance(), "weaponType"), PersistentDataType.DOUBLE) ? (int)Math.round(container.get(new NamespacedKey(Main.getInstance(), "weaponType"), PersistentDataType.DOUBLE)) : 0;
-					switch (weaponType) {
-						case 1 -> {
-							double projSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
-							Vector playerDirection = player.getLocation().getDirection();
-							Arrow shortbowArrow = player.launchProjectile(Arrow.class, playerDirection.multiply(projSpeed));
-							if (shortbowArrow != null) {
-								shortbowArrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
-
-								HashMap<String, Double> attributes = new HashMap<>();
-
-								double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
-								boolean critBoolean = Math.random() < critChance;
-								double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
-
-								attributes.put("Damage", customDamage);
-								attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
-
-								EntityHandling.projectileAttributes.put(shortbowArrow.getUniqueId(), attributes);
-
-								double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
-
-								player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
-							}
-						}
-						default ->//Normal Swords
-						{
-							LivingEntity victim = (LivingEntity) hitTraceResult(player);
-							if (victim != null) {
-								double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
-								boolean critBoolean = Math.random() < critChance;
-								double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
-
-								EntityHandling.dealDamageToEntity(victim, player, customDamage, critBoolean, 0);
-
-								double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
-
-								player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
-							} else {
-								player.setCooldown(player.getInventory().getItemInMainHand().getType(), 1);
-							}
-						}
-					}
-	        	}
-	        	else
-	        	{
-	        		event.setCancelled(true);
-	        	}
-	        }
-        }
+		leftClickAttack(player);
     }
+
+	public void leftClickAttack(Player player)
+	{
+		UUID id = player.getUniqueId();
+		if(player.getCooldown(player.getInventory().getItemInMainHand().getType()) != 0)
+			return;
+
+		ItemMeta meta = player.getInventory().getItemInMainHand().getItemMeta();
+
+		if (meta == null)
+			return;
+		PersistentDataContainer container = meta.getPersistentDataContainer();
+		if (container == null)
+			return;
+
+		int weaponType = container.has(new NamespacedKey(Main.getInstance(), "weaponType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "weaponType"), PersistentDataType.DOUBLE)) : 0;
+		switch (weaponType) {
+			case 1 -> {
+				double projSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+				Vector playerDirection = player.getLocation().getDirection();
+				Arrow shortbowArrow = player.launchProjectile(Arrow.class, playerDirection.multiply(projSpeed));
+				if (shortbowArrow == null)
+					return;
+
+				shortbowArrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+
+				HashMap<String, Double> attributes = new HashMap<>();
+
+				double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
+				boolean critBoolean = Math.random() < critChance;
+				double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
+
+				attributes.put("Damage", customDamage);
+				attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
+
+				EntityHandling.projectileAttributes.put(shortbowArrow.getUniqueId(), attributes);
+
+				double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
+
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
+
+			}
+			default ->//Normal Swords
+			{
+				LivingEntity victim = (LivingEntity) hitTraceResult(player);
+				if (victim == null)
+					return;
+
+				double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
+				boolean critBoolean = Math.random() < critChance;
+				double customDamage = CustomAttributes.getDamageModified(player.getUniqueId(), critBoolean);
+
+				EntityHandling.dealDamageToEntity(victim, player, customDamage, critBoolean, 0);
+
+				double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
+
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
+			}
+		}
+	}
     private Entity hitTraceResult(Player player) {
         double attackRange = Main.getAttributes().get(player.getUniqueId()).getOrDefault("AttackRange", 3.0);
         //List<Entity> entities = (List<Entity>) player.getWorld().getNearbyEntities(player.getLocation(), attackRange, attackRange, attackRange);
