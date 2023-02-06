@@ -20,6 +20,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -215,10 +216,10 @@ public class itemList implements Listener
 		boolean rightClick = a == Action.RIGHT_CLICK_AIR || a == Action.RIGHT_CLICK_BLOCK;
 
 		switch(itemID) {
-			case "MURASAMA" -> {if(rightClick) murasama_ability(e,e.getPlayer());}
-			case "JUMP_ROD" -> {if(rightClick) jump_ability(e);}
-			case "ELDEN_STAR" -> {if(rightClick) star_ability(e);}
-			case "YAMATO" -> {if(rightClick) judgement_cut(e);}
+			case "MURASAMA" -> {if(rightClick) murasama_ability(e,meta);}
+			case "JUMP_ROD" -> {if(rightClick) jump_ability(e,meta);}
+			case "ELDEN_STAR" -> {if(rightClick) star_ability(e,meta);}
+			case "YAMATO" -> {if(rightClick) judgement_cut(e,meta);}
 			case "SPAWNER_ZOMBIEKING" -> {if(rightClick) spawn(e, "ZOMBIE_KING");}
 			case "SPAWNER_SKELETONKING" -> {if(rightClick) spawn(e, "SKELETON_KING");}
 			case "NIGGER" -> {if(rightClick) kill(e);}
@@ -236,16 +237,42 @@ public class itemList implements Listener
 		Ent.spawnCustomEntity(id, vec.toLocation(e.getPlayer().getWorld()));
 	}
 
-	private void judgement_cut(PlayerInteractEvent e) {
-		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 0.5)) return;
+	private void judgement_cut(PlayerInteractEvent e, ItemMeta meta) {
+		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 0.5, meta)) return;
 
 		Player p = e.getPlayer();
-		Vector vec = traceToEntity(e, 15.0);
+		Vector vec = traceToEntity(e, 8.0);
 		Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
 		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 4.1, 4.1, 4.1, ignoreList);
 		Location loc = vec.toLocation(e.getPlayer().getWorld());
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.33f,1f);
 
 		//Run particles multithreaded so performance doesn't suck ass
+		for(int i = 0;i< 8;i++) {
+			new BukkitRunnable() {
+				final double random = Math.random()-0.5;
+				final double randomX = 3.5*(Math.random()-0.5);
+				final double randomY = 3.5*(Math.random()-0.5);
+				final double randomZ = 3.5*(Math.random()-0.5);
+				@Override
+				public void run() {
+					Location temp = loc.clone();
+					loc.setYaw((float) (random*360));
+					loc.setPitch((float) (random*180));
+					Vector a = temp.getDirection();
+					a.multiply(-4);
+					temp.add(a);
+					Vector addDir = temp.getDirection();
+					Vector randVec = new Vector(randomX, randomY, randomZ);
+					for (int i = 0; i < 40; i++ ) {
+						Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 0.7f);
+						loc.getWorld().spawnParticle(Particle.REDSTONE, temp.clone().add(addDir.clone().multiply(i*0.2)).add(randVec), 0, 0.0, 0.0, 0.0, dust);
+						dust = new Particle.DustOptions(Color.fromRGB(150, 230, 255), 0.7f);
+						loc.getWorld().spawnParticle(Particle.REDSTONE, temp.clone().add(addDir.clone().multiply(i*0.2)).add(randVec), 0, 0.0, 0.0, 0.0, dust);
+					}
+				}
+			}.runTaskLaterAsynchronously(Main.getInstance(), i*2);
+		}
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -262,8 +289,9 @@ public class itemList implements Listener
 						loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 0, 0.0, 0.0, 0.0, dust);
 					}
 				}
+				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 1.33f,0.8f);
 			}
-		}.runTaskAsynchronously(Main.getInstance());
+		}.runTaskLaterAsynchronously(Main.getInstance(), 20);
 
 		for(Entity entity : entities) {
 			loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
@@ -274,8 +302,8 @@ public class itemList implements Listener
 		p.setVelocity(speed.add(new Vector(0, 0.15, 0)));
 	}
 
-	private void star_ability(PlayerInteractEvent e) {
-		if(!check_ready(e.getPlayer(), "ELDEN_STAR", 30.0, 2.5)) return;
+	private void star_ability(PlayerInteractEvent e, ItemMeta meta) {
+		if(!check_ready(e.getPlayer(), "ELDEN_STAR", 30.0, 2.5, meta)) return;
 
 		Player p = e.getPlayer();
 		Location loc = p.getLocation();
@@ -369,8 +397,8 @@ public class itemList implements Listener
 	}
 
 
-	private void jump_ability(PlayerInteractEvent e) {
-		if(!check_ready(e.getPlayer(), "JUMP_ROD", 20.0, 0.75)) return;
+	private void jump_ability(PlayerInteractEvent e, ItemMeta meta) {
+		if(!check_ready(e.getPlayer(), "JUMP_ROD", 20.0, 0.75, meta)) return;
 
 		Player p = e.getPlayer();
 		Vector vector = p.getEyeLocation().getDirection();
@@ -379,8 +407,9 @@ public class itemList implements Listener
 		p.setVelocity(vector.add(new Vector(0, 1, 0)));
 	}
 
-	private void murasama_ability(PlayerInteractEvent e, Player p) {
-		if (!check_ready(e.getPlayer(), "MURASAMA", 100.0, 2.0)) return;
+	private void murasama_ability(PlayerInteractEvent e, ItemMeta meta) {
+		Player p = e.getPlayer();
+		if (!check_ready(e.getPlayer(), "MURASAMA", 100.0, 2.0, meta)) return;
 		//PART 1
 		//Particle
 		Vector addVec = p.getEyeLocation().getDirection();
@@ -396,28 +425,54 @@ public class itemList implements Listener
 		Vector right = Main.getRightVector(loc);
 		Vector up = Main.getUpVector(loc);
 		//WHAT THE FUCK BOOOOOOOM
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
-			p.playSound(p.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.0F, 1.0F);
-
-			for (int i = -15; i < 16; i++) {
-				final int finalI = i;
-				Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
-					Vector tmpForward = forward.clone().multiply(4.0 - Math.pow(Math.abs(finalI * 0.1), 2.1));
-					Vector tmpRight = right.clone().multiply(finalI * 0.15);
-					Vector tmpUp = up.clone().multiply(finalI * 0.07);
-					Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 70 + finalI * 3, 0), 1.2F);
-
-					Vector finalVec = new Vector();
-					finalVec.add(p.getEyeLocation().toVector());
-					finalVec.add(tmpForward);
-					finalVec.add(tmpRight);
-					finalVec.add(tmpUp);
-					p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 20, dustOptions);
-				}, (i + 15) / 6);
+		new BukkitRunnable(){
+			public void run()
+			{
+				p.playSound(p.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.0F, 1.0F);
+				for (int i = -19; i < 19; i++) {
+					final int finalI = i;
+					new BukkitRunnable(){
+						public void run(){
+							double fwdFactor = Math.pow(Math.abs(finalI * 0.1), 2.1);
+							//First round
+							Vector tmpForward = forward.clone().multiply(4.0 - fwdFactor);
+							Vector tmpRight = right.clone().multiply(finalI * 0.15);
+							Vector tmpUp = up.clone().multiply(finalI * 0.07);
+							Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 70 + finalI * 3, 0), 1F);
+							Vector finalVec = new Vector();
+							finalVec.add(p.getEyeLocation().toVector());
+							finalVec.add(tmpForward);
+							finalVec.add(tmpRight);
+							finalVec.add(tmpUp);
+							p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
+							//Backshadow 1
+							tmpForward = forward.clone().multiply(3.6 - fwdFactor);
+							tmpRight = right.clone().multiply(finalI * 0.15);
+							tmpUp = up.clone().multiply(finalI * 0.07);
+							dustOptions = new Particle.DustOptions(Color.fromRGB(190, 70 + finalI * 3, 0), 1F);
+							finalVec = new Vector();
+							finalVec.add(p.getEyeLocation().toVector());
+							finalVec.add(tmpForward);
+							finalVec.add(tmpRight);
+							finalVec.add(tmpUp);
+							p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
+							//Backshadow 2
+							tmpForward = forward.clone().multiply(3.2 - fwdFactor);
+							tmpRight = right.clone().multiply(finalI * 0.15);
+							tmpUp = up.clone().multiply(finalI * 0.07);
+							dustOptions = new Particle.DustOptions(Color.fromRGB(100, 20 + finalI, 0), 1F);
+							finalVec = new Vector();
+							finalVec.add(p.getEyeLocation().toVector());
+							finalVec.add(tmpForward);
+							finalVec.add(tmpRight);
+							finalVec.add(tmpUp);
+							p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
+						}
+					}.runTaskLaterAsynchronously(Main.getInstance(), (i + 15) / 10);
+				}
+				EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p.getUniqueId(), true) * 3.5, true, 0);
 			}
-
-			EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p.getUniqueId(), true) * 3.5, true, 0);
-		}, 5);
+		}.runTaskLater(Main.getInstance(), 5);
 	}
 
 	private Vector traceToEntity(PlayerInteractEvent e, double range) {
@@ -454,7 +509,7 @@ public class itemList implements Listener
 
 
 
-	private boolean check_ready(Player p, String itemID, double manaCost, double delay) { //ability check / set x333
+	private boolean check_ready(Player p, String itemID, double manaCost, double delay, ItemMeta meta) { //ability check / set x333
 		UUID uuid = p.getUniqueId();
 		if(!ability_cooldown.containsKey(uuid) || !ability_cooldown.get(uuid).containsKey(itemID)) {
 			HashMap<String, Double> map = new HashMap<>();
@@ -464,8 +519,6 @@ public class itemList implements Listener
 		
 		if(System.currentTimeMillis() < ability_cooldown.get(uuid).get(itemID)) {
 			HUDTimer.playerStatusCooldown.put(uuid, ability_cooldown.get(uuid).get(itemID));
-
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {HUDTimer.playerStatusCooldown.remove(uuid);},15);
 			return false;
 		}
 
@@ -473,6 +526,11 @@ public class itemList implements Listener
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
 		Main.getAttributes().get(uuid).replace("Mana", (currentMana - manaCost));
 		ability_cooldown.get(uuid).replace(itemID, (1000.0*delay) + System.currentTimeMillis());
+
+
+		String buffer = String.format("§6Used %s§f! §b-%.0f★",
+				Normalizer.normalize(meta.getDisplayName(),Normalizer.Form.NFKC),manaCost);
+		HUDTimer.playerStatusAbility.put(uuid, new Object[]{buffer,System.currentTimeMillis()+1000});
 		return true;
 	}	
 
