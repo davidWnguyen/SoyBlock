@@ -242,13 +242,14 @@ public class itemList implements Listener
 
 		Player p = e.getPlayer();
 		Vector vec = traceToEntity(e, 8.0);
-		Predicate<Entity> ignoreList = f -> (f != e.getPlayer() && f instanceof LivingEntity && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
+		Predicate<Entity> ignoreList = f -> ( f instanceof LivingEntity && !(f instanceof Player) && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
 		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 4.1, 4.1, 4.1, ignoreList);
 		Location loc = vec.toLocation(e.getPlayer().getWorld());
-		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.33f,1f);
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.75f,1f);
 
 		//Run particles multithreaded so performance doesn't suck ass
-		for(int i = 0;i< 8;i++) {
+		for(int i = 0;i< 16;i++) {
+			int finalI = i;
 			new BukkitRunnable() {
 				final double random = Math.random()-0.5;
 				final double randomX = 3.5*(Math.random()-0.5);
@@ -270,8 +271,10 @@ public class itemList implements Listener
 						dust = new Particle.DustOptions(Color.fromRGB(150, 230, 255), 0.7f);
 						loc.getWorld().spawnParticle(Particle.REDSTONE, temp.clone().add(addDir.clone().multiply(i*0.2)).add(randVec), 0, 0.0, 0.0, 0.0, dust);
 					}
+					if((finalI & 1) == 1)
+						p.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, (float) (1 + finalI *0.035));
 				}
-			}.runTaskLaterAsynchronously(Main.getInstance(), i*2);
+			}.runTaskLaterAsynchronously(Main.getInstance(), i+2);
 		}
 		new BukkitRunnable() {
 			@Override
@@ -289,7 +292,7 @@ public class itemList implements Listener
 						loc.getWorld().spawnParticle(Particle.REDSTONE, temp, 0, 0.0, 0.0, 0.0, dust);
 					}
 				}
-				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 1.33f,0.8f);
+				p.getWorld().playSound(loc, Sound.ENTITY_EVOKER_FANGS_ATTACK, 2.0f,1f);
 			}
 		}.runTaskLaterAsynchronously(Main.getInstance(), 20);
 
@@ -434,39 +437,18 @@ public class itemList implements Listener
 					new BukkitRunnable(){
 						public void run(){
 							double fwdFactor = Math.pow(Math.abs(finalI * 0.1), 2.1);
-							//First round
-							Vector tmpForward = forward.clone().multiply(4.0 - fwdFactor);
-							Vector tmpRight = right.clone().multiply(finalI * 0.15);
-							Vector tmpUp = up.clone().multiply(finalI * 0.07);
-							Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 70 + finalI * 3, 0), 1F);
-							Vector finalVec = new Vector();
-							finalVec.add(p.getEyeLocation().toVector());
-							finalVec.add(tmpForward);
-							finalVec.add(tmpRight);
-							finalVec.add(tmpUp);
-							p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
-							//Backshadow 1
-							tmpForward = forward.clone().multiply(3.6 - fwdFactor);
-							tmpRight = right.clone().multiply(finalI * 0.15);
-							tmpUp = up.clone().multiply(finalI * 0.07);
-							dustOptions = new Particle.DustOptions(Color.fromRGB(190, 70 + finalI * 3, 0), 1F);
-							finalVec = new Vector();
-							finalVec.add(p.getEyeLocation().toVector());
-							finalVec.add(tmpForward);
-							finalVec.add(tmpRight);
-							finalVec.add(tmpUp);
-							p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
-							//Backshadow 2
-							tmpForward = forward.clone().multiply(3.2 - fwdFactor);
-							tmpRight = right.clone().multiply(finalI * 0.15);
-							tmpUp = up.clone().multiply(finalI * 0.07);
-							dustOptions = new Particle.DustOptions(Color.fromRGB(100, 20 + finalI, 0), 1F);
-							finalVec = new Vector();
-							finalVec.add(p.getEyeLocation().toVector());
-							finalVec.add(tmpForward);
-							finalVec.add(tmpRight);
-							finalVec.add(tmpUp);
-							p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
+							for(int i = 0; i < 15;i++) {
+								Vector tmpForward = forward.clone().multiply(4.0 - fwdFactor - i*0.12);
+								Vector tmpRight = right.clone().multiply(finalI * 0.15);
+								Vector tmpUp = up.clone().multiply(finalI * 0.07);
+								Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255 - i*15, Math.max(70 + finalI*3 - i*10,0), 0), 1F);
+								Vector finalVec = new Vector();
+								finalVec.add(p.getEyeLocation().toVector());
+								finalVec.add(tmpForward);
+								finalVec.add(tmpRight);
+								finalVec.add(tmpUp);
+								p.spawnParticle(Particle.REDSTONE, finalVec.toLocation(p.getWorld()), 0, dustOptions);
+							}
 						}
 					}.runTaskLaterAsynchronously(Main.getInstance(), (i + 15) / 10);
 				}

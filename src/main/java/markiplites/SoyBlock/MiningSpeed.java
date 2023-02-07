@@ -29,15 +29,20 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class MiningSpeed implements Listener{
     private final NamespacedKey blockIDKey;
     private final ProtocolManager protocolManager;
+
+	private final HashMap<UUID, Block> blockBeingMined = new HashMap<>();
+	private final HashMap<UUID, Integer> blockBreakStage = new HashMap<>();
     Main mainPlugin;
     public MiningSpeed(Main main) {
         mainPlugin = main;
@@ -57,10 +62,21 @@ public class MiningSpeed implements Listener{
                 Player p = event.getPlayer();
                 
                 if(!digType.equals(PlayerDigType.START_DESTROY_BLOCK)) {
-					setFatigue(p, 0,-1);
-                }
+					blockBeingMined.remove(p.getUniqueId());
+					blockBreakStage.remove(p.getUniqueId());
+					setFatigue(p, 0, -1);
+				}
             }
         });
+		protocolManager.addPacketListener(new PacketAdapter(mainPlugin, ListenerPriority.NORMAL, PacketType.Play.Server.BLOCK_BREAK_ANIMATION) {
+			@Override
+			public void onPacketSending(PacketEvent event){
+				PacketContainer packet = event.getPacket();
+				Player p = event.getPlayer();
+				int stage = blockBreakStage.getOrDefault(p.getUniqueId(), 0);
+				packet.getIntegers().write(1, stage);
+			}
+		});
     }
     @EventHandler
     public void OnBlockPlace(BlockPlaceEvent event)
@@ -70,15 +86,15 @@ public class MiningSpeed implements Listener{
 		if(meta == null) return;
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 		
-		if(container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE)
-				|| container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE)
-				|| container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+		if(container.has(new NamespacedKey(mainPlugin, "baseDamage"), PersistentDataType.DOUBLE)
+				|| container.has(new NamespacedKey(mainPlugin, "toolType"), PersistentDataType.DOUBLE)
+				|| container.has(new NamespacedKey(mainPlugin, "itemAction"), PersistentDataType.DOUBLE))
 			event.setCancelled(true);
 		
-		if(container.has(new NamespacedKey(Main.getInstance(), "blockID"), PersistentDataType.STRING))
+		if(container.has(new NamespacedKey(mainPlugin, "blockID"), PersistentDataType.STRING))
 		{
-			PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
-			String id = container.get(new NamespacedKey(Main.getInstance(), "blockID"), PersistentDataType.STRING);
+			PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), mainPlugin);
+			String id = container.get(new NamespacedKey(mainPlugin, "blockID"), PersistentDataType.STRING);
 			customBlockData.set(blockIDKey, PersistentDataType.STRING, id);
 		}
     }
@@ -90,10 +106,13 @@ public class MiningSpeed implements Listener{
     }
     @EventHandler
     public void OnBlockHit(BlockDamageEvent event) {
-    	Player eventPlayer = event.getPlayer();
-		event.setInstaBreak(false);
+		if(event.getInstaBreak())
+			return;
 
-		PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
+    	Player eventPlayer = event.getPlayer();
+		blockBeingMined.put(eventPlayer.getUniqueId(), event.getBlock());
+
+		PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), mainPlugin);
 		String blockID;
 		if(customBlockData.has(blockIDKey, PersistentDataType.STRING))
 			blockID = customBlockData.get(blockIDKey, PersistentDataType.STRING);
@@ -129,24 +148,24 @@ public class MiningSpeed implements Listener{
     }
 
     public void MiningBlock(BlockDamageEvent event, Block block) {
-        Player p = event.getPlayer();
-		  //p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 200, 4, true));
-		  setFatigue(p, 200,4);
-		  //Instead of getting the hash every time the breaking process is done, get it when it starts.
-		  PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), Main.getInstance());
-		  String blockID;
-		  if(customBlockData.has(blockIDKey, PersistentDataType.STRING))
-			  blockID = customBlockData.get(blockIDKey, PersistentDataType.STRING);
-		  else
-			  blockID = event.getBlock().getType().toString();
+		Player p = event.getPlayer();
+		//p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 200, 4, true));
+		setFatigue(p, 200,4);
+		//Instead of getting the hash every time the breaking process is done, get it when it starts.
+		PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), mainPlugin);
+		String blockID;
+		if(customBlockData.has(blockIDKey, PersistentDataType.STRING))
+			blockID = customBlockData.get(blockIDKey, PersistentDataType.STRING);
+		else
+			blockID = event.getBlock().getType().toString();
 
-		  if(!blockList.block_attributes.containsKey(blockID))
-			  return;
+		if(!blockList.block_attributes.containsKey(blockID))
+			return;
 
-		  double toolSpeed = Main.getAttributes().get(p.getUniqueId()).getOrDefault("MiningSpeed", 1.0);
-		  long temporaryBreakTime = Math.round(blockList.block_attributes.get(blockID).get(attr.blockDurability) / 9.0 / toolSpeed);
-		  blockBreakingStages(event, p, 0, block,temporaryBreakTime, blockID);
-		  blockBreakEffect(p, event.getBlock().getLocation().toVector(), 1);
+		double toolSpeed = Main.getAttributes().get(p.getUniqueId()).getOrDefault("MiningSpeed", 1.0);
+		long temporaryBreakTime = Math.round(blockList.block_attributes.get(blockID).get(attr.blockDurability) / 9.0 / toolSpeed);
+		blockBreakingStages( p, 0, block, temporaryBreakTime, blockID);
+		blockBreakEffect(p, block.getLocation().toVector(), 1);
     }
 
 	public void blockBreakEffect(Player player, Vector vector, int step) {
@@ -178,7 +197,6 @@ public class MiningSpeed implements Listener{
 			}
 			return;
 		}
-
 		PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EFFECT);
 		potionPacket.getIntegers().write(0, p.getEntityId())
 				.write(1, duration);
@@ -191,46 +209,51 @@ public class MiningSpeed implements Listener{
 			e.printStackTrace();
 		}
 	}
-    public void blockBreakingStages(BlockDamageEvent event, Player p, int stage, Block block, long temporaryBreakTime, String blockID)
+    public void blockBreakingStages(Player p, int stage, Block block, long temporaryBreakTime, String blockID)
     {
 		UUID uuid = p.getUniqueId();
-		BukkitScheduler scheduler = mainPlugin.getServer().getScheduler();
-		blockBreakEffect(p, event.getBlock().getLocation().toVector(), stage);
-		scheduler.scheduleSyncDelayedTask(mainPlugin, () -> {
-			if (stage < 9) {
-				blockBreakEffect(p, event.getBlock().getLocation().toVector(), stage);
-				blockBreakingStages(event, p, stage + 1, block, temporaryBreakTime, blockID);
-			} else {
-				mainPlugin.getServer().getPluginManager().callEvent(new BlockBreakEvent(event.getBlock(), event.getPlayer()));
-				//Block Breaking shit
-				block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 20, 0.3, 0.1, 0.3, block.getType().createBlockData());
-				block.setType(Material.AIR);
 
-				if (blockList.block_loot.containsKey(blockID)) {
-					double miningFortune = Main.getAttributes().get(uuid).getOrDefault("MiningFortune", 0.0);
-					int blockExp = (int) Math.round(blockList.block_attributes.get(blockID).getOrDefault(attr.blockExp, 0.0));
-					p.giveExp(blockExp);
-					for (String itemName : blockList.block_loot.get(blockID)) {
-						ItemStack item = ItemListHandler.generateItem(itemName);
-						if (item == null) continue;
+		if(!(blockBeingMined.containsKey(uuid) && blockBeingMined.get(uuid).equals(block)))
+			return;
+		blockBreakStage.put(uuid, stage);
+		blockBreakEffect(p, block.getLocation().toVector(), stage);
+		new BukkitRunnable() {
+			public void run() {
+				blockBreakEffect(p, block.getLocation().toVector(), stage);
+				if (stage < 9) {
+					blockBreakingStages(p, stage + 1, block, temporaryBreakTime, blockID);
+				} else {
+					mainPlugin.getServer().getPluginManager().callEvent(new BlockBreakEvent(block, p));
+					//Block Breaking shit
+					block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 20, 0.3, 0.1, 0.3, block.getType().createBlockData());
+					block.setType(Material.AIR);
 
-						if (item.getMaxStackSize() != 1) {
-							int miningMult = (int) Math.floor((miningFortune / 100.0) + 1.0);
-							if (Math.random() < (miningFortune / 100.0) - Math.floor(miningFortune / 100.0))
-								miningMult += 1;
+					if (blockList.block_loot.containsKey(blockID)) {
+						double miningFortune = Main.getAttributes().get(uuid).getOrDefault("MiningFortune", 0.0);
+						int blockExp = (int) Math.round(blockList.block_attributes.get(blockID).getOrDefault(attr.blockExp, 0.0));
+						p.giveExp(blockExp);
+						for (String itemName : blockList.block_loot.get(blockID)) {
+							ItemStack item = ItemListHandler.generateItem(itemName);
+							if (item == null) continue;
 
-							item.setAmount(item.getAmount() * miningMult);
-						}
-						if (p.getInventory().firstEmpty() != -1)//If player's inventory is not full
-						{
-							p.getInventory().addItem(item);
-						} else {//Drop the item where the block was broken
-							event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
+							if (item.getMaxStackSize() != 1) {
+								int miningMult = (int) Math.floor((miningFortune / 100.0) + 1.0);
+								if (Math.random() < (miningFortune / 100.0) - Math.floor(miningFortune / 100.0))
+									miningMult += 1;
+
+								item.setAmount(item.getAmount() * miningMult);
+							}
+							if (p.getInventory().firstEmpty() != -1)//If player's inventory is not full
+							{
+								p.getInventory().addItem(item);
+							} else {//Drop the item where the block was broken
+								block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
+							}
 						}
 					}
+					setFatigue(p, 0, -1);
 				}
-				setFatigue(p, 0, -1);
 			}
-		}, temporaryBreakTime);
+		}.runTaskLater(mainPlugin,temporaryBreakTime);
 	}
 }
