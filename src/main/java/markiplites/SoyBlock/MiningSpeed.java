@@ -103,6 +103,25 @@ public class MiningSpeed implements Listener{
     {
 		event.setCancelled(true);
 		event.setExpToDrop(0);
+		UUID id = event.getPlayer().getUniqueId();
+		Material block = event.getBlock().getType();
+		String blockName = event.getBlock().toString();
+		if(blockName.contains("LOG")) {
+			Skills.addSkillExp(id, "Foraging", 5.0);
+			return;
+		}
+		
+		switch(block) { //mining blocks: add more if you find them
+			case STONE -> Skills.addSkillExp(id, "Mining", 15.0);
+			case COBBLESTONE -> Skills.addSkillExp(id, "Mining", 15.0);
+			case ANDESITE -> Skills.addSkillExp(id, "Mining", 15.0);
+			case DIORITE -> Skills.addSkillExp(id, "Mining", 15.0);
+			case GRANITE -> Skills.addSkillExp(id, "Mining", 15.0);
+			case DEEPSLATE -> Skills.addSkillExp(id, "Mining", 15.0);
+			case DRIPSTONE_BLOCK -> Skills.addSkillExp(id, "Mining", 69420.0); //its a reference
+			case SANDSTONE -> Skills.addSkillExp(id, "Mining", 2.5);
+		}
+		
     }
     @EventHandler
     public void OnBlockHit(BlockDamageEvent event) {

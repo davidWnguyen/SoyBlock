@@ -41,7 +41,15 @@ public class Skills {
                 levels = (int)((Math.log(1 + ((skillExperience.get(id).get(skill)*2)/20) - (skillExperience.get(id).get(skill))/20))/(Math.log(2)) + 1);
                 bonus = "+5 Base Damage";
             }
-            default -> {Bukkit.getLogger().info("Nigga you crazyyy");}
+            case "Foraging" -> {
+                levels = (int)((Math.log(1 + ((skillExperience.get(id).get(skill)*2)/20) - (skillExperience.get(id).get(skill))/20))/(Math.log(2)) + 1);
+                bonus = "+5 Strength";
+            }
+            case "Mining" -> {
+                levels = (int)((Math.log(1 + ((skillExperience.get(id).get(skill)*3)/50) - (skillExperience.get(id).get(skill))/50))/(Math.log(3)) + 1);
+                bonus = "+1% Absorption"; 
+            }
+            default -> {Bukkit.getLogger().info("SOYBLOCK SKILLS: Cannot find associated skill to get level formula.");}
         };
         int previous = skillLevels.get(id).replace(skill, levels);
         if(previous != levels) {
@@ -55,9 +63,13 @@ public class Skills {
         if(!skillLevels.get(id).containsKey(skill)) return 1;
         return skillLevels.get(id).get(skill);
     }
-    public static double getRequiredEXP(UUID id, String skill, int offset){
+    public static double getRequiredEXP(UUID id, String skill, int offset) {
         int level = getLevel(id,skill);
-        return 20.0*((1-Math.pow(2.0, level-1+offset)) / (1-2.0));
+        switch(skill) {
+            case "Foraging","Combat" : {return 20.0*((1-Math.pow(2.0, level-1+offset)) / (1-2.0));}
+            case "Mining" : {return 50.0*((1-Math.pow(3.0, level-1+offset)) / (1-3.0));}
+            default : {return 0.0;}
+        }
     }
     public static double getPlayerEXP(UUID id, String skill){
         if(!skillExperience.containsKey(id)) return 0.0;

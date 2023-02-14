@@ -193,6 +193,7 @@ public class itemList implements Listener
 		attributes.put(attr.miningHardness, 4.0);
 		attributes.put(attr.miningFortune, 30.0);
 		new Hoe("NETHERITE_HOE", "Netherite Hoe", Material.NETHERITE_HOE, attributes, "");
+	
 	}
 
 
@@ -241,7 +242,7 @@ public class itemList implements Listener
 		if(!check_ready(e.getPlayer(), "YAMATO", 75.0, 0.5, meta)) return;
 
 		Player p = e.getPlayer();
-		Vector vec = traceToEntity(e, 8.0);
+		Vector vec = traceToEntity(e, 15.0);
 		Predicate<Entity> ignoreList = f -> ( f instanceof LivingEntity && !(f instanceof Player) && !f.isDead() && f.getType() != EntityType.ARMOR_STAND);
 		Collection<Entity> entities = e.getPlayer().getWorld().getNearbyEntities(vec.toLocation(e.getPlayer().getWorld()), 4.1, 4.1, 4.1, ignoreList);
 		Location loc = vec.toLocation(e.getPlayer().getWorld());
