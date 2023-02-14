@@ -685,10 +685,16 @@ public class CustomAttributes implements Listener {
 					AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 		
+		//Skill shittoids
 		if(attributes.containsKey("BaseDamage"))
 			attributes.replace("BaseDamage", (5.0 * (Skills.getLevel(uuid, "Combat"))-1) + attributes.get("BaseDamage"));
-
-		//Check for maximums
+		if(attributes.containsKey("Strength"))
+			attributes.replace("Strength", (5.0 * (Skills.getLevel(uuid, "Foraging"))-1) + attributes.get("Strength"));
+		if(attributes.containsKey("Absorption"))
+			attributes.replace("Absorption", (1.0 * (Skills.getLevel(uuid, "Mining"))-1) + attributes.get("Absorption"));
+		
+		
+			//Check for maximums
 		HashMap<String, Double> attr = Main.getAttributes().get(uuid);
 
 		if(attr == null) return;

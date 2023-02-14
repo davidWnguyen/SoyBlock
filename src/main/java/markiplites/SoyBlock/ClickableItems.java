@@ -187,7 +187,7 @@ public class ClickableItems implements Listener {
 private static void skills(Player p) {
 	String[] guiSetup = {
 		"bbbbbbbbb",
-		"b       b",
+		"b   m   b",
 		"b  fch  b",
 		"b       b",
 		"bbbbbbbbb"
@@ -213,7 +213,9 @@ private static void skills(Player p) {
 	click -> {
 		return true; // returning true will cancel the click event and stop taking the item
 	},
-	IridiumColorAPI.process("<SOLID:0C8536>Foraging Skill Menu")
+	IridiumColorAPI.process("<SOLID:0C8536>Foraging Skill Menu"),
+	String.format("+%d Strength", (5 * (Skills.getLevel(p.getUniqueId(), "Foraging")-1))),
+	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Foraging"),Skills.getRequiredEXP(p.getUniqueId(), "Foraging", 1))
 	));
 
 	gui.addElement(new StaticGuiElement('h',
@@ -222,7 +224,20 @@ private static void skills(Player p) {
 	click -> {
 		return true; // returning true will cancel the click event and stop taking the item
 	},
-	IridiumColorAPI.process("<SOLID:C0D9F1>Alchemy Skill Menu")
+	IridiumColorAPI.process("<SOLID:C0D9F1>Alchemy Skill Menu"),
+	String.format("+%d Iteglicen", (5 * (Skills.getLevel(p.getUniqueId(), "Alchemy")-1))),
+	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Alchemy"),Skills.getRequiredEXP(p.getUniqueId(), "Alchemy", 1))
+	));
+
+	gui.addElement(new StaticGuiElement('m',
+	ItemListHandler.getItemForDisplay(Material.IRON_PICKAXE),
+	Math.min(Skills.getLevel(p.getUniqueId(), "Mining"), 64),
+	click -> {
+		return true; // returning true will cancel the click event and stop taking the item
+	},
+	IridiumColorAPI.process("<SOLID:7B2EDB>Mining Skill Menu"),
+	String.format("+%d%% Absorption", (1 * (Skills.getLevel(p.getUniqueId(), "Mining")-1))),
+	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Mining"),Skills.getRequiredEXP(p.getUniqueId(), "Mining", 1))
 	));
 
 	gui.addElement(new StaticGuiElement('b',
@@ -231,7 +246,7 @@ private static void skills(Player p) {
 	click -> {
 		return true; // returning true will cancel the click event and stop taking the item
 	},
-	IridiumColorAPI.process("")
+	" "
 	));
 
 	gui.show(p);
@@ -255,7 +270,7 @@ private static void skills(Player p) {
 		click -> {
 			return true; // returning true will cancel the click event and stop taking the item
 		},
-		IridiumColorAPI.process("")
+		" "
 		));
 
 		gui.addElement(new StaticGuiElement('n',

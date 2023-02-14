@@ -22,6 +22,7 @@ public class blockList {
         attributes.put(attr.blockRegenerationTime, 3.0);
         attributes.put(attr.stackable, 1.0);
         attributes.put(attr.rarity, 1.0);
+        //wood
         new Block("OAK_LOG", "Oak Log", Material.OAK_LOG, attributes,
                 "mine diamond :3",new String[]{"OAK_LOG"});
         new Block("BIRCH_LOG", "Birch Log", Material.BIRCH_LOG, attributes,
@@ -36,7 +37,28 @@ public class blockList {
                 "<SOLID:7a7a7a>Wood lel",new String[]{"SPRUCE_LOG"});
         new Block("DARK_OAK_LOG", "Dark Oak Log", Material.DARK_OAK_LOG, attributes,
                 "<SOLID:7a7a7a>Wood lel",new String[]{"DARK_OAK_LOG"});
-
+        
+        //stone
+        attributes.replace(attr.blockTool, 1.0);
+        new Block("STONE", "Stone", Material.STONE, attributes,
+                "<SOLID:#61737A>The bong method has worked out so far",new String[]{"STONE"});
+        new Block("COBBLESTONE", "Cobblestone", Material.COBBLESTONE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"COBBLESTONE"});
+        new Block("ANDESITE", "Andesite", Material.ANDESITE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"ANDESITE"});
+        new Block("DIORITE", "Diorite", Material.DIORITE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"DIORITE"});
+        new Block("COBBLESTONE", "Cobblestone", Material.COBBLESTONE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"COBBLESTONE"});       
+        new Block("GRANITE", "Granite", Material.GRANITE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"GRANITE"});       
+        new Block("DEEPSLATE", "Deepslate", Material.DEEPSLATE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"DEEPSLATE"});
+        new Block("DRIPSTONE_BLOCK", "DRIPSTONE_BLOCK", Material.DRIPSTONE_BLOCK, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"DRIPSTONE_BLOCK"});
+        new Block("SANDSTONE", "Sandstone", Material.SANDSTONE, attributes,
+                "<SOLID:61737A>The bong method has worked out so far",new String[]{"SANDSTONE"});
+        
         attributes.clear();
         attributes.put(attr.blockDurability, 500.0);
         attributes.put(attr.blockHardness, 3.0);
