@@ -74,7 +74,6 @@ public class HitDetection implements Listener {
 				double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 
 				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
-
 			}
 			default ->//Normal Swords
 			{

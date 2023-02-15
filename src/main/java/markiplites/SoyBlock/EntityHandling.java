@@ -72,7 +72,9 @@ public class EntityHandling implements Listener {
 	}
 	//Deal Damage
 	public static void dealDamageToEntity(LivingEntity en, LivingEntity damager, double damageDealt, boolean isCrit, int damageType){
-		
+		if(en.isDead())
+			return;
+
 		en.damage(0.0);
 		UUID id = en.getUniqueId();
 		

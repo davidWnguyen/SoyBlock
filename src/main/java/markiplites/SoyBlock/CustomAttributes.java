@@ -114,88 +114,88 @@ public class CustomAttributes implements Listener {
 		//Mining Stats
 		//Mining Speed
 		if(miningSpeed > 0) {
-			lore.add(String.format("§6\u26CF Mining Speed: §a+§x§0§0§a§1§f§b%.0f\n",miningSpeed));
+			lore.add(String.format("§6⛏ Mining Speed: §a+§x§0§0§a§1§f§b%.0f\n",miningSpeed));
 		}else if(miningSpeed < 0) {
-			lore.add(String.format("§6\u26CF Mining Speed: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningSpeed)));
+			lore.add(String.format("§6⛏ Mining Speed: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningSpeed)));
 		}
 		//Mining Hardness
 		if(miningHardness > 0) {
-			lore.add(String.format("§6\u26CF Mining Tier: §a+§x§0§0§a§1§f§b%.0f\n",miningHardness));
+			lore.add(String.format("§6⛏ Mining Tier: §a+§x§0§0§a§1§f§b%.0f\n",miningHardness));
 		}else if(miningHardness < 0) {
-			lore.add(String.format("§6\u26CF Mining Tier: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningHardness)));
+			lore.add(String.format("§6⛏ Mining Tier: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningHardness)));
 		}
 		//Mining Fortune
 		if(miningFortune > 0) {
-			lore.add(IridiumColorAPI.process(String.format("§6\u2663 Mining Fortune: §a+<GRADIENT:059600>%.0f</GRADIENT:00F794>\n",miningFortune)));
+			lore.add(IridiumColorAPI.process(String.format("§6♣ Mining Fortune: §a+<GRADIENT:059600>%.0f</GRADIENT:00F794>\n",miningFortune)));
 		}else if(miningFortune < 0) {
-			lore.add(String.format("§6\u2663 Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n",Math.abs(miningFortune)));
+			lore.add(String.format("§6♣ Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n",Math.abs(miningFortune)));
 		}
 		
 		//Health
 		if(healthBonusRaw > 0) {
-			lore.add(String.format("§6\u2764 Maximum Health: §a+§c%.0f\n",healthBonusRaw));
+			lore.add(String.format("§6❤ Maximum Health: §a+§c%.0f\n",healthBonusRaw));
 		}else if(healthBonusRaw < 0) {
-			lore.add(String.format("§6\u2764 Maximum Health: §c-§c%.0f\n",Math.abs(healthBonusRaw)));
+			lore.add(String.format("§6❤ Maximum Health: §c-§c%.0f\n",Math.abs(healthBonusRaw)));
 		}
 		//Absorption (defense)
 		if(absorptionBonusRaw > 0) {
-			lore.add(String.format("§6\u26E8 Absorption: §a+§a%.2f%%\n",absorptionBonusRaw));
+			lore.add(String.format("§6⛨ Absorption: §a+§a%.2f%%\n",absorptionBonusRaw));
 		}else if(absorptionBonusRaw < 0) {
-			lore.add(String.format("§6\u26E8 Absorption: §c-§a%.2f%%\n",Math.abs(absorptionBonusRaw)));
+			lore.add(String.format("§6⛨ Absorption: §c-§a%.2f%%\n",Math.abs(absorptionBonusRaw)));
 		}
 		//Intelligence
 		if(intelligenceBonusRaw > 0) {
-			lore.add(String.format("§6\u2605 Intelligence: §a+§b%.0f\n",intelligenceBonusRaw));
+			lore.add(String.format("§6★ Intelligence: §a+§b%.0f\n",intelligenceBonusRaw));
 		}else if(intelligenceBonusRaw < 0) {
-			lore.add(String.format("§6\u2605 Intelligence: §c-§b%.0f\n",Math.abs(intelligenceBonusRaw)));
+			lore.add(String.format("§6★ Intelligence: §c-§b%.0f\n",Math.abs(intelligenceBonusRaw)));
 		}
 		
 		if(intelligenceScaling > 0) {
-			lore.add(String.format("§6\u2605 Intelligence Scaling - §b%s (%.2f)\n",ScalingToLetter(intelligenceScaling),intelligenceScaling));
+			lore.add(String.format("§6★ Intelligence Scaling - §b%s (%.2f)\n",ScalingToLetter(intelligenceScaling),intelligenceScaling));
 		}
 		//Strength
 		if(strengthBonusRaw > 0) {
-			lore.add(String.format("§6\u01A9 Strength: §a+§x§2§5§8§e§0§0%.0f\n",strengthBonusRaw));
+			lore.add(String.format("§6Ʃ Strength: §a+§x§2§5§8§e§0§0%.0f\n",strengthBonusRaw));
 		}else if(strengthBonusRaw < 0) {
-			lore.add(String.format("§6\u01A9 Strength: §c-§x§2§5§8§e§0§0%.0f\n",Math.abs(strengthBonusRaw)));
+			lore.add(String.format("§6Ʃ Strength: §c-§x§2§5§8§e§0§0%.0f\n",Math.abs(strengthBonusRaw)));
 		}
 		
 		if(strengthScaling > 0) {
-			lore.add(String.format("§6\u01A9 Strength Scaling - §x§2§5§8§e§0§0%s (%.2f)\n",ScalingToLetter(strengthScaling),strengthScaling));
+			lore.add(String.format("§6Ʃ Strength Scaling - §x§2§5§8§e§0§0%s (%.2f)\n",ScalingToLetter(strengthScaling),strengthScaling));
 		}
 		//Dexterity
 		if(dexterityBonusRaw > 0) {
-			lore.add(String.format("§6\u2620 Dexterity: §a+§x§d§8§0§0§6§8%.0f\n",dexterityBonusRaw));
+			lore.add(String.format("§6☠ Dexterity: §a+§x§d§8§0§0§6§8%.0f\n",dexterityBonusRaw));
 		}else if(dexterityBonusRaw < 0) {
-			lore.add(String.format("§6\u2620 Dexterity: §c-§x§d§8§0§0§6§8%.0f\n",Math.abs(dexterityBonusRaw)));
+			lore.add(String.format("§6☠ Dexterity: §c-§x§d§8§0§0§6§8%.0f\n",Math.abs(dexterityBonusRaw)));
 		}
 		
 		if(dexterityScaling > 0) {
-			lore.add(String.format("§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8%s (%.2f)\n",ScalingToLetter(dexterityScaling),dexterityScaling));
+			lore.add(String.format("§6☠ Dexterity Scaling - §x§d§8§0§0§6§8%s (%.2f)\n",ScalingToLetter(dexterityScaling),dexterityScaling));
 		}
 		
 		if(critChance > 0) {
-			lore.add(String.format("§6\u2620 Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance*100.0));
+			lore.add(String.format("§6☠ Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance*100.0));
 		}else if(critChance < 0) {
-			lore.add(String.format("§6\u2620 Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance)*100.0));
+			lore.add(String.format("§6☠ Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance)*100.0));
 		}
 		
 		if(critDamage > 0) {
-			lore.add(String.format("§6\u2620 Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage*100.0));
+			lore.add(String.format("§6☠ Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage*100.0));
 		}else if(critDamage < 0) {
-			lore.add(String.format("§6\u2620 Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage)*100.0));
+			lore.add(String.format("§6☠ Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage)*100.0));
 		}
 		
 		if(regenerationBonus > 0) {
-			lore.add(String.format("§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n",regenerationBonus));
+			lore.add(String.format("§6❤ Regeneration Bonus: §a+§c%.0f%%\n",regenerationBonus));
 		}else if(regenerationBonus < 0) {
-			lore.add(String.format("§6\u2764 Regeneration Bonus: §c-%.0f%%\n",Math.abs(regenerationBonus)));
+			lore.add(String.format("§6❤ Regeneration Bonus: §c-%.0f%%\n",Math.abs(regenerationBonus)));
 		}
 		
 		if(moveSpeed > 0) {
-			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
+			lore.add(String.format("§6☄ Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
 		}else if(moveSpeed < 0) {
-			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed)*100.0));
+			lore.add(String.format("§6☄ Speed: §c-%.0f%%\n",Math.abs(moveSpeed)*100.0));
 		}
 		
 
@@ -290,26 +290,26 @@ public class CustomAttributes implements Listener {
 		//Mining Stats6
 		//Mining Speed
 		if(miningSpeed > 0) {
-			lore.add(String.format("§6\u26CF Mining Speed: §a+§x§0§0§a§1§f§b%.0f\n",miningSpeed));
+			lore.add(String.format("§6⛏ Mining Speed: §a+§x§0§0§a§1§f§b%.0f\n",miningSpeed));
 			attributes.put("MiningSpeed", attributes.get("MiningSpeed") + miningSpeed);
 		}else if(miningSpeed < 0) {
-			lore.add(String.format("§6\u26CF Mining Speed: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningSpeed)));
+			lore.add(String.format("§6⛏ Mining Speed: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningSpeed)));
 			attributes.put("MiningSpeed", attributes.get("MiningSpeed") + miningSpeed);
 		}
 		//Mining Hardness
 		if(miningHardness > 0) {
-			lore.add(String.format("§6\u26CF Mining Tier: §a+§x§0§0§a§1§f§b%.0f\n",miningHardness));
+			lore.add(String.format("§6⛏ Mining Tier: §a+§x§0§0§a§1§f§b%.0f\n",miningHardness));
 			attributes.put("ToolHardness", attributes.get("ToolHardness") + miningHardness);
 		}else if(miningHardness < 0) {
-			lore.add(String.format("§6\u26CF Mining Tier: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningHardness)));
+			lore.add(String.format("§6⛏ Mining Tier: §c-§x§0§0§a§1§f§b%.0f\n",Math.abs(miningHardness)));
 			attributes.put("ToolHardness", attributes.get("ToolHardness") + miningHardness);
 		}
 		//Mining Fortune
 		if(miningFortune > 0) {
-			lore.add(IridiumColorAPI.process(String.format("§6\u2663 Mining Fortune: §a+<GRADIENT:059600>%.0f</GRADIENT:00F794>\n",miningFortune)));
+			lore.add(IridiumColorAPI.process(String.format("§6♣ Mining Fortune: §a+<GRADIENT:059600>%.0f</GRADIENT:00F794>\n",miningFortune)));
 			attributes.put("MiningFortune", attributes.get("MiningFortune") + miningFortune);
 		}else if(miningFortune < 0) {
-			lore.add(String.format("§6\u2663 Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n",Math.abs(miningFortune)));
+			lore.add(String.format("§6♣ Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n",Math.abs(miningFortune)));
 			attributes.put("MiningFortune", attributes.get("MiningFortune") + miningFortune);
 		}
 		//Tool Type
@@ -319,89 +319,89 @@ public class CustomAttributes implements Listener {
 		//Health
 		if(healthBonusRaw > 0) {
 			attributes.put("MaxHealth", attributes.get("MaxHealth") + healthBonusRaw);
-			lore.add(String.format("§6\u2764 Maximum Health: §a+§c%.0f\n",healthBonusRaw));
+			lore.add(String.format("§6❤ Maximum Health: §a+§c%.0f\n",healthBonusRaw));
 		}else if(healthBonusRaw < 0) {
 			attributes.put("MaxHealth", attributes.get("MaxHealth") + healthBonusRaw);
-			lore.add(String.format("§6\u2764 Maximum Health: §c-§c%.0f\n",Math.abs(healthBonusRaw)));
+			lore.add(String.format("§6❤ Maximum Health: §c-§c%.0f\n",Math.abs(healthBonusRaw)));
 		}
 		//Absorption (defense)
 		if(absorptionBonusRaw > 0) {
 			attributes.put("Absorption", attributes.get("Absorption") - ((attributes.get("Absorption")*absorptionBonusRaw)/100.0) + absorptionBonusRaw);
-			lore.add(String.format("§6\u26E8 Absorption: §a+§a%.2f%%\n",absorptionBonusRaw));
+			lore.add(String.format("§6⛨ Absorption: §a+§a%.2f%%\n",absorptionBonusRaw));
 		}else if(absorptionBonusRaw < 0) {
 			attributes.put("Absorption", attributes.get("Absorption") - ((attributes.get("Absorption")*absorptionBonusRaw)/100.0) + absorptionBonusRaw);
-			lore.add(String.format("§6\u26E8 Absorption: §c-§a%.2f%%\n",Math.abs(absorptionBonusRaw)));
+			lore.add(String.format("§6⛨ Absorption: §c-§a%.2f%%\n",Math.abs(absorptionBonusRaw)));
 		}
 		//Intelligence
 		if(intelligenceBonusRaw > 0) {
 			attributes.put("Intelligence", attributes.get("Intelligence") + intelligenceBonusRaw);
-			lore.add(String.format("§6\u2605 Intelligence: §a+§b%.0f\n",intelligenceBonusRaw));
+			lore.add(String.format("§6★ Intelligence: §a+§b%.0f\n",intelligenceBonusRaw));
 		}else if(intelligenceBonusRaw < 0) {
 			attributes.put("Intelligence", attributes.get("Intelligence") + intelligenceBonusRaw);
-			lore.add(String.format("§6\u2605 Intelligence: §c-§b%.0f\n",Math.abs(intelligenceBonusRaw)));
+			lore.add(String.format("§6★ Intelligence: §c-§b%.0f\n",Math.abs(intelligenceBonusRaw)));
 		}
 		
 		if(intelligenceScaling > 0) {
 			attributes.put("IntelligenceScaling", attributes.get("IntelligenceScaling") + intelligenceScaling);
-			lore.add(String.format("§6\u2605 Intelligence Scaling - §b%s (%.2f)\n",ScalingToLetter(intelligenceScaling),intelligenceScaling));
+			lore.add(String.format("§6★ Intelligence Scaling - §b%s (%.2f)\n",ScalingToLetter(intelligenceScaling),intelligenceScaling));
 		}
 		//Strength
 		if(strengthBonusRaw > 0) {
 			attributes.put("Strength", attributes.get("Strength") + strengthBonusRaw);
-			lore.add(String.format("§6\u01A9 Strength: §a+§x§2§5§8§e§0§0%.0f\n",strengthBonusRaw));
+			lore.add(String.format("§6Ʃ Strength: §a+§x§2§5§8§e§0§0%.0f\n",strengthBonusRaw));
 		}else if(strengthBonusRaw < 0) {
 			attributes.put("Strength", attributes.get("Strength") + strengthBonusRaw);
-			lore.add(String.format("§6\u01A9 Strength: §c-§x§2§5§8§e§0§0%.0f\n",Math.abs(strengthBonusRaw)));
+			lore.add(String.format("§6Ʃ Strength: §c-§x§2§5§8§e§0§0%.0f\n",Math.abs(strengthBonusRaw)));
 		}
 		
 		if(strengthScaling > 0) {
 			attributes.put("StrengthScaling", attributes.get("StrengthScaling") + strengthScaling);
-			lore.add(String.format("§6\u01A9 Strength Scaling - §x§2§5§8§e§0§0%s (%.2f)\n",ScalingToLetter(strengthScaling),strengthScaling));
+			lore.add(String.format("§6Ʃ Strength Scaling - §x§2§5§8§e§0§0%s (%.2f)\n",ScalingToLetter(strengthScaling),strengthScaling));
 		}
 		//Dexterity
 		if(dexterityBonusRaw > 0) {
 			attributes.put("Dexterity", attributes.get("Dexterity") + dexterityBonusRaw);
-			lore.add(String.format("§6\u2620 Dexterity: §a+§x§d§8§0§0§6§8%.0f\n",dexterityBonusRaw));
+			lore.add(String.format("§6☠ Dexterity: §a+§x§d§8§0§0§6§8%.0f\n",dexterityBonusRaw));
 		}else if(dexterityBonusRaw < 0) {
 			attributes.put("Dexterity", attributes.get("Dexterity") + dexterityBonusRaw);
-			lore.add(String.format("§6\u2620 Dexterity: §c-§x§d§8§0§0§6§8%.0f\n",Math.abs(dexterityBonusRaw)));
+			lore.add(String.format("§6☠ Dexterity: §c-§x§d§8§0§0§6§8%.0f\n",Math.abs(dexterityBonusRaw)));
 		}
 		
 		if(dexterityScaling > 0) {
 			attributes.put("DexterityScaling", attributes.get("DexterityScaling") + dexterityScaling);
-			lore.add(String.format("§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8%s (%.2f)\n",ScalingToLetter(dexterityScaling),dexterityScaling));
+			lore.add(String.format("§6☠ Dexterity Scaling - §x§d§8§0§0§6§8%s (%.2f)\n",ScalingToLetter(dexterityScaling),dexterityScaling));
 		}
 		
 		if(critChance > 0) {
 			attributes.put("CritChance", attributes.get("CritChance") + critChance);
-			lore.add(String.format("§6\u2620 Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance*100.0));
+			lore.add(String.format("§6☠ Crit Chance: §a+§x§f§b§0§0§d§3%.0f%%\n",critChance*100.0));
 		}else if(critChance < 0) {
 			attributes.put("CritChance", attributes.get("CritChance") + critChance);
-			lore.add(String.format("§6\u2620 Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance*100.0)));
+			lore.add(String.format("§6☠ Crit Chance: §c-§x§f§b§0§0§d§3%.0f%%\n",Math.abs(critChance*100.0)));
 		}
 		
 		if(critDamage > 0) {
 			attributes.put("CritDamage", attributes.get("CritDamage") + critDamage);
-			lore.add(String.format("§6\u2620 Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage*100.0));
+			lore.add(String.format("§6☠ Crit Damage: §a+§x§9§c§0§0§f§b%.0f%%\n",critDamage*100.0));
 		}else if(critDamage < 0) {
 			attributes.put("CritDamage", attributes.get("CritDamage") + critDamage);
-			lore.add(String.format("§6\u2620 Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage*100.0)));
+			lore.add(String.format("§6☠ Crit Damage: §c-§x§9§c§0§0§f§b%.0f%%\n",Math.abs(critDamage*100.0)));
 		}
 
 		if(regenerationBonus > 0) {
 			attributes.put("RegenerationBonus", attributes.get("RegenerationBonus") + regenerationBonus);
-			lore.add(String.format("§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n",regenerationBonus*100.0));
+			lore.add(String.format("§6❤ Regeneration Bonus: §a+§c%.0f%%\n",regenerationBonus*100.0));
 		}else if(regenerationBonus < 0) {
 			attributes.put("RegenerationBonus", attributes.get("RegenerationBonus") + regenerationBonus);
-			lore.add(String.format("§6\u2764 Regeneration Bonus: §c-%.0f%%\n",Math.abs(regenerationBonus*100.0)));
+			lore.add(String.format("§6❤ Regeneration Bonus: §c-%.0f%%\n",Math.abs(regenerationBonus*100.0)));
 		}
 		
 		if(moveSpeed > 0) {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
-			lore.add(String.format("§6\u2604 Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
+			lore.add(String.format("§6☄ Speed: §a+§c%.0f%%\n",moveSpeed*100.0));
 		}else if(moveSpeed < 0) {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
-			lore.add(String.format("§6\u2604 Speed: §c-%.0f%%\n",Math.abs(moveSpeed*100.0)));
+			lore.add(String.format("§6☄ Speed: §c-%.0f%%\n",Math.abs(moveSpeed*100.0)));
 		}
 		
 		if(container.has(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING)) {	
@@ -603,23 +603,23 @@ public class CustomAttributes implements Listener {
 		UUID uuid = player.getUniqueId();
 		if(playerAttributes.get(uuid).containsKey("BaseDamage"))statFormat=String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("BaseDamage"));
 		if(playerAttributes.get(uuid).containsKey("AttackSpeedBonus") && playerAttributes.get(uuid).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(uuid).get("AttackSpeedBonus")*100.0);
-		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)statFormat=String.format("%s§6\u2764 Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(uuid).get("MaxHealth"));
-		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)statFormat=String.format("%s§6\u26E8 Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(uuid).get("Absorption"));
-		if(playerAttributes.get(uuid).containsKey("Intelligence") && playerAttributes.get(uuid).get("Intelligence")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(uuid).get("Intelligence"));
-		if(playerAttributes.get(uuid).containsKey("IntelligenceScaling") && playerAttributes.get(uuid).get("IntelligenceScaling")!=0.0)statFormat=String.format("%s§6\u2605 Intelligence Scaling - §b(%.2f)\n", statFormat,playerAttributes.get(uuid).get("IntelligenceScaling"));
-		if(playerAttributes.get(uuid).containsKey("Strength") && playerAttributes.get(uuid).get("Strength")!=0.0)statFormat=String.format("%s§6\u01A9 Strength: §a§x§2§5§8§e§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("Strength"));
-		if(playerAttributes.get(uuid).containsKey("StrengthScaling") && playerAttributes.get(uuid).get("StrengthScaling")!=0.0)statFormat=String.format("%s§6\u01A9 Strength Scaling - §x§2§5§8§e§0§0 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("StrengthScaling"));
-		if(playerAttributes.get(uuid).containsKey("Dexterity") && playerAttributes.get(uuid).get("Dexterity")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity: §a§x§d§8§0§0§6§8%.0f\n", statFormat,playerAttributes.get(uuid).get("Dexterity"));
-		if(playerAttributes.get(uuid).containsKey("DexterityScaling") && playerAttributes.get(uuid).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6\u2620 Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("DexterityScaling"));
+		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)statFormat=String.format("%s§6❤ Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(uuid).get("MaxHealth"));
+		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)statFormat=String.format("%s§6⛨ Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(uuid).get("Absorption"));
+		if(playerAttributes.get(uuid).containsKey("Intelligence") && playerAttributes.get(uuid).get("Intelligence")!=0.0)statFormat=String.format("%s§6★ Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(uuid).get("Intelligence"));
+		if(playerAttributes.get(uuid).containsKey("IntelligenceScaling") && playerAttributes.get(uuid).get("IntelligenceScaling")!=0.0)statFormat=String.format("%s§6★ Intelligence Scaling - §b(%.2f)\n", statFormat,playerAttributes.get(uuid).get("IntelligenceScaling"));
+		if(playerAttributes.get(uuid).containsKey("Strength") && playerAttributes.get(uuid).get("Strength")!=0.0)statFormat=String.format("%s§6Ʃ Strength: §a§x§2§5§8§e§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("Strength"));
+		if(playerAttributes.get(uuid).containsKey("StrengthScaling") && playerAttributes.get(uuid).get("StrengthScaling")!=0.0)statFormat=String.format("%s§6Ʃ Strength Scaling - §x§2§5§8§e§0§0 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("StrengthScaling"));
+		if(playerAttributes.get(uuid).containsKey("Dexterity") && playerAttributes.get(uuid).get("Dexterity")!=0.0)statFormat=String.format("%s§6☠ Dexterity: §a§x§d§8§0§0§6§8%.0f\n", statFormat,playerAttributes.get(uuid).get("Dexterity"));
+		if(playerAttributes.get(uuid).containsKey("DexterityScaling") && playerAttributes.get(uuid).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6☠ Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("DexterityScaling"));
 		
-		if(playerAttributes.get(uuid).containsKey("CritChance") && playerAttributes.get(uuid).get("CritChance")!=0.0)statFormat=String.format("%s§6\u2620 Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritChance")*100.0);
-		if(playerAttributes.get(uuid).containsKey("CritDamage") && playerAttributes.get(uuid).get("CritDamage")!=0.0)statFormat=String.format("%s§6\u2620 Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritDamage")*100.0);
-		if(playerAttributes.get(uuid).containsKey("RegenerationBonus") && playerAttributes.get(uuid).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6\u2764 Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("RegenerationBonus")*100.0);
-		if(playerAttributes.get(uuid).containsKey("Speed") && playerAttributes.get(uuid).get("Speed")!=0.0)statFormat=String.format("%s§6\u2604 Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("Speed")*100.0);
+		if(playerAttributes.get(uuid).containsKey("CritChance") && playerAttributes.get(uuid).get("CritChance")!=0.0)statFormat=String.format("%s§6☠ Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritChance")*100.0);
+		if(playerAttributes.get(uuid).containsKey("CritDamage") && playerAttributes.get(uuid).get("CritDamage")!=0.0)statFormat=String.format("%s§6☠ Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritDamage")*100.0);
+		if(playerAttributes.get(uuid).containsKey("RegenerationBonus") && playerAttributes.get(uuid).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6❤ Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("RegenerationBonus")*100.0);
+		if(playerAttributes.get(uuid).containsKey("Speed") && playerAttributes.get(uuid).get("Speed")!=0.0)statFormat=String.format("%s§6☄ Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("Speed")*100.0);
 		
-		if(playerAttributes.get(uuid).containsKey("MiningSpeed") && playerAttributes.get(uuid).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6\u26CF Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("MiningSpeed"));
-		if(playerAttributes.get(uuid).containsKey("ToolHardness") && playerAttributes.get(uuid).get("ToolHardness")!=0.0)statFormat=String.format("%s§6\u26CF Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("ToolHardness"));
-		if(playerAttributes.get(uuid).containsKey("MiningFortune") && playerAttributes.get(uuid).get("MiningFortune")>=10.0)statFormat=IridiumColorAPI.process(String.format("%s§6\u2663 Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n", statFormat,playerAttributes.get(uuid).get("MiningFortune")));
+		if(playerAttributes.get(uuid).containsKey("MiningSpeed") && playerAttributes.get(uuid).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6⛏ Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("MiningSpeed"));
+		if(playerAttributes.get(uuid).containsKey("ToolHardness") && playerAttributes.get(uuid).get("ToolHardness")!=0.0)statFormat=String.format("%s§6⛏ Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("ToolHardness"));
+		if(playerAttributes.get(uuid).containsKey("MiningFortune") && playerAttributes.get(uuid).get("MiningFortune")>=10.0)statFormat=IridiumColorAPI.process(String.format("%s§6♣ Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n", statFormat,playerAttributes.get(uuid).get("MiningFortune")));
 		
 		return statFormat;
 	}
@@ -746,7 +746,7 @@ public class CustomAttributes implements Listener {
 	}
 	public static double getDamageModified(UUID uuid, boolean isCrit)
 	{
-		double customDamage = 0.0;
+		double customDamage;
 		if(Bukkit.getPlayer(uuid) != null) { //if uuid belongs to a player
 			double baseDMG = Main.getAttributes().get(uuid).getOrDefault("BaseDamage", 5.0);
 			double dex = Main.getAttributes().get(uuid).containsKey("Dexterity") ? Math.max(Main.getAttributes().get(uuid).get("Dexterity"), 0.0) : 0.0;

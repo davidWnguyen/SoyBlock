@@ -12,7 +12,6 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType;
 import com.jeff_media.customblockdata.CustomBlockData;
 import markiplites.SoyBlock.Lists.blockList;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -27,13 +26,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -103,31 +98,9 @@ public class MiningSpeed implements Listener{
     {
 		event.setCancelled(true);
 		event.setExpToDrop(0);
-		UUID id = event.getPlayer().getUniqueId();
-		Material block = event.getBlock().getType();
-		String blockName = event.getBlock().toString();
-		if(blockName.contains("LOG")) {
-			Skills.addSkillExp(id, "Foraging", 5.0);
-			return;
-		}
-		
-		switch(block) { //mining blocks: add more if you find them
-			case STONE -> Skills.addSkillExp(id, "Mining", 15.0);
-			case COBBLESTONE -> Skills.addSkillExp(id, "Mining", 15.0);
-			case ANDESITE -> Skills.addSkillExp(id, "Mining", 15.0);
-			case DIORITE -> Skills.addSkillExp(id, "Mining", 15.0);
-			case GRANITE -> Skills.addSkillExp(id, "Mining", 15.0);
-			case DEEPSLATE -> Skills.addSkillExp(id, "Mining", 15.0);
-			case DRIPSTONE_BLOCK -> Skills.addSkillExp(id, "Mining", 69420.0); //its a reference
-			case SANDSTONE -> Skills.addSkillExp(id, "Mining", 2.5);
-		}
-		
     }
     @EventHandler
     public void OnBlockHit(BlockDamageEvent event) {
-		if(event.getInstaBreak())
-			return;
-
     	Player eventPlayer = event.getPlayer();
 		blockBeingMined.put(eventPlayer.getUniqueId(), event.getBlock());
 
@@ -183,8 +156,12 @@ public class MiningSpeed implements Listener{
 
 		double toolSpeed = Main.getAttributes().get(p.getUniqueId()).getOrDefault("MiningSpeed", 1.0);
 		long temporaryBreakTime = Math.round(blockList.block_attributes.get(blockID).get(attr.blockDurability) / 9.0 / toolSpeed);
-		blockBreakingStages( p, 0, block, temporaryBreakTime, blockID);
-		blockBreakEffect(p, block.getLocation().toVector(), 1);
+		if(temporaryBreakTime == 0){
+			blockBreakingStages(p, 9, block, temporaryBreakTime, blockID);
+		} else {
+			blockBreakingStages(p, 0, block, temporaryBreakTime, blockID);
+			blockBreakEffect(p, block.getLocation().toVector(), 1);
+		}
     }
 
 	public void blockBreakEffect(Player player, Vector vector, int step) {
@@ -234,6 +211,7 @@ public class MiningSpeed implements Listener{
 
 		if(!(blockBeingMined.containsKey(uuid) && blockBeingMined.get(uuid).equals(block)))
 			return;
+
 		blockBreakStage.put(uuid, stage);
 		blockBreakEffect(p, block.getLocation().toVector(), stage);
 		new BukkitRunnable() {
@@ -259,7 +237,6 @@ public class MiningSpeed implements Listener{
 								int miningMult = (int) Math.floor((miningFortune / 100.0) + 1.0);
 								if (Math.random() < (miningFortune / 100.0) - Math.floor(miningFortune / 100.0))
 									miningMult += 1;
-
 								item.setAmount(item.getAmount() * miningMult);
 							}
 							if (p.getInventory().firstEmpty() != -1)//If player's inventory is not full
@@ -269,6 +246,15 @@ public class MiningSpeed implements Listener{
 								block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), item);
 							}
 						}
+					}
+					if(blockList.block_attributes.containsKey(blockID))
+					{
+						if(blockList.block_attributes.get(blockID).containsKey(attr.blockMiningExp))
+							Skills.addSkillExp(uuid, "Mining", blockList.block_attributes.get(blockID).get(attr.blockMiningExp));
+						if(blockList.block_attributes.get(blockID).containsKey(attr.blockFarmingExp))
+							Skills.addSkillExp(uuid, "Farming", blockList.block_attributes.get(blockID).get(attr.blockFarmingExp));
+						if(blockList.block_attributes.get(blockID).containsKey(attr.blockForagingExp))
+							Skills.addSkillExp(uuid, "Foraging", blockList.block_attributes.get(blockID).get(attr.blockForagingExp));
 					}
 					setFatigue(p, 0, -1);
 				}

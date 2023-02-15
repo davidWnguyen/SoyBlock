@@ -1,6 +1,4 @@
 package markiplites.SoyBlock.Lists;
-
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import markiplites.SoyBlock.*;
 import markiplites.SoyBlock.Item;
 import markiplites.SoyBlock.ItemClasses.*;
@@ -161,6 +159,7 @@ public class itemList implements Listener
 		new Spell("SPAWNER_ZOMBIEKING", "Spawn Zombie_King", Material.STICK, attributes, "zmb");
 
 		new Spell("SPAWNER_SKELETONKING", "Spawn Skeleton_King", Material.STICK, attributes, ":skull: meme");
+		new Spell("SPAWNER_TARGETDUMMY", "Spawn Target Dummy", Material.STICK, attributes, "Hitting P100");
 
 		attributes.put(attr.baseDamage, 15.0);
 		attributes.put(attr.attackReachBonusRaw, 2.1);
@@ -193,7 +192,6 @@ public class itemList implements Listener
 		attributes.put(attr.miningHardness, 4.0);
 		attributes.put(attr.miningFortune, 30.0);
 		new Hoe("NETHERITE_HOE", "Netherite Hoe", Material.NETHERITE_HOE, attributes, "");
-	
 	}
 
 
@@ -223,6 +221,7 @@ public class itemList implements Listener
 			case "YAMATO" -> {if(rightClick) judgement_cut(e,meta);}
 			case "SPAWNER_ZOMBIEKING" -> {if(rightClick) spawn(e, "ZOMBIE_KING");}
 			case "SPAWNER_SKELETONKING" -> {if(rightClick) spawn(e, "SKELETON_KING");}
+			case "SPAWNER_TARGETDUMMY" -> {if(rightClick) spawn(e, "TARGET_DUMMY");}
 			case "NIGGER" -> {if(rightClick) kill(e);}
 		}
 	}
@@ -272,10 +271,15 @@ public class itemList implements Listener
 						dust = new Particle.DustOptions(Color.fromRGB(150, 230, 255), 0.7f);
 						loc.getWorld().spawnParticle(Particle.REDSTONE, temp.clone().add(addDir.clone().multiply(i*0.2)).add(randVec), 0, 0.0, 0.0, 0.0, dust);
 					}
-					if((finalI & 1) == 1)
-						p.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, (float) (1 + finalI *0.035));
+					if((finalI & 1) == 1) {
+						p.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, (float) (1 + finalI * 0.035));
+						for(Entity entity : entities) {
+							loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
+							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 0.05*CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
+						}
+					}
 				}
-			}.runTaskLaterAsynchronously(Main.getInstance(), i+2);
+			}.runTaskLater(Main.getInstance(), i+2);
 		}
 		new BukkitRunnable() {
 			@Override
@@ -294,13 +298,13 @@ public class itemList implements Listener
 					}
 				}
 				p.getWorld().playSound(loc, Sound.ENTITY_EVOKER_FANGS_ATTACK, 2.0f,1f);
+				for(Entity entity : entities) {
+					loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
+					EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 0.75*CustomAttributes.getDamageModified(p.getUniqueId(), true), true, 1);
+				}
 			}
-		}.runTaskLaterAsynchronously(Main.getInstance(), 20);
+		}.runTaskLater(Main.getInstance(), 20);
 
-		for(Entity entity : entities) {
-			loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
-			EntityHandling.dealDamageToEntity((LivingEntity)entity, p, CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
-		}
 		Vector speed = p.getLocation().getDirection().multiply(1.05).setY(0);
 		speed = p.getVelocity().add(speed);
 		p.setVelocity(speed.add(new Vector(0, 0.15, 0)));
@@ -333,8 +337,15 @@ public class itemList implements Listener
 					cancel();
 					return;
 				}
-				if(mainStar == null)
+				if(mainStar.isDead())
 				{
+					//When it collides/dies, cause an explosion.
+					mainStar.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, mainStar.getLocation(), 20);
+					mainStar.getWorld().playSound(mainStar.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.2f,0.7f);
+					Collection<Entity> entities = p.getWorld().getNearbyEntities(mainStar.getLocation(), 7, 7, 7, ignoreList);
+					for(Entity ent : entities){
+						EntityHandling.dealDamageToEntity((LivingEntity) ent, p, damageDealt*20.0, true, 1);
+					}
 					for(Snowball star : projectiles) {
 						star.remove();
 					}
@@ -413,7 +424,7 @@ public class itemList implements Listener
 
 	private void murasama_ability(PlayerInteractEvent e, ItemMeta meta) {
 		Player p = e.getPlayer();
-		if (!check_ready(e.getPlayer(), "MURASAMA", 100.0, 2.0, meta)) return;
+		if (!check_ready(e.getPlayer(), "MURASAMA", 100.0, 5.0, meta)) return;
 		//PART 1
 		//Particle
 		Vector addVec = p.getEyeLocation().getDirection();
@@ -453,7 +464,7 @@ public class itemList implements Listener
 						}
 					}.runTaskLaterAsynchronously(Main.getInstance(), (i + 15) / 10);
 				}
-				EntityHandling.dealAOEAngledDamage(p, 60.0, 6.0, CustomAttributes.getDamageModified(p.getUniqueId(), true) * 3.5, true, 0);
+				EntityHandling.dealAOEAngledDamage(p, 75.0, 6.0, CustomAttributes.getDamageModified(p.getUniqueId(), true) * 3.5, true, 0);
 			}
 		}.runTaskLater(Main.getInstance(), 5);
 	}

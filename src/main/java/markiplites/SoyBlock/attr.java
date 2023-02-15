@@ -30,6 +30,9 @@ public enum attr {
     blockHardness,
     blockTool,
     blockExp,
+    blockMiningExp,
+    blockForagingExp,
+    blockFarmingExp,
     blockRegenerationTime,
     stackable
 }

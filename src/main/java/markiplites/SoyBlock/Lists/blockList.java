@@ -2,7 +2,6 @@ package markiplites.SoyBlock.Lists;
 
 import markiplites.SoyBlock.ItemClasses.Block;
 import markiplites.SoyBlock.attr;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import java.util.HashMap;
 
@@ -19,6 +18,7 @@ public class blockList {
         attributes.put(attr.blockHardness, 1.0);
         attributes.put(attr.blockTool, 2.0);
         attributes.put(attr.blockExp, 1.0);
+        attributes.put(attr.blockForagingExp, 5.0);
         attributes.put(attr.blockRegenerationTime, 3.0);
         attributes.put(attr.stackable, 1.0);
         attributes.put(attr.rarity, 1.0);
@@ -40,6 +40,8 @@ public class blockList {
         
         //stone
         attributes.replace(attr.blockTool, 1.0);
+        attributes.remove(attr.blockForagingExp);
+        attributes.put(attr.blockMiningExp, 15.0);
         new Block("STONE", "Stone", Material.STONE, attributes,
                 "<SOLID:#61737A>The bong method has worked out so far",new String[]{"STONE"});
         new Block("COBBLESTONE", "Cobblestone", Material.COBBLESTONE, attributes,
@@ -48,8 +50,6 @@ public class blockList {
                 "<SOLID:61737A>The bong method has worked out so far",new String[]{"ANDESITE"});
         new Block("DIORITE", "Diorite", Material.DIORITE, attributes,
                 "<SOLID:61737A>The bong method has worked out so far",new String[]{"DIORITE"});
-        new Block("COBBLESTONE", "Cobblestone", Material.COBBLESTONE, attributes,
-                "<SOLID:61737A>The bong method has worked out so far",new String[]{"COBBLESTONE"});       
         new Block("GRANITE", "Granite", Material.GRANITE, attributes,
                 "<SOLID:61737A>The bong method has worked out so far",new String[]{"GRANITE"});       
         new Block("DEEPSLATE", "Deepslate", Material.DEEPSLATE, attributes,
@@ -64,6 +64,7 @@ public class blockList {
         attributes.put(attr.blockHardness, 3.0);
         attributes.put(attr.blockTool, 2.0);
         attributes.put(attr.blockExp, 50.0);
+        attributes.put(attr.blockForagingExp, 50.0);
         attributes.put(attr.blockRegenerationTime, 10.0);
         attributes.put(attr.stackable, 1.0);
         attributes.put(attr.rarity, 3.0);
@@ -73,6 +74,7 @@ public class blockList {
         attributes.put(attr.blockDurability, 1.0);
         attributes.put(attr.blockHardness, 1.0);
         attributes.put(attr.blockExp, 0.0);
+        attributes.put(attr.blockFarmingExp, 5.0);
         attributes.put(attr.blockRegenerationTime, 10.0);
         attributes.put(attr.stackable, 1.0);
         attributes.put(attr.rarity, 1.0);
