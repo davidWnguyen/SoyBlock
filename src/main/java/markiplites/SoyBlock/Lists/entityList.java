@@ -29,5 +29,10 @@ public class entityList {
         new Ent("ZOMBIE_KING", "Zombie King", EntityType.ZOMBIE, attributes);
 
         new Ent("SKELETON_KING", "Skeleton King", EntityType.SKELETON, attributes);
+
+        attributes.clear();
+        attributes.put("Health", 100000000.0);
+        attributes.put("MaxHealth", 100000000.0);
+        new Ent("TARGET_DUMMY", "Target Dummy", EntityType.ZOMBIE, attributes);
     }
 }
