@@ -36,6 +36,10 @@ public class Item implements Listener
 			double attributeValue = attributes.get(attributeName);
 			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), attributeName.name()), PersistentDataType.DOUBLE, attributeValue);
 		}
+
+		if(attributes.containsKey(attr.itemTexture)) {
+			meta.setCustomModelData((int)Math.round(attributes.get(attr.itemTexture)));
+		}
 		meta.setDisplayName(IridiumColorAPI.process(itemName));
 
 		meta.setUnbreakable(true);

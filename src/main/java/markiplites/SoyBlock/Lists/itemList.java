@@ -192,6 +192,20 @@ public class itemList implements Listener
 		attributes.put(attr.miningHardness, 4.0);
 		attributes.put(attr.miningFortune, 30.0);
 		new Hoe("NETHERITE_HOE", "Netherite Hoe", Material.NETHERITE_HOE, attributes, "");
+
+		attributes.clear();
+
+		attributes.put(attr.baseDamage, 5000.0);
+		attributes.put(attr.weaponType, 2.0);
+		attributes.put(attr.baseAttackSpeed, 2.0);
+		attributes.put(attr.strengthBonusRaw, 200.0);
+		attributes.put(attr.strengthScaling, 2.0);
+		attributes.put(attr.projectileSpeed, 1.5);
+		attributes.put(attr.blastRadius, 3.25);
+		attributes.put(attr.blastFalloff, 0.35);
+		attributes.put(attr.rarity, 6.0);
+		attributes.put(attr.itemTexture, 1000000.0);
+		new Explosives("BLUNT_LAUNCHER", "<GRADIENT:cc9900>Blunt Launcher</GRADIENT:009933>", Material.WHEAT, attributes, "rawket lawnchair");
 	}
 
 
@@ -345,6 +359,7 @@ public class itemList implements Listener
 					Collection<Entity> entities = p.getWorld().getNearbyEntities(mainStar.getLocation(), 7, 7, 7, ignoreList);
 					for(Entity ent : entities){
 						EntityHandling.dealDamageToEntity((LivingEntity) ent, p, damageDealt*20.0, true, 1);
+						EntityHandling.dealKnockback(mainStar, ent, 5.0, 0.3);
 					}
 					for(Snowball star : projectiles) {
 						star.remove();
@@ -394,12 +409,12 @@ public class itemList implements Listener
 							}
 						}
 
-						double baseSpeed = star.getVelocity().length()*0.3;
+						double baseSpeed = star.getVelocity().length()*0.2;
 						Vector endResult = subStarLocation.toVector().subtract(closest.getLocation().toVector());
 						Vector projVector = endResult.add(star.getVelocity()).normalize();
 						double[] angles = new double[2];
 						Main.VectorAngles(projVector, angles);
-						double newSpeed = -(baseSpeed*3.1);
+						double newSpeed = -(baseSpeed*5);
 						projVector.multiply(newSpeed);
 						star.setVelocity(projVector);
 						star.setRotation((float)angles[0],(float)angles[1]);

@@ -26,6 +26,8 @@ public enum attr {
     itemAction,
     weaponType,
     projectileSpeed,
+    blastRadius,
+    blastFalloff,
     blockDurability,
     blockHardness,
     blockTool,
@@ -34,5 +36,6 @@ public enum attr {
     blockForagingExp,
     blockFarmingExp,
     blockRegenerationTime,
-    stackable
+    stackable,
+    itemTexture
 }
