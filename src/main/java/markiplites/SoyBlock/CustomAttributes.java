@@ -84,13 +84,18 @@ public class CustomAttributes implements Listener {
 		double miningSpeed = container.has(new NamespacedKey(Main.getInstance(), "miningSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningSpeed"), PersistentDataType.DOUBLE) : 0.0;
 		double miningHardness = container.has(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) : 0.0;
 		double miningFortune = container.has(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) : 0.0;
-		
+		//Projectile Stats
+		double projectileSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+		double blastRadius = container.has(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) : 0.0;
+		double blastFalloff = container.has(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) : 0.0;
+
 		//Set lore of item
 		ArrayList<String> lore = new ArrayList<>();
 		//Base Damage
 		if(baseDamage > 0) {
 			lore.add(String.format("§6Damage: §x§f§f§6§b§0§0%.0f\n",baseDamage));
 		}
+
 		//Attackspeeds, do not add base attackspeed and multiplier on same item
 		if(baseAttackSpeed > 0) {
 			lore.add(String.format("§6Attack Speed: §x§f§f§9§9§0§0%.1f\n",baseAttackSpeed));
@@ -197,6 +202,17 @@ public class CustomAttributes implements Listener {
 		}else if(moveSpeed < 0) {
 			lore.add(String.format("§6☄ Speed: §c-%.0f%%\n",Math.abs(moveSpeed)*100.0));
 		}
+
+		if(projectileSpeed > 1)
+			lore.add(String.format("§6Projectile Speed: §x§f§f§9§9§0§0+%.2f%%\n",(projectileSpeed-1)*100.0));
+		else if(projectileSpeed < 1)
+			lore.add(String.format("§6Projectile Speed: §x§f§f§9§9§0§0-%.2f%%\n",Math.abs((projectileSpeed-1)*100.0)));
+
+		if(blastRadius > 0)
+			lore.add(String.format("§6Blast Radius: §x§f§f§9§9§0§0%.2f §6Blocks\n",blastRadius));
+
+		if(blastFalloff > 0.0)
+			lore.add(String.format("§6Blast Falloff: §x§f§f§9§9§0§0%.2f%%\n", blastFalloff*100.0));
 		
 
 		if(container.has(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING)) {	
@@ -256,7 +272,12 @@ public class CustomAttributes implements Listener {
 		double miningHardness = container.has(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) : 0.0;
 		double toolType = container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE) : 0.0;
 		double miningFortune = container.has(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) : 0.0;
-		
+
+		//Projectile Stats
+		double projectileSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+		double blastRadius = container.has(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) : 0.0;
+		double blastFalloff = container.has(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) : 0.0;
+
 		ArrayList<String> lore = new ArrayList<>();
 		//Base Damage
 		if(baseDamage > 0) {
@@ -403,7 +424,18 @@ public class CustomAttributes implements Listener {
 			attributes.put("Speed", attributes.get("Speed") + moveSpeed);
 			lore.add(String.format("§6☄ Speed: §c-%.0f%%\n",Math.abs(moveSpeed*100.0)));
 		}
-		
+
+		if(projectileSpeed > 1)
+			lore.add(String.format("§6Projectile Speed: §x§f§f§9§9§0§0+%.2f%%\n",(projectileSpeed-1)*100.0));
+		else if(projectileSpeed < 1)
+			lore.add(String.format("§6Projectile Speed: §x§f§f§9§9§0§0-%.2f%%\n",Math.abs((projectileSpeed-1)*100.0)));
+
+		if(blastRadius > 0)
+			lore.add(String.format("§6Blast Radius: §x§f§f§9§9§0§0%.2f §6Blocks\n",blastRadius));
+
+		if(blastFalloff > 0.0)
+			lore.add(String.format("§6Blast Falloff: §x§f§f§9§9§0§0%.2f%%\n", blastFalloff*100.0));
+
 		if(container.has(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING)) {	
 			lore.add(container.get(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING));
 		}

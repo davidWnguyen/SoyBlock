@@ -234,14 +234,21 @@ public class EntityHandling implements Listener {
 		UUID projID = i.getUniqueId();
 		if(projectileAttributes.containsKey(projID))
 		{
-			Double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
+			double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
 			int damageType = (int) Math.round(projectileAttributes.get(projID).getOrDefault("DamageType", 0.0));
 			boolean critBoolean = (projectileAttributes.get(projID).getOrDefault("CriticalAttack", 0.0))==1.0;
-			if((LivingEntity)s instanceof LivingEntity)
+			if(s instanceof LivingEntity)
 				dealDamageToEntity((LivingEntity)v, (LivingEntity) s, customDamage, critBoolean, damageType);
 			else
 				dealDamageToEntity((LivingEntity)v, null, customDamage, critBoolean, damageType);
 			resetIFrames((LivingEntity)v);
+
+			double knockback = projectileAttributes.get(projID).getOrDefault("Knockback", 0.0);
+			if(knockback > 0.0)
+				dealKnockback(i, v, knockback, 0.2*knockback);
+
+			e.setCancelled(true);
+			i.remove();
 		}
 	}
 	@EventHandler
@@ -266,10 +273,9 @@ public class EntityHandling implements Listener {
 			if(e instanceof EntityDamageByEntityEvent)
 			{
 				Entity attacker = ((EntityDamageByEntityEvent)e).getDamager();
-				UUID inflictorID = attacker.getUniqueId();
-				//If the "attacker" is an arrow, make the attacker instead the shooter.
-				if(attacker instanceof Arrow && ((Arrow)attacker).getShooter() instanceof LivingEntity)
-					attacker = (Entity) ((Arrow)attacker).getShooter();
+				//If the "attacker" is an projectile, make the attacker instead the shooter.
+				if(attacker instanceof Projectile && ((Projectile)attacker).getShooter() instanceof LivingEntity)
+					attacker = (Entity) ((Projectile)attacker).getShooter();
 
 				UUID attackerID = attacker.getUniqueId();
 				if(attacker instanceof Player)
@@ -364,6 +370,17 @@ public class EntityHandling implements Listener {
 
 			dealDamageToEntity(entity, p, damageDealt, isCrit, damageType);
 		}
+	}
+	public static void dealKnockback(Entity attacker, Entity victim, double knockback, double upwardsVelocity)
+	{
+		UUID uuid = victim.getUniqueId();
+		if(victim instanceof Player && Main.playerAttributes.containsKey(uuid))
+			knockback /= Main.playerAttributes.get(uuid).getOrDefault("KnockbackResistance", 1.0);
+		else if(attacker instanceof LivingEntity && entityAttributes.containsKey(uuid))
+			knockback /= entityAttributes.get(uuid).getOrDefault("KnockbackResistance", 1.0);
+
+		Vector addedKB = attacker.getLocation().subtract(victim.getLocation()).toVector().normalize().setY(-upwardsVelocity).normalize().multiply(-knockback);
+		victim.setVelocity(addedKB.add(victim.getVelocity()));
 	}
 	public static double getAngleBetweenVector(Vector vec1, Vector vec2){
 		return 180-(180/Math.PI*(Math.acos( vec1.dot(vec2)  / (vec1.length() * vec2.length() ))));
