@@ -29,12 +29,12 @@ public class Item implements Listener
 
 		attributes.put(attr.itemType, itemType);
 
-		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING, itemID);
-		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
+		meta.getPersistentDataContainer().set(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING, itemID);
+		meta.getPersistentDataContainer().set(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
 		
 		for(attr attributeName : attributes.keySet()) {
 			double attributeValue = attributes.get(attributeName);
-			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), attributeName.name()), PersistentDataType.DOUBLE, attributeValue);
+			meta.getPersistentDataContainer().set(Main.attributeKeys.get( attributeName.name()), PersistentDataType.DOUBLE, attributeValue);
 		}
 
 		if(attributes.containsKey(attr.itemTexture)) {
@@ -48,6 +48,9 @@ public class Item implements Listener
 		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		stack.setItemMeta(meta);
+
+		if(itemType == 0.0)
+			finalizeItem(itemID);
 	}
 	public ItemMeta getItemMeta()
 	{

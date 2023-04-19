@@ -48,13 +48,13 @@ public class HitDetection implements Listener {
 		if (container == null)
 			return;
 
-		int weaponType = container.has(new NamespacedKey(Main.getInstance(), "weaponType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "weaponType"), PersistentDataType.DOUBLE)) : 0;
+		int weaponType = container.has(Main.attributeKeys.get( "weaponType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "weaponType"), PersistentDataType.DOUBLE)) : 0;
 		switch (weaponType) {
 			//Rocket Launchers
 			case 2 -> {
-				double projSpeed = container.getOrDefault(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE, 1.0);
-				double blastRadius = container.getOrDefault(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE, 1.0);
-				double blastFalloff = container.getOrDefault(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE, 0.5);
+				double projSpeed = container.getOrDefault(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE, 1.0);
+				double blastRadius = container.getOrDefault(Main.attributeKeys.get( "blastRadius"), PersistentDataType.DOUBLE, 1.0);
+				double blastFalloff = container.getOrDefault(Main.attributeKeys.get( "blastFalloff"), PersistentDataType.DOUBLE, 0.5);
 
 				Vector playerDirection = player.getLocation().getDirection();
 				Snowball rocket = player.launchProjectile(Snowball.class, playerDirection.multiply(projSpeed));
@@ -99,7 +99,7 @@ public class HitDetection implements Listener {
 			}
 			//Shortbows
 			case 1 -> {
-				double projSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+				double projSpeed = container.has(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
 				Vector playerDirection = player.getLocation().getDirection();
 				Arrow shortbowArrow = player.launchProjectile(Arrow.class, playerDirection.multiply(projSpeed));
 				if (shortbowArrow == null)

@@ -1,7 +1,7 @@
 main: markiplites.SoyBlock.Main
 name: Soyblock
 version: 1.0
-api-version: 1.17
+api-version: 1.19
 authors: [BigDaddy,razoe]
 depend: [ArmorEquipEvent,ProtocolLib]
 description: Death Upon Israel

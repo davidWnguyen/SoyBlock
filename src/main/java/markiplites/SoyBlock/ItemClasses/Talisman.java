@@ -20,7 +20,7 @@ public class Talisman extends Item
 		ItemStack stack = super.getItemStack();
 		ItemMeta meta = super.getItemMeta();
 
-		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "talismanFamily"), DataType.STRING, family);
+		meta.getPersistentDataContainer().set(Main.attributeKeys.get( "talismanFamily"), DataType.STRING, family);
 		stack.setItemMeta(meta);
 
 		super.setItemMeta(meta);

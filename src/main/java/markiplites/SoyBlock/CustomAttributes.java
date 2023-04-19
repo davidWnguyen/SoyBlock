@@ -4,7 +4,6 @@ import com.codingforcookies.armorequip.ArmorEquipEvent;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Item;
@@ -56,38 +55,38 @@ public class CustomAttributes implements Listener {
 		if(meta == null)
 			return;
 		PersistentDataContainer container = meta.getPersistentDataContainer();
-		if(container.has(new NamespacedKey(Main.getInstance(), "UUID"), PersistentDataType.DOUBLE) && !meta.getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "itemUUID"), PersistentDataType.STRING))
+		if(container.has(Main.attributeKeys.get( "UUID"), PersistentDataType.DOUBLE) && !meta.getPersistentDataContainer().has(Main.attributeKeys.get( "itemUUID"), PersistentDataType.STRING))
 		{
 			String itemUUID = UUID.randomUUID().toString();
-			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "itemUUID"), PersistentDataType.STRING, itemUUID);
+			meta.getPersistentDataContainer().set(Main.attributeKeys.get( "itemUUID"), PersistentDataType.STRING, itemUUID);
 		}
 		
 		//all da variables!!!!!!!!meme
-		double baseDamage = container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE) : 0.0;
-		double baseAttackSpeed = container.has(new NamespacedKey(Main.getInstance(), "baseAttackSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "baseAttackSpeed"), PersistentDataType.DOUBLE) : 0.0;
-		double attackReachBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "attackReachBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "attackReachBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double attackSpeedBaseMult = container.has(new NamespacedKey(Main.getInstance(), "attackSpeedBaseMult"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "attackSpeedBaseMult"), PersistentDataType.DOUBLE) : 0.0;
-		double healthBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "healthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "healthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double absorptionBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "absorptionBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "absorptionBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double intelligenceBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "intelligenceBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "intelligenceBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double intelligenceScaling = container.has(new NamespacedKey(Main.getInstance(), "intelligenceScaling"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "intelligenceScaling"), PersistentDataType.DOUBLE) : 0.0;
-		double strengthBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "strengthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "strengthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double strengthScaling = container.has(new NamespacedKey(Main.getInstance(), "strengthScaling"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "strengthScaling"), PersistentDataType.DOUBLE) : 0.0;
-		double dexterityBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "dexterityBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "dexterityBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double dexterityScaling = container.has(new NamespacedKey(Main.getInstance(), "dexteritySCaling"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "dexterityScaling"), PersistentDataType.DOUBLE) : 0.0;
+		double baseDamage = container.has(Main.attributeKeys.get( "baseDamage"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "baseDamage"), PersistentDataType.DOUBLE) : 0.0;
+		double baseAttackSpeed = container.has(Main.attributeKeys.get( "baseAttackSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "baseAttackSpeed"), PersistentDataType.DOUBLE) : 0.0;
+		double attackReachBonusRaw = container.has(Main.attributeKeys.get( "attackReachBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "attackReachBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double attackSpeedBaseMult = container.has(Main.attributeKeys.get( "attackSpeedBaseMult"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "attackSpeedBaseMult"), PersistentDataType.DOUBLE) : 0.0;
+		double healthBonusRaw = container.has(Main.attributeKeys.get( "healthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "healthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double absorptionBonusRaw = container.has(Main.attributeKeys.get( "absorptionBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "absorptionBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double intelligenceBonusRaw = container.has(Main.attributeKeys.get( "intelligenceBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "intelligenceBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double intelligenceScaling = container.has(Main.attributeKeys.get( "intelligenceScaling"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "intelligenceScaling"), PersistentDataType.DOUBLE) : 0.0;
+		double strengthBonusRaw = container.has(Main.attributeKeys.get( "strengthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "strengthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double strengthScaling = container.has(Main.attributeKeys.get( "strengthScaling"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "strengthScaling"), PersistentDataType.DOUBLE) : 0.0;
+		double dexterityBonusRaw = container.has(Main.attributeKeys.get( "dexterityBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "dexterityBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double dexterityScaling = container.has(Main.attributeKeys.get( "dexterityScaling"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "dexterityScaling"), PersistentDataType.DOUBLE) : 0.0;
 		//Independent Stats
-		double critChance = container.has(new NamespacedKey(Main.getInstance(), "critChance"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "critChance"), PersistentDataType.DOUBLE) : 0.0;
-		double critDamage = container.has(new NamespacedKey(Main.getInstance(), "critDamage"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "critDamage"), PersistentDataType.DOUBLE) : 0.0;
-		double regenerationBonus = container.has(new NamespacedKey(Main.getInstance(), "regenerationBonus"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "regenerationBonus"), PersistentDataType.DOUBLE) : 0.0;
-		double moveSpeed = container.has(new NamespacedKey(Main.getInstance(), "moveSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "moveSpeed"), PersistentDataType.DOUBLE) : 0.0;
+		double critChance = container.has(Main.attributeKeys.get( "critChance"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "critChance"), PersistentDataType.DOUBLE) : 0.0;
+		double critDamage = container.has(Main.attributeKeys.get( "critDamage"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "critDamage"), PersistentDataType.DOUBLE) : 0.0;
+		double regenerationBonus = container.has(Main.attributeKeys.get( "regenerationBonus"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "regenerationBonus"), PersistentDataType.DOUBLE) : 0.0;
+		double moveSpeed = container.has(Main.attributeKeys.get( "moveSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "moveSpeed"), PersistentDataType.DOUBLE) : 0.0;
 		//Mining Stats
-		double miningSpeed = container.has(new NamespacedKey(Main.getInstance(), "miningSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningSpeed"), PersistentDataType.DOUBLE) : 0.0;
-		double miningHardness = container.has(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) : 0.0;
-		double miningFortune = container.has(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) : 0.0;
+		double miningSpeed = container.has(Main.attributeKeys.get( "miningSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "miningSpeed"), PersistentDataType.DOUBLE) : 0.0;
+		double miningHardness = container.has(Main.attributeKeys.get( "miningHardness"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "miningHardness"), PersistentDataType.DOUBLE) : 0.0;
+		double miningFortune = container.has(Main.attributeKeys.get( "miningFortune"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "miningFortune"), PersistentDataType.DOUBLE) : 0.0;
 		//Projectile Stats
-		double projectileSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
-		double blastRadius = container.has(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) : 0.0;
-		double blastFalloff = container.has(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) : 0.0;
+		double projectileSpeed = container.has(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+		double blastRadius = container.has(Main.attributeKeys.get( "blastRadius"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "blastRadius"), PersistentDataType.DOUBLE) : 0.0;
+		double blastFalloff = container.has(Main.attributeKeys.get( "blastFalloff"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "blastFalloff"), PersistentDataType.DOUBLE) : 0.0;
 
 		//Set lore of item
 		ArrayList<String> lore = new ArrayList<>();
@@ -215,12 +214,12 @@ public class CustomAttributes implements Listener {
 			lore.add(String.format("§6Blast Falloff: §x§f§f§9§9§0§0%.2f%%\n", blastFalloff*100.0));
 		
 
-		if(container.has(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING)) {	
-			lore.addAll(Arrays.asList(container.get(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING).split(", ")));
+		if(container.has(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING)) {	
+			lore.addAll(Arrays.asList(container.get(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING).split(", ")));
 		}
 		
-		int rarity = container.has(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE)) : 1;
-		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 0;
+		int rarity = container.has(Main.attributeKeys.get( "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "rarity"), PersistentDataType.DOUBLE)) : 1;
+		int itemType = container.has(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE)) : 0;
 
 		switch (rarity) {
 			case 2 -> lore.add(IridiumColorAPI.process(String.format("<SOLID:33cccc>Uncommon %s", getItemTypeIntToString(itemType))));
@@ -248,35 +247,35 @@ public class CustomAttributes implements Listener {
 		if(meta == null)
 			return;
 		PersistentDataContainer container = meta.getPersistentDataContainer();
-		//String itemUUID = container.has(new NamespacedKey(Main.getInstance(), "itemUUID"), PersistentDataType.STRING) ? container.get(new NamespacedKey(Main.getInstance(), "itemUUID"), PersistentDataType.STRING) : "";
+		//String itemUUID = container.has(Main.attributeKeys.get( "itemUUID"), PersistentDataType.STRING) ? container.get(Main.attributeKeys.get( "itemUUID"), PersistentDataType.STRING) : "";
 		
-		double baseDamage = container.has(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "baseDamage"), PersistentDataType.DOUBLE) : 0.0;
-		double baseAttackSpeed = container.has(new NamespacedKey(Main.getInstance(), "baseAttackSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "baseAttackSpeed"), PersistentDataType.DOUBLE) : 0.0;
-		double attackSpeedBaseMult = container.has(new NamespacedKey(Main.getInstance(), "attackSpeedBaseMult"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "attackSpeedBaseMult"), PersistentDataType.DOUBLE) : 0.0;
-		double attackReachBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "attackReachBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "attackReachBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double healthBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "healthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "healthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double absorptionBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "absorptionBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "absorptionBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double intelligenceBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "intelligenceBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "intelligenceBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double intelligenceScaling = container.has(new NamespacedKey(Main.getInstance(), "intelligenceScaling"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "intelligenceScaling"), PersistentDataType.DOUBLE) : 0.0;
-		double strengthBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "strengthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "strengthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double strengthScaling = container.has(new NamespacedKey(Main.getInstance(), "strengthScaling"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "strengthScaling"), PersistentDataType.DOUBLE) : 0.0;
-		double dexterityBonusRaw = container.has(new NamespacedKey(Main.getInstance(), "dexterityBonusRaw"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "dexterityBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
-		double dexterityScaling = container.has(new NamespacedKey(Main.getInstance(), "dexterityScaling"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "dexterityScaling"), PersistentDataType.DOUBLE) : 0.0;
+		double baseDamage = container.has(Main.attributeKeys.get( "baseDamage"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "baseDamage"), PersistentDataType.DOUBLE) : 0.0;
+		double baseAttackSpeed = container.has(Main.attributeKeys.get( "baseAttackSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "baseAttackSpeed"), PersistentDataType.DOUBLE) : 0.0;
+		double attackSpeedBaseMult = container.has(Main.attributeKeys.get( "attackSpeedBaseMult"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "attackSpeedBaseMult"), PersistentDataType.DOUBLE) : 0.0;
+		double attackReachBonusRaw = container.has(Main.attributeKeys.get( "attackReachBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "attackReachBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double healthBonusRaw = container.has(Main.attributeKeys.get( "healthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "healthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double absorptionBonusRaw = container.has(Main.attributeKeys.get( "absorptionBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "absorptionBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double intelligenceBonusRaw = container.has(Main.attributeKeys.get( "intelligenceBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "intelligenceBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double intelligenceScaling = container.has(Main.attributeKeys.get( "intelligenceScaling"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "intelligenceScaling"), PersistentDataType.DOUBLE) : 0.0;
+		double strengthBonusRaw = container.has(Main.attributeKeys.get( "strengthBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "strengthBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double strengthScaling = container.has(Main.attributeKeys.get( "strengthScaling"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "strengthScaling"), PersistentDataType.DOUBLE) : 0.0;
+		double dexterityBonusRaw = container.has(Main.attributeKeys.get( "dexterityBonusRaw"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "dexterityBonusRaw"), PersistentDataType.DOUBLE) : 0.0;
+		double dexterityScaling = container.has(Main.attributeKeys.get( "dexterityScaling"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "dexterityScaling"), PersistentDataType.DOUBLE) : 0.0;
 		
-		double critChance = container.has(new NamespacedKey(Main.getInstance(), "critChance"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "critChance"), PersistentDataType.DOUBLE) : 0.0;
-		double critDamage = container.has(new NamespacedKey(Main.getInstance(), "critDamage"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "critDamage"), PersistentDataType.DOUBLE) : 0.0;
-		double regenerationBonus = container.has(new NamespacedKey(Main.getInstance(), "regenerationBonus"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "regenerationBonus"), PersistentDataType.DOUBLE) : 0.0;
-		double moveSpeed = container.has(new NamespacedKey(Main.getInstance(), "moveSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "moveSpeed"), PersistentDataType.DOUBLE) : 0.0;
+		double critChance = container.has(Main.attributeKeys.get( "critChance"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "critChance"), PersistentDataType.DOUBLE) : 0.0;
+		double critDamage = container.has(Main.attributeKeys.get( "critDamage"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "critDamage"), PersistentDataType.DOUBLE) : 0.0;
+		double regenerationBonus = container.has(Main.attributeKeys.get( "regenerationBonus"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "regenerationBonus"), PersistentDataType.DOUBLE) : 0.0;
+		double moveSpeed = container.has(Main.attributeKeys.get( "moveSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "moveSpeed"), PersistentDataType.DOUBLE) : 0.0;
 		
-		double miningSpeed = container.has(new NamespacedKey(Main.getInstance(), "miningSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningSpeed"), PersistentDataType.DOUBLE) : 0.0;
-		double miningHardness = container.has(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningHardness"), PersistentDataType.DOUBLE) : 0.0;
-		double toolType = container.has(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "toolType"), PersistentDataType.DOUBLE) : 0.0;
-		double miningFortune = container.has(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "miningFortune"), PersistentDataType.DOUBLE) : 0.0;
+		double miningSpeed = container.has(Main.attributeKeys.get( "miningSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "miningSpeed"), PersistentDataType.DOUBLE) : 0.0;
+		double miningHardness = container.has(Main.attributeKeys.get( "miningHardness"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "miningHardness"), PersistentDataType.DOUBLE) : 0.0;
+		double toolType = container.has(Main.attributeKeys.get( "toolType"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "toolType"), PersistentDataType.DOUBLE) : 0.0;
+		double miningFortune = container.has(Main.attributeKeys.get( "miningFortune"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "miningFortune"), PersistentDataType.DOUBLE) : 0.0;
 
 		//Projectile Stats
-		double projectileSpeed = container.has(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
-		double blastRadius = container.has(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastRadius"), PersistentDataType.DOUBLE) : 0.0;
-		double blastFalloff = container.has(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) ? container.get(new NamespacedKey(Main.getInstance(), "blastFalloff"), PersistentDataType.DOUBLE) : 0.0;
+		double projectileSpeed = container.has(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+		double blastRadius = container.has(Main.attributeKeys.get( "blastRadius"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "blastRadius"), PersistentDataType.DOUBLE) : 0.0;
+		double blastFalloff = container.has(Main.attributeKeys.get( "blastFalloff"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "blastFalloff"), PersistentDataType.DOUBLE) : 0.0;
 
 		ArrayList<String> lore = new ArrayList<>();
 		//Base Damage
@@ -436,12 +435,12 @@ public class CustomAttributes implements Listener {
 		if(blastFalloff > 0.0)
 			lore.add(String.format("§6Blast Falloff: §x§f§f§9§9§0§0%.2f%%\n", blastFalloff*100.0));
 
-		if(container.has(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING)) {	
-			lore.add(container.get(new NamespacedKey(Main.getInstance(), "additionalLore"), PersistentDataType.STRING));
+		if(container.has(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING)) {	
+			lore.add(container.get(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING));
 		}
 		
-		int rarity = container.has(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "rarity"), PersistentDataType.DOUBLE)) : 1;
-		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 0;
+		int rarity = container.has(Main.attributeKeys.get( "rarity"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "rarity"), PersistentDataType.DOUBLE)) : 1;
+		int itemType = container.has(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE)) : 0;
 
 		switch (rarity) {
 			case 2 -> lore.add(IridiumColorAPI.process(String.format("<SOLID:33cccc>Uncommon %s", getItemTypeIntToString(itemType))));
@@ -521,7 +520,7 @@ public class CustomAttributes implements Listener {
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
 					PersistentDataContainer container = meta.getPersistentDataContainer();
-					if (!(container.has(new NamespacedKey(Main.getInstance(), "canOffhand"), PersistentDataType.DOUBLE))) {
+					if (!(container.has(Main.attributeKeys.get( "canOffhand"), PersistentDataType.DOUBLE))) {
 						p.getWorld().dropItem(p.getLocation(),item);
 						e.setCancelled(true);
 						return;
@@ -549,7 +548,7 @@ public class CustomAttributes implements Listener {
 			return;
 
 		PersistentDataContainer container = meta.getPersistentDataContainer();
-		if (!(container.has(new NamespacedKey(Main.getInstance(), "canOffhand"), PersistentDataType.DOUBLE))) {
+		if (!(container.has(Main.attributeKeys.get( "canOffhand"), PersistentDataType.DOUBLE))) {
 			e.getPlayer().getInventory().setItemInOffHand(null);
 			e.getPlayer().getWorld().dropItem(e.getPlayer().getLocation(), offhand);
 		}
@@ -565,7 +564,7 @@ public class CustomAttributes implements Listener {
 			return;
 
 		PersistentDataContainer container = meta.getPersistentDataContainer();
-		if (!(container.has(new NamespacedKey(Main.getInstance(), "canOffhand"), PersistentDataType.DOUBLE))) {
+		if (!(container.has(Main.attributeKeys.get( "canOffhand"), PersistentDataType.DOUBLE))) {
 			e.setCancelled(true);
 		}
 	}
@@ -613,10 +612,10 @@ public class CustomAttributes implements Listener {
 			return;
 
 		PersistentDataContainer container = meta.getPersistentDataContainer();
-		if(container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+		if(container.has(Main.attributeKeys.get( "itemAction"), PersistentDataType.DOUBLE))
 			{e.setCancelled(true);return;}
 
-		int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+		int itemType = container.has(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE)) : 1;
 		if(itemType == 200 || (itemType > 0 && itemType < 100))
 		{
 			HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
@@ -669,7 +668,7 @@ public class CustomAttributes implements Listener {
 				continue;
 
 			PersistentDataContainer container = meta.getPersistentDataContainer();
-			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+			int itemType = container.has(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE)) : 1;
 			if(checkWeapon && p.getInventory().getItemInMainHand().equals(checkItem) && itemType < 100)
 			{
 				CustomAttributes.giveItemStats(checkItem,attributes);
@@ -678,10 +677,10 @@ public class CustomAttributes implements Listener {
 			{
 				if(talismans > 4)
 					continue;
-				if(!container.has(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING))
+				if(!container.has(Main.attributeKeys.get( "talismanFamily"), PersistentDataType.STRING))
 					continue;
 
-				String family = container.get(new NamespacedKey(Main.getInstance(), "talismanFamily"), PersistentDataType.STRING);
+				String family = container.get(Main.attributeKeys.get( "talismanFamily"), PersistentDataType.STRING);
 				if(family == null)
 					continue;
 
@@ -702,7 +701,7 @@ public class CustomAttributes implements Listener {
 				continue;
 
 			PersistentDataContainer container = meta.getPersistentDataContainer();
-			int itemType = container.has(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemType"), PersistentDataType.DOUBLE)) : 1;
+			int itemType = container.has(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "itemType"), PersistentDataType.DOUBLE)) : 1;
 			if(itemType > 100)
 				CustomAttributes.giveItemStats(checkItem,attributes);
 		}

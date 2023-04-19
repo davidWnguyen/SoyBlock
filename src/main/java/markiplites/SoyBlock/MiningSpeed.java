@@ -132,11 +132,6 @@ public class MiningSpeed implements Listener{
 				event.setCancelled(true);
 			}
 		}
-		else
-		{
-			eventPlayer.sendMessage("§x§d§3§0§0§0§0You are using the wrong tool for this block.");
-			event.setCancelled(true);
-		}
     }
 
     public void MiningBlock(BlockDamageEvent event, Block block) {
@@ -222,7 +217,7 @@ public class MiningSpeed implements Listener{
 				} else {
 					mainPlugin.getServer().getPluginManager().callEvent(new BlockBreakEvent(block, p));
 					//Block Breaking shit
-					block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation(), 20, 0.3, 0.1, 0.3, block.getType().createBlockData());
+					block.getWorld().spawnParticle(Particle.BLOCK_CRACK, block.getLocation().add(0.5,0.5,0.5), 20, 0.3, 0.1, 0.3, block.getType().createBlockData());
 					block.setType(Material.AIR);
 
 					if (blockList.block_loot.containsKey(blockID)) {
@@ -230,6 +225,7 @@ public class MiningSpeed implements Listener{
 						int blockExp = (int) Math.round(blockList.block_attributes.get(blockID).getOrDefault(attr.blockExp, 0.0));
 						p.giveExp(blockExp);
 						for (String itemName : blockList.block_loot.get(blockID)) {
+							if(itemName.isEmpty()) continue;
 							ItemStack item = ItemListHandler.generateItem(itemName);
 							if (item == null) continue;
 

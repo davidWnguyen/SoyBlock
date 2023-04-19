@@ -31,11 +31,11 @@ public class ItemListHandler {
 			return null;
 		ItemMeta meta = item.getItemMeta();
 
-		boolean isStackable = meta.getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "stackable"), PersistentDataType.DOUBLE) &&
-				(meta.getPersistentDataContainer().get(new NamespacedKey(Main.getInstance(), "stackable"), PersistentDataType.DOUBLE) == 1.0);
+		boolean isStackable = meta.getPersistentDataContainer().has(Main.attributeKeys.get( "stackable"), PersistentDataType.DOUBLE) &&
+				(meta.getPersistentDataContainer().get(Main.attributeKeys.get( "stackable"), PersistentDataType.DOUBLE) == 1.0);
 		if(!isStackable) {
 			String itemUUID = UUID.randomUUID().toString();
-			meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "itemUUID"), PersistentDataType.STRING, itemUUID);
+			meta.getPersistentDataContainer().set(Main.attributeKeys.get( "itemUUID"), PersistentDataType.STRING, itemUUID);
 		}
 		item.setItemMeta(meta);
 		return item;
