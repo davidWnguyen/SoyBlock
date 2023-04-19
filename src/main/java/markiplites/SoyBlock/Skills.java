@@ -3,6 +3,7 @@ package markiplites.SoyBlock;
 import java.util.HashMap;
 import java.util.UUID;
 
+import markiplites.SoyBlock.Configs.skillsConfig;
 import org.bukkit.Bukkit;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
@@ -15,6 +16,7 @@ public class Skills {
     }
 
     public static void addSkillExp(UUID id, String skill, double exp) {
+        //curse java
         if(!skillExperience.containsKey(id)) {
             HashMap<String, Double> map = new HashMap<>();
             map.put("Combat", 0.0);
@@ -34,25 +36,19 @@ public class Skills {
             skillLevels.put(id, map);
         }
         if(!skillLevels.get(id).containsKey(skill)) {skillLevels.get(id).put(skill, 1);return;}
-        int levels = 1;
+
+        int levels = skillLevels.get(id).get(skill);
         String bonus = "";
-        switch(skill) {
-            case "Combat" -> {
-                levels = (int)((Math.log(1 + ((skillExperience.get(id).get(skill)*2)/20) - (skillExperience.get(id).get(skill))/20))/(Math.log(2)) + 1);
-                bonus = "+5 Base Damage";
+        //When you level up.
+        if(skillExperience.get(id).get(skill) >= skillsConfig.skillEXPRequirementsCumulative.get(skill)[levels]) {
+            switch (skill) {
+                case "Combat" -> bonus = "+1 Combat Skill Point";
+                case "Foraging" -> bonus = "+1 Foraging Skill Point";
+                case "Mining" -> bonus = "+1 Mining Skill Point";
+                case "Farming" -> bonus = "+1 Horticulture Skill Point";
+                default -> Bukkit.getLogger().info("SOYBLOCK SKILLS: Cannot find associated skill to get level formula.");
             }
-            case "Foraging" -> {
-                levels = (int)((Math.log(1 + ((skillExperience.get(id).get(skill)*2)/20) - (skillExperience.get(id).get(skill))/20))/(Math.log(2)) + 1);
-                bonus = "+5 Strength";
-            }
-            case "Mining" -> {
-                levels = (int)((Math.log(1 + ((skillExperience.get(id).get(skill)*3)/50) - (skillExperience.get(id).get(skill))/50))/(Math.log(3)) + 1);
-                bonus = "+1% Absorption"; 
-            }
-            default -> {Bukkit.getLogger().info("SOYBLOCK SKILLS: Cannot find associated skill to get level formula.");}
-        };
-        int previous = skillLevels.get(id).replace(skill, levels);
-        if(previous != levels) {
+            skillLevels.get(id).replace(skill, levels+1);
             Bukkit.getServer().getPlayer(id).sendMessage(IridiumColorAPI.process(String.format("You leveled up %s. You are now level <SOLID:09AABD>%d<SOLID:FFFFFF>!", skill, levels)));
             Bukkit.getServer().getPlayer(id).sendMessage(IridiumColorAPI.process(String.format("You get <SOLID:D5DD19>%s", bonus)));
         }
@@ -62,14 +58,6 @@ public class Skills {
         if(!skillLevels.containsKey(id)) return 1;
         if(!skillLevels.get(id).containsKey(skill)) return 1;
         return skillLevels.get(id).get(skill);
-    }
-    public static double getRequiredEXP(UUID id, String skill, int offset) {
-        int level = getLevel(id,skill);
-        switch(skill) {
-            case "Foraging","Combat" : {return 20.0*((1-Math.pow(2.0, level-1+offset)) / (1-2.0));}
-            case "Mining" : {return 50.0*((1-Math.pow(3.0, level-1+offset)) / (1-3.0));}
-            default : {return 0.0;}
-        }
     }
     public static double getPlayerEXP(UUID id, String skill){
         if(!skillExperience.containsKey(id)) return 0.0;

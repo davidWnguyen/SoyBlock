@@ -145,6 +145,7 @@ public class itemList implements Listener
 
 		attributes.clear();
 		attributes.put(attr.baseDamage, 150.0);
+		attributes.put(attr.baseAttackSpeed, 4.0);
 		attributes.put(attr.intelligenceBonusRaw, 500.0);
 		attributes.put(attr.intelligenceScaling, 1.5);
 		attributes.put(attr.strengthBonusRaw, 500.0);
@@ -152,8 +153,10 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, 400.0);
 		attributes.put(attr.dexterityScaling, 1.35);
 		attributes.put(attr.attackReachBonusRaw, 7.5);
+		attributes.put(attr.itemAbilityTotalCooldown, 2.0);
+		attributes.put(attr.itemTexture, 1000001.0);
 		attributes.put(attr.rarity, 6.0);
-		Sword yamato = new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
+		new Sword("YAMATO", "Yamato", Material.IRON_SWORD, attributes, "WOOOOOOO DO THE VERGIL!!!!\n\nRight click: Judgement Cut\n");
 		
 		attributes.clear();
 		new Spell("SPAWNER_ZOMBIEKING", "Spawn Zombie_King", Material.STICK, attributes, "zmb");
@@ -221,7 +224,7 @@ public class itemList implements Listener
 			return;
 
 		PersistentDataContainer p = meta.getPersistentDataContainer();
-		String itemID = p.get(new NamespacedKey(Main.getInstance(), "itemID"), PersistentDataType.STRING);
+		String itemID = p.get(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING);
 		if(itemID == null) return;
 
 		Action a = e.getAction();
@@ -289,7 +292,7 @@ public class itemList implements Listener
 						p.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.5f, (float) (1 + finalI * 0.035));
 						for(Entity entity : entities) {
 							loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
-							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 0.05*CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
+							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 0.1*CustomAttributes.getDamageModified(p.getUniqueId(), false), false, 1);
 						}
 					}
 				}
@@ -314,7 +317,7 @@ public class itemList implements Listener
 				p.getWorld().playSound(loc, Sound.ENTITY_EVOKER_FANGS_ATTACK, 2.0f,1f);
 				for(Entity entity : entities) {
 					loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, entity.getLocation(), 30, 0.0, 0.0, 0.0);
-					EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 0.75*CustomAttributes.getDamageModified(p.getUniqueId(), true), true, 1);
+					EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 2.0*CustomAttributes.getDamageModified(p.getUniqueId(), true), true, 1);
 				}
 			}
 		}.runTaskLater(Main.getInstance(), 20);
@@ -516,9 +519,10 @@ public class itemList implements Listener
 		return null;
 	}
 
-
-
 	private boolean check_ready(Player p, String itemID, double manaCost, double delay, ItemMeta meta) { //ability check / set x333
+		if(p.getCooldown(p.getInventory().getItemInMainHand().getType()) != 0)
+			return false;
+
 		UUID uuid = p.getUniqueId();
 		if(!ability_cooldown.containsKey(uuid) || !ability_cooldown.get(uuid).containsKey(itemID)) {
 			HashMap<String, Double> map = new HashMap<>();
@@ -540,6 +544,11 @@ public class itemList implements Listener
 		String buffer = String.format("§6Used %s§f! §b-%.0f★",
 				Normalizer.normalize(meta.getDisplayName(),Normalizer.Form.NFKC),manaCost);
 		HUDTimer.playerStatusAbility.put(uuid, new Object[]{buffer,System.currentTimeMillis()+1000});
+
+		double cd = meta.getPersistentDataContainer().getOrDefault(Main.attributeKeys.get("itemAbilityTotalCooldown"), PersistentDataType.DOUBLE,0.0);
+		if(cd > 0.0)
+			p.setCooldown(p.getInventory().getItemInMainHand().getType(), (int) (cd*20.0));
+
 		return true;
 	}	
 

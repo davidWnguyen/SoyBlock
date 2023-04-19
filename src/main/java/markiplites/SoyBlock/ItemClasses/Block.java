@@ -21,7 +21,7 @@ public class Block extends Item
 		super(itemID,itemName,mat,attributes,lore,0.0);
 		ItemStack stack = super.getItemStack();
 		ItemMeta meta = super.getItemMeta();
-		meta.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "blockID"), PersistentDataType.STRING, itemID);
+		meta.getPersistentDataContainer().set(Main.attributeKeys.get( "blockID"), PersistentDataType.STRING, itemID);
 		stack.setItemMeta(meta);
 		super.setItemMeta(meta);
 		super.setItemStack(stack);

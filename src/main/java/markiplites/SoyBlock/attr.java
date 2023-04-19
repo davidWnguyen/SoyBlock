@@ -37,5 +37,6 @@ public enum attr {
     blockFarmingExp,
     blockRegenerationTime,
     stackable,
-    itemTexture
+    itemTexture,
+    itemAbilityTotalCooldown,
 }

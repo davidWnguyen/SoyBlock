@@ -1,8 +1,8 @@
 package markiplites.SoyBlock;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import markiplites.SoyBlock.Configs.skillsConfig;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,23 +22,25 @@ public class ClickableItems implements Listener {
 	public ClickableItems() {
 		init();
 	}
-	public void init() {	
-	
+
+	public void init() {
+
 	}
+
 	@EventHandler
     public void PlayerInteract(PlayerInteractEvent event) {
 		Player p = event.getPlayer();
         if (p != null && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
         {
-    		ItemMeta meta = p.getInventory().getItemInMainHand().getItemMeta();
-    		if(meta == null)
-    			return;
-    		PersistentDataContainer container = meta.getPersistentDataContainer();
+			ItemMeta meta = p.getInventory().getItemInMainHand().getItemMeta();
+			if(meta == null)
+				return;
+			PersistentDataContainer container = meta.getPersistentDataContainer();
 
-			if(!container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+			if(!container.has(Main.attributeKeys.get( "itemAction"), PersistentDataType.DOUBLE))
 				return;
 
-    		int itemActionType =  (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE));
+			int itemActionType =  (int) Math.round(container.get(Main.attributeKeys.get( "itemAction"), PersistentDataType.DOUBLE));
 			switch (itemActionType) {
 				case 1 -> Menu_SBMainMenu(p);
 			}
@@ -46,9 +48,9 @@ public class ClickableItems implements Listener {
 
         }
 	}
+
 	@EventHandler
-	public void PlayerInventoryInteract(InventoryClickEvent e)
-	{
+	public void PlayerInventoryInteract(InventoryClickEvent e) {
 		HumanEntity p = e.getWhoClicked();
 		if(p == null || !(p instanceof Player))
 			return;
@@ -61,19 +63,19 @@ public class ClickableItems implements Listener {
 
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 
-		if(!container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+		if(!container.has(Main.attributeKeys.get( "itemAction"), PersistentDataType.DOUBLE))
 			return;
 
-		int itemActionType = (int) Math.round(container.get(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE));
+		int itemActionType = (int) Math.round(container.get(Main.attributeKeys.get( "itemAction"), PersistentDataType.DOUBLE));
 		e.setCancelled(true);
 		p.closeInventory();
 		switch (itemActionType) {
 			case 1 -> Menu_SBMainMenu((Player)p);
 		}
 	}
+
 	@EventHandler
-	public void onPlayerSwapHands(PlayerSwapHandItemsEvent e)
-	{
+	public void onPlayerSwapHands(PlayerSwapHandItemsEvent e) {
 		HumanEntity p = e.getPlayer();
 		if(p == null)
 			return;
@@ -85,11 +87,11 @@ public class ClickableItems implements Listener {
 			return;
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 
-		if(container.has(new NamespacedKey(Main.getInstance(), "itemAction"), PersistentDataType.DOUBLE))
+		if(container.has(Main.attributeKeys.get( "itemAction"), PersistentDataType.DOUBLE))
 			e.setCancelled(true);
 	}
-	public static void Menu_SBMainMenu(Player player)
-	{
+
+	public static void Menu_SBMainMenu(Player player) {
 		String[] guiSetup = {
 				"bbbbbbbbb",
 				"b   v   b",
@@ -186,67 +188,82 @@ public class ClickableItems implements Listener {
 	}
 private static void skills(Player p) {
 	String[] guiSetup = {
-		"bbbbbbbbb",
-		"b   m   b",
-		"b  fch  b",
-		"b       b",
-		"bbbbbbbbb"
+			"bbbbbbbbb",
+			"b   m   b",
+			"b  fch  b",
+			"b   a   b",
+			"bbbbbbbbb"
 	};
 	InventoryGui gui = new InventoryGui(Main.getInstance(), p, "Soyblock Main Menu", guiSetup);
 	gui.setFiller(new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1)); // fill the empty slots with this
 
+	int skillLevel = Skills.getLevel(p.getUniqueId(), "Combat");
 	gui.addElement(new StaticGuiElement('c',
-	ItemListHandler.getItemForDisplay(Material.IRON_SWORD),
-	Math.min(Skills.getLevel(p.getUniqueId(), "Combat"), 64),
-	click -> {
-		combat_menu(p);
-		return true; // returning true will cancel the click event and stop taking the item
-	},
-	IridiumColorAPI.process("<SOLID:1652C3>Combat Skill Menu"),
-	String.format("+%d Base Damage", (5 * (Skills.getLevel(p.getUniqueId(), "Combat")-1))),
-	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Combat"),Skills.getRequiredEXP(p.getUniqueId(), "Combat", 1))
+			ItemListHandler.getItemForDisplay(Material.IRON_SWORD),
+			Math.min(skillLevel, 64),
+			click -> {
+				combat_menu(p);
+				return true; // returning true will cancel the click event and stop taking the item
+			},
+			IridiumColorAPI.process("<SOLID:1652C3>Combat Skill Menu"),
+			String.format("%d Skill Points Available", skillLevel),
+			String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Combat")-skillsConfig.skillEXPRequirementsCumulative.get("Combat")[skillLevel-1], skillsConfig.skillEXPRequirements.get("Combat")[skillLevel])
 	));
 
+	skillLevel = Skills.getLevel(p.getUniqueId(), "Foraging");
 	gui.addElement(new StaticGuiElement('f',
-	ItemListHandler.getItemForDisplay(Material.SPRUCE_SAPLING),
-	Math.min(Skills.getLevel(p.getUniqueId(), "Foraging"), 64),
-	click -> {
-		return true; // returning true will cancel the click event and stop taking the item
-	},
-	IridiumColorAPI.process("<SOLID:0C8536>Foraging Skill Menu"),
-	String.format("+%d Strength", (5 * (Skills.getLevel(p.getUniqueId(), "Foraging")-1))),
-	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Foraging"),Skills.getRequiredEXP(p.getUniqueId(), "Foraging", 1))
+			ItemListHandler.getItemForDisplay(Material.SPRUCE_SAPLING),
+			Math.min(skillLevel, 64),
+			click -> {
+				return true; // returning true will cancel the click event and stop taking the item
+			},
+			IridiumColorAPI.process("<SOLID:0C8536>Foraging Skill Menu"),
+			String.format("%d Skill Points Available", skillLevel),
+			String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Foraging")-skillsConfig.skillEXPRequirementsCumulative.get("Foraging")[skillLevel-1], skillsConfig.skillEXPRequirements.get("Foraging")[skillLevel])
 	));
-
+	skillLevel = Skills.getLevel(p.getUniqueId(), "Alchemy");
 	gui.addElement(new StaticGuiElement('h',
-	ItemListHandler.getItemForDisplay(Material.BREWING_STAND),
-	Math.min(Skills.getLevel(p.getUniqueId(), "Alchemy"), 64),
-	click -> {
-		return true; // returning true will cancel the click event and stop taking the item
-	},
-	IridiumColorAPI.process("<SOLID:C0D9F1>Alchemy Skill Menu"),
-	String.format("+%d Iteglicen", (5 * (Skills.getLevel(p.getUniqueId(), "Alchemy")-1))),
-	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Alchemy"),Skills.getRequiredEXP(p.getUniqueId(), "Alchemy", 1))
+			ItemListHandler.getItemForDisplay(Material.BREWING_STAND),
+			Math.min(skillLevel, 64),
+			click -> {
+				return true; // returning true will cancel the click event and stop taking the item
+			},
+			IridiumColorAPI.process("<SOLID:C0D9F1>Alchemy Skill Menu"),
+			String.format("%d Skill Points Available", skillLevel),
+			String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Alchemy")-skillsConfig.skillEXPRequirementsCumulative.get("Alchemy")[skillLevel-1], skillsConfig.skillEXPRequirements.get("Alchemy")[skillLevel])
 	));
 
+	skillLevel = Skills.getLevel(p.getUniqueId(), "Mining");
 	gui.addElement(new StaticGuiElement('m',
-	ItemListHandler.getItemForDisplay(Material.IRON_PICKAXE),
-	Math.min(Skills.getLevel(p.getUniqueId(), "Mining"), 64),
-	click -> {
-		return true; // returning true will cancel the click event and stop taking the item
-	},
-	IridiumColorAPI.process("<SOLID:7B2EDB>Mining Skill Menu"),
-	String.format("+%d%% Absorption", (1 * (Skills.getLevel(p.getUniqueId(), "Mining")-1))),
-	String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Mining"),Skills.getRequiredEXP(p.getUniqueId(), "Mining", 1))
+			ItemListHandler.getItemForDisplay(Material.IRON_PICKAXE),
+			Math.min(skillLevel, 64),
+			click -> {
+				return true; // returning true will cancel the click event and stop taking the item
+			},
+			IridiumColorAPI.process("<SOLID:7B2EDB>Mining Skill Menu"),
+			String.format("%d Skill Points Available", skillLevel),
+			String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Mining")-skillsConfig.skillEXPRequirementsCumulative.get("Mining")[skillLevel-1], skillsConfig.skillEXPRequirements.get("Mining")[skillLevel])
+	));
+
+	skillLevel = Skills.getLevel(p.getUniqueId(), "Farming");
+	gui.addElement(new StaticGuiElement('a',
+			ItemListHandler.getItemForDisplay(Material.IRON_HOE),
+			Math.min(skillLevel, 64),
+			click -> {
+				return true; // returning true will cancel the click event and stop taking the item
+			},
+			IridiumColorAPI.process("<SOLID:666633>Farming Skill Menu"),
+			String.format("%d Skill Points Available", skillLevel),
+			String.format("%.1f/%.1f EXP", Skills.getPlayerEXP(p.getUniqueId(),"Farming")-skillsConfig.skillEXPRequirementsCumulative.get("Farming")[skillLevel-1], skillsConfig.skillEXPRequirements.get("Farming")[skillLevel])
 	));
 
 	gui.addElement(new StaticGuiElement('b',
-	ItemListHandler.getItemForDisplay(Material.BLACK_STAINED_GLASS_PANE),
-	1,
-	click -> {
-		return true; // returning true will cancel the click event and stop taking the item
-	},
-	" "
+			ItemListHandler.getItemForDisplay(Material.BLACK_STAINED_GLASS_PANE),
+			1,
+			click -> {
+				return true; // returning true will cancel the click event and stop taking the item
+			},
+			" "
 	));
 
 	gui.show(p);
@@ -255,31 +272,31 @@ private static void skills(Player p) {
 
 	private static void combat_menu(Player p) {
 		String[] guiSetup = {
-			"bbbbbbbbb",
-			"b       b",
-			"b   n   b",
-			"b       b",
-			"bbbbbbbbb"
+				"bbbbbbbbb",
+				"b       b",
+				"b   n   b",
+				"b       b",
+				"bbbbbbbbb"
 		};
 		InventoryGui gui = new InventoryGui(Main.getInstance(), p, "Soyblock Main Menu", guiSetup);
 		gui.setFiller(new ItemStack(Material.WHITE_STAINED_GLASS_PANE, 1)); // fill the empty slots with this
-		
+
 		gui.addElement(new StaticGuiElement('b',
-		ItemListHandler.getItemForDisplay(Material.BLACK_STAINED_GLASS_PANE),
-		1,
-		click -> {
-			return true; // returning true will cancel the click event and stop taking the item
-		},
-		" "
+				ItemListHandler.getItemForDisplay(Material.BLACK_STAINED_GLASS_PANE),
+				1,
+				click -> {
+					return true; // returning true will cancel the click event and stop taking the item
+				},
+				" "
 		));
 
 		gui.addElement(new StaticGuiElement('n',
-		ItemListHandler.getItemForDisplay(Material.WOODEN_SWORD),
-		1,
-		click -> {
-			return true; // returning true will cancel the click event and stop taking the item
-		},
-		IridiumColorAPI.process("<SOLID:846D49>NIGGER!!!!!")
+				ItemListHandler.getItemForDisplay(Material.WOODEN_SWORD),
+				1,
+				click -> {
+					return true; // returning true will cancel the click event and stop taking the item
+				},
+				IridiumColorAPI.process("<SOLID:846D49>NIGGER!!!!!")
 		));
 
 		gui.show(p);

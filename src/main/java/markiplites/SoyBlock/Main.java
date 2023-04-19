@@ -1,10 +1,8 @@
 package markiplites.SoyBlock;
 
-import markiplites.SoyBlock.Lists.blockList;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.World;
+import markiplites.SoyBlock.Configs.skillsConfig;
+import markiplites.SoyBlock.Lists.*;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,8 +12,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import markiplites.SoyBlock.Lists.entityList;
-import markiplites.SoyBlock.Lists.itemList;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -26,20 +22,39 @@ public class Main extends JavaPlugin implements Listener{
 	private static Main instance;
 	ItemListHandler itemListHandler;
 	public static HashMap<UUID, HashMap<String, Double>> playerAttributes = new HashMap<>();
+	public static HashMap<String, NamespacedKey> attributeKeys = new HashMap<>();
 	
 	@Override
 	public void onEnable() {
 		instance = this;
-		itemListHandler = new ItemListHandler();
+		//Cache all attribute namespaced keys
+		for(attr attrName : attr.values()){
+			attributeKeys.put(attrName.name(), new NamespacedKey(this, attrName.name()));
+		}
+		//For all of the non-attribute stringy stuff
+		attributeKeys.put("itemID", new NamespacedKey(this, "itemID"));
+		attributeKeys.put("additionalLore", new NamespacedKey(this, "additionalLore"));
+		attributeKeys.put("UUID", new NamespacedKey(this, "UUID"));
+		attributeKeys.put("talismanFamily", new NamespacedKey(this, "talismanFamily"));
+		attributeKeys.put("blockID", new NamespacedKey(this, "blockID"));
+		attributeKeys.put("itemUUID", new NamespacedKey(this, "itemUUID"));
+
+		Bukkit.clearRecipes();
+
 		Bukkit.getPluginManager().registerEvents(this, this); // registers eventlistener for events
 		Bukkit.getPluginManager().registerEvents(new CustomAttributes(), this);
 		Bukkit.getPluginManager().registerEvents(new HitDetection(), this);
 		Bukkit.getPluginManager().registerEvents(new EntityHandling(), this);
 		Bukkit.getPluginManager().registerEvents(new itemList(), this);
+		Bukkit.getPluginManager().registerEvents(new recipeList(), this);
 		Bukkit.getPluginManager().registerEvents(new ClickableItems(), this);
+		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+
 		new entityList();
 		new blockList();
-		Bukkit.getPluginManager().registerEvents(new MiningSpeed(this), this);
+		new miscList();
+		new skillsConfig();
+		itemListHandler = new ItemListHandler();
 		//Timers
 		HUDTimer.run(instance);
 		//Commands
@@ -120,6 +135,15 @@ public class Main extends JavaPlugin implements Listener{
 
 		angle[0] = pitch;
 		angle[1] = yaw;
+	}
+	public static int countStringArray(String[] array, String compare){
+		int c=0;
+		for (String s : array) {
+			if (s != null && s.equals(compare))
+				c++;
+		}
+		Bukkit.getLogger().info("appeared "+c+" times");
+		return c;
 	}
 
 	public enum ItemProperties{
