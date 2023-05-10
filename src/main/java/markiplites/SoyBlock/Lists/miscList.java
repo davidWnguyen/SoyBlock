@@ -42,5 +42,10 @@ public class miscList {
                 "", 0.0);
         new Item("STICK", "Stick", Material.STICK, attributes,
                 "", 0.0);
+
+        attributes.replace(attr.rarity, 1.0);
+
+        new Item("STICK", "Stick", Material.STICK, attributes,
+                "", 0.0);
     }
 }

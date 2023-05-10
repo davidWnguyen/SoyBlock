@@ -627,32 +627,53 @@ public class CustomAttributes implements Listener {
 			}}.runTaskLater(Main.getInstance(), 1);
 		}
 	}
-	public static String getPlayerStatsFormat(Player player)
+	public static String[] getPlayerStatsFormat(Player player)
 	{
 		HashMap<UUID, HashMap<String, Double>> playerAttributes = Main.getAttributes();
-		String statFormat = "";
 		UUID uuid = player.getUniqueId();
-		if(playerAttributes.get(uuid).containsKey("BaseDamage"))statFormat=String.format("%s§6Damage: §x§f§f§6§b§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("BaseDamage"));
-		if(playerAttributes.get(uuid).containsKey("AttackSpeedBonus") && playerAttributes.get(uuid).get("AttackSpeedBonus")!=1.0)statFormat=String.format("%s§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%\n", statFormat,playerAttributes.get(uuid).get("AttackSpeedBonus")*100.0);
-		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)statFormat=String.format("%s§6❤ Maximum Health: §a§c%.0f\n", statFormat,playerAttributes.get(uuid).get("MaxHealth"));
-		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)statFormat=String.format("%s§6⛨ Absorption: §a§a%.2f%%\n", statFormat,playerAttributes.get(uuid).get("Absorption"));
-		if(playerAttributes.get(uuid).containsKey("Intelligence") && playerAttributes.get(uuid).get("Intelligence")!=0.0)statFormat=String.format("%s§6★ Intelligence: §a§b%.0f\n", statFormat,playerAttributes.get(uuid).get("Intelligence"));
-		if(playerAttributes.get(uuid).containsKey("IntelligenceScaling") && playerAttributes.get(uuid).get("IntelligenceScaling")!=0.0)statFormat=String.format("%s§6★ Intelligence Scaling - §b(%.2f)\n", statFormat,playerAttributes.get(uuid).get("IntelligenceScaling"));
-		if(playerAttributes.get(uuid).containsKey("Strength") && playerAttributes.get(uuid).get("Strength")!=0.0)statFormat=String.format("%s§6Ʃ Strength: §a§x§2§5§8§e§0§0%.0f\n", statFormat,playerAttributes.get(uuid).get("Strength"));
-		if(playerAttributes.get(uuid).containsKey("StrengthScaling") && playerAttributes.get(uuid).get("StrengthScaling")!=0.0)statFormat=String.format("%s§6Ʃ Strength Scaling - §x§2§5§8§e§0§0 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("StrengthScaling"));
-		if(playerAttributes.get(uuid).containsKey("Dexterity") && playerAttributes.get(uuid).get("Dexterity")!=0.0)statFormat=String.format("%s§6☠ Dexterity: §a§x§d§8§0§0§6§8%.0f\n", statFormat,playerAttributes.get(uuid).get("Dexterity"));
-		if(playerAttributes.get(uuid).containsKey("DexterityScaling") && playerAttributes.get(uuid).get("DexterityScaling")!=0.0)statFormat=String.format("%s§6☠ Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)\n", statFormat,playerAttributes.get(uuid).get("DexterityScaling"));
+
+		ArrayList<String> output = new ArrayList<String>();
 		
-		if(playerAttributes.get(uuid).containsKey("CritChance") && playerAttributes.get(uuid).get("CritChance")!=0.0)statFormat=String.format("%s§6☠ Crit Chance: §a§x§f§b§0§0§d§3%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritChance")*100.0);
-		if(playerAttributes.get(uuid).containsKey("CritDamage") && playerAttributes.get(uuid).get("CritDamage")!=0.0)statFormat=String.format("%s§6☠ Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%\n", statFormat,playerAttributes.get(uuid).get("CritDamage")*100.0);
-		if(playerAttributes.get(uuid).containsKey("RegenerationBonus") && playerAttributes.get(uuid).get("RegenerationBonus")!=0.0)statFormat=String.format("%s§6❤ Regeneration Bonus: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("RegenerationBonus")*100.0);
-		if(playerAttributes.get(uuid).containsKey("Speed") && playerAttributes.get(uuid).get("Speed")!=0.0)statFormat=String.format("%s§6☄ Speed: §a+§c%.0f%%\n", statFormat,playerAttributes.get(uuid).get("Speed")*100.0);
+		if(playerAttributes.get(uuid).containsKey("BaseDamage"))
+			output.add(String.format("§6Damage: §x§f§f§6§b§0§0%.0f", playerAttributes.get(uuid).get("BaseDamage")));
 		
-		if(playerAttributes.get(uuid).containsKey("MiningSpeed") && playerAttributes.get(uuid).get("MiningSpeed")!=1.0)statFormat=String.format("%s§6⛏ Mining Speed: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("MiningSpeed"));
-		if(playerAttributes.get(uuid).containsKey("ToolHardness") && playerAttributes.get(uuid).get("ToolHardness")!=0.0)statFormat=String.format("%s§6⛏ Mining Tier: §a§x§0§0§a§1§f§b%.0f\n", statFormat,playerAttributes.get(uuid).get("ToolHardness"));
-		if(playerAttributes.get(uuid).containsKey("MiningFortune") && playerAttributes.get(uuid).get("MiningFortune")>=10.0)statFormat=IridiumColorAPI.process(String.format("%s§6♣ Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f\n", statFormat,playerAttributes.get(uuid).get("MiningFortune")));
+		if(playerAttributes.get(uuid).containsKey("AttackSpeedBonus") && playerAttributes.get(uuid).get("AttackSpeedBonus")!=1.0)
+			output.add(String.format("§6Attack Speed: §a+§x§f§f§9§9§0§0%.0f%%", playerAttributes.get(uuid).get("AttackSpeedBonus")*100.0));
 		
-		return statFormat;
+		if(playerAttributes.get(uuid).containsKey("MaxHealth") && playerAttributes.get(uuid).get("MaxHealth")>0.0)
+			output.add(String.format("§6❤ Maximum Health: §a§c%.0f", playerAttributes.get(uuid).get("MaxHealth")));
+		if(playerAttributes.get(uuid).containsKey("Absorption") && playerAttributes.get(uuid).get("Absorption")!=0.0)
+			output.add(String.format("§6⛨ Absorption: §a§a%.2f%%", playerAttributes.get(uuid).get("Absorption")));
+		if(playerAttributes.get(uuid).containsKey("Intelligence") && playerAttributes.get(uuid).get("Intelligence")!=0.0)
+			output.add(String.format("§6★ Intelligence: §a§b%.0f", playerAttributes.get(uuid).get("Intelligence")));
+		if(playerAttributes.get(uuid).containsKey("IntelligenceScaling") && playerAttributes.get(uuid).get("IntelligenceScaling")!=0.0)
+			output.add(String.format("§6★ Intelligence Scaling - §b(%.2f)", playerAttributes.get(uuid).get("IntelligenceScaling")));
+		if(playerAttributes.get(uuid).containsKey("Strength") && playerAttributes.get(uuid).get("Strength")!=0.0)
+			output.add(String.format("§6Ʃ Strength: §a§x§2§5§8§e§0§0%.0f", playerAttributes.get(uuid).get("Strength")));
+		if(playerAttributes.get(uuid).containsKey("StrengthScaling") && playerAttributes.get(uuid).get("StrengthScaling")!=0.0)
+			output.add(String.format("§6Ʃ Strength Scaling - §x§2§5§8§e§0§0 (%.2f)", playerAttributes.get(uuid).get("StrengthScaling")));
+		if(playerAttributes.get(uuid).containsKey("Dexterity") && playerAttributes.get(uuid).get("Dexterity")!=0.0)
+			output.add(String.format("§6☠ Dexterity: §a§x§d§8§0§0§6§8%.0f", playerAttributes.get(uuid).get("Dexterity")));
+		if(playerAttributes.get(uuid).containsKey("DexterityScaling") && playerAttributes.get(uuid).get("DexterityScaling")!=0.0)
+			output.add(String.format("§6☠ Dexterity Scaling - §x§d§8§0§0§6§8 (%.2f)", playerAttributes.get(uuid).get("DexterityScaling")));
+		
+		if(playerAttributes.get(uuid).containsKey("CritChance") && playerAttributes.get(uuid).get("CritChance")!=0.0)
+			output.add(String.format("§6☠ Crit Chance: §a§x§f§b§0§0§d§3%.0f%%", playerAttributes.get(uuid).get("CritChance")*100.0));
+		if(playerAttributes.get(uuid).containsKey("CritDamage") && playerAttributes.get(uuid).get("CritDamage")!=0.0)
+			output.add(String.format("§6☠ Crit Damage: §c+§x§9§c§0§0§f§b%.0f%%", playerAttributes.get(uuid).get("CritDamage")*100.0));
+		if(playerAttributes.get(uuid).containsKey("RegenerationBonus") && playerAttributes.get(uuid).get("RegenerationBonus")!=0.0)
+			output.add(String.format("§6❤ Regeneration Bonus: §a+§c%.0f%%", playerAttributes.get(uuid).get("RegenerationBonus")*100.0));
+		if(playerAttributes.get(uuid).containsKey("Speed") && playerAttributes.get(uuid).get("Speed")!=0.0)
+			output.add(String.format("§6☄ Speed: §a+§c%.0f%%", playerAttributes.get(uuid).get("Speed")*100.0));
+		
+		if(playerAttributes.get(uuid).containsKey("MiningSpeed") && playerAttributes.get(uuid).get("MiningSpeed")!=1.0)
+			output.add(String.format("§6⛏ Mining Speed: §a§x§0§0§a§1§f§b%.0f", playerAttributes.get(uuid).get("MiningSpeed")));
+		if(playerAttributes.get(uuid).containsKey("ToolHardness") && playerAttributes.get(uuid).get("ToolHardness")!=0.0)
+			output.add(String.format("§6⛏ Mining Tier: §a§x§0§0§a§1§f§b%.0f", playerAttributes.get(uuid).get("ToolHardness")));
+		if(playerAttributes.get(uuid).containsKey("MiningFortune") && playerAttributes.get(uuid).get("MiningFortune")>=10.0)
+			output.add(IridiumColorAPI.process(String.format("§6♣ Mining Fortune: §c-<GRADIENT:059600>%.0f</GRADIENT:00F794>f", playerAttributes.get(uuid).get("MiningFortune"))));
+		
+		return output.toArray(new String[0]);
 	}
 	
 	public static void getUpdatedPlayerAttributes(Player p, HashMap<String, Double> attributes, boolean checkWeapon)
