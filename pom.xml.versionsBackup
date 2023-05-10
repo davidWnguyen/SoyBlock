@@ -45,8 +45,8 @@
 			<url>https://nexus.iridiumdevelopment.net/repository/maven-releases/</url>
 		</repository>
 		<repository>
-			<id>xenondevs</id>
-			<url>https://repo.xenondevs.xyz/releases</url>
+			<id>minebench-repo</id>
+			<url>https://repo.minebench.de/</url>
 		</repository>
 	</repositories>
 
@@ -78,27 +78,28 @@
 		<dependency>
 		    <groupId>com.jeff_media</groupId>
 		    <artifactId>CustomBlockData</artifactId>
-		    <version>2.2.0</version>
+		    <version>2.0.0</version>
 		    <scope>compile</scope>
 		</dependency>
 		<dependency>
 		    <groupId>com.iridium</groupId>
 		    <artifactId>IridiumColorAPI</artifactId>
-		    <version>1.0.6</version>
+		    <version>LATEST</version>
 		    <scope>compile</scope>
 		</dependency>
 		<dependency>
 		   <groupId>com.jeff_media</groupId>
 		   <artifactId>MorePersistentDataTypes</artifactId>
-		   <version>2.4.0</version>
+		   <version>2.3.1</version>
 		   <scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>xyz.xenondevs.invui</groupId>
-			<artifactId>invui</artifactId>
-			<version>1.5</version>
-			<type>pom</type>
-		</dependency>
+	    <dependency>
+	        <groupId>de.themoep</groupId>
+	        <artifactId>inventorygui</artifactId>
+	        <!--The following version may not be the latest. Check it before using.-->
+	        <version>1.6-SNAPSHOT</version>
+	        <scope>compile</scope>
+	    </dependency>
 	</dependencies>
 
   <build>
@@ -212,6 +213,7 @@
                     <shadedPattern>markiplites.SoyBlock</shadedPattern>
                 </relocation>
 			</relocations>
+				<outputDirectory>../../Servers/SoyblockTestServer/plugins</outputDirectory>
 				<shadedArtifactAttached>true</shadedArtifactAttached>
             </configuration>
         </plugin>

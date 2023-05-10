@@ -65,6 +65,11 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+        <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
@@ -106,6 +111,7 @@
                 <shadedPattern>markiplites.SoyBlock</shadedPattern>
               </relocation>
             </relocations>
+            <outputDirectory>../../Servers/SoyblockTestServer/plugins</outputDirectory>
             <shadedArtifactAttached>true</shadedArtifactAttached>
           </configuration>
         </plugin>
@@ -134,8 +140,8 @@
       <url>https://nexus.iridiumdevelopment.net/repository/maven-releases/</url>
     </repository>
     <repository>
-      <id>minebench-repo</id>
-      <url>https://repo.minebench.de/</url>
+      <id>xenondevs</id>
+      <url>https://repo.xenondevs.xyz/releases</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -168,6 +174,13 @@
       <artifactId>ArmorEquipEvent</artifactId>
       <version>1.7.6</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>xyz.xenondevs.invui</groupId>
+      <artifactId>invui</artifactId>
+      <version>1.5</version>
+      <type>pom</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <properties>

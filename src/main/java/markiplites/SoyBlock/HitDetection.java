@@ -39,7 +39,9 @@ public class HitDetection implements Listener {
 		UUID id = player.getUniqueId();
 		if(player.getCooldown(player.getInventory().getItemInMainHand().getType()) != 0)
 			return;
-
+		
+		int weaponType;
+		
 		ItemMeta meta = player.getInventory().getItemInMainHand().getItemMeta();
 
 		if (meta == null)
@@ -48,7 +50,7 @@ public class HitDetection implements Listener {
 		if (container == null)
 			return;
 
-		int weaponType = container.has(Main.attributeKeys.get( "weaponType"), PersistentDataType.DOUBLE) ? (int) Math.round(container.get(Main.attributeKeys.get( "weaponType"), PersistentDataType.DOUBLE)) : 0;
+		weaponType=container.getOrDefault(Main.attributeKeys.get( "weaponType"), PersistentDataType.DOUBLE, 0.0).intValue();
 		switch (weaponType) {
 			//Rocket Launchers
 			case 2 -> {
@@ -62,7 +64,7 @@ public class HitDetection implements Listener {
 					return;
 				rocket.setGravity(false);
 				rocket.setItem(new ItemStack(Material.TNT));
-				rocket.getWorld().playSound(rocket.getLocation(), Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.0f,1.0f);
+				rocket.getWorld().playSound(rocket.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f,1.0f);
 				HashMap<String, Double> attributes = new HashMap<>();
 
 				double critChance = Main.getAttributes().get(id).getOrDefault("CritChance", 0.0);
@@ -80,7 +82,7 @@ public class HitDetection implements Listener {
 
 						if(rocket.isDead())
 						{
-							rocket.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, rocket.getLocation(), 10);
+							rocket.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, rocket.getLocation(), 10, 0.0,0.0,0.0, blastRadius);
 							rocket.getWorld().playSound(rocket.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.2f,0.7f);
 							Collection<Entity> entities = rocket.getWorld().getNearbyEntities(rocket.getLocation(), blastRadius, blastRadius, blastRadius, ignoreList);
 							for(Entity ent : entities){
@@ -95,11 +97,11 @@ public class HitDetection implements Listener {
 					}
 				}.runTaskTimer(Main.getInstance(), 0, 3);
 				double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
-				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) (20.0 / attackSpeed));
 			}
 			//Shortbows
 			case 1 -> {
-				double projSpeed = container.has(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) ? container.get(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE) : 1.0;
+				double projSpeed = container.getOrDefault(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE, 1.0);
 				Vector playerDirection = player.getLocation().getDirection();
 				Arrow shortbowArrow = player.launchProjectile(Arrow.class, playerDirection.multiply(projSpeed));
 				if (shortbowArrow == null)
@@ -120,7 +122,7 @@ public class HitDetection implements Listener {
 
 				double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 
-				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) (20.0 / attackSpeed));
 			}
 			default ->//Normal Swords
 			{
@@ -136,7 +138,7 @@ public class HitDetection implements Listener {
 
 				double attackSpeed = Main.getAttributes().get(id).getOrDefault("AttackSpeed", 4.0);
 
-				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) Math.round(20.0 / attackSpeed));
+				player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int) (20.0 / attackSpeed));
 			}
 		}
 	}

@@ -67,4 +67,16 @@ public class ItemListHandler {
 		item.setItemMeta(meta);
 		return item;
 	}
+	public static ItemStack getItemForDisplay(Material mat, int custom_texture)
+	{
+		ItemStack item = new ItemStack(mat);
+		ItemMeta meta = item.getItemMeta();
+		meta.setCustomModelData(custom_texture);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		item.setItemMeta(meta);
+		return item;
+	}
 }
