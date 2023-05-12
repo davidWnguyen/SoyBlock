@@ -3,6 +3,7 @@ package markiplites.SoyBlock.SubMenus.Crafting;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import markiplites.SoyBlock.MenuItems.MainMenu.AnvilMenu;
 import markiplites.SoyBlock.MenuItems.MainMenu.CraftingTable;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -13,7 +14,7 @@ public class CraftingMainMenu {
     public static void open(Player p){
 		String[] guiSetup = {
             "bbbbbbbbb",
-            "bc......b",
+            "bca.....b",
             "b.......b",
             "b.......b",
             "bbbbbbbbb"
@@ -22,11 +23,12 @@ public class CraftingMainMenu {
             .setStructure(guiSetup)
             .addIngredient('b', new SimpleItem(new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE)))
             .addIngredient('c', new CraftingTable())
+            .addIngredient('a', new AnvilMenu())
             .build();
 
     Window window = Window.single()
             .setViewer(p)
-            .setTitle("Soyblock Main Menu")
+            .setTitle("Crafting Main Menu")
             .setGui(gui)
             .build();
     

@@ -9,11 +9,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -23,6 +26,7 @@ public class Main extends JavaPlugin implements Listener{
 	ItemListHandler itemListHandler;
 	public static HashMap<UUID, HashMap<String, Double>> playerAttributes = new HashMap<>();
 	public static HashMap<String, NamespacedKey> attributeKeys = new HashMap<>();
+	public static HashMap<String, NamespacedKey> modifierKeys = new HashMap<>();
 	
 	@Override
 	public void onEnable() {
@@ -30,6 +34,10 @@ public class Main extends JavaPlugin implements Listener{
 		//Cache all attribute namespaced keys
 		for(attr attrName : attr.values()){
 			attributeKeys.put(attrName.name(), new NamespacedKey(this, attrName.name()));
+		}
+		//Same for modifiers!
+		for(modifiers mod : modifiers.values()){
+			modifierKeys.put(mod.name(), new NamespacedKey(this, mod.name()));
 		}
 		//For all of the non-attribute stringy stuff
 		attributeKeys.put("itemID", new NamespacedKey(this, "itemID"));
@@ -91,6 +99,13 @@ public class Main extends JavaPlugin implements Listener{
 		
 		ItemStack mainMenu = ItemListHandler.generateItem("SBMENU");
 		p.getInventory().setItem(8, mainMenu);
+
+		p.setResourcePack("http://136.57.191.195/fastdl/SoyblockTextures.zip","d3a619a6c29b0b092cf21741ebc46faedd6cb3d0");
+		//10s later
+		new BukkitRunnable(){public void run(){
+			if(p.getResourcePackStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED)
+				p.sendMessage(IridiumColorAPI.process("<SOLID:800000>please just accept the texture pack"));
+		}}.runTaskLater(Main.getInstance(), 200);
 	}
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e)
@@ -108,7 +123,7 @@ public class Main extends JavaPlugin implements Listener{
 		return playerAttributes;
 	}
 	public static Vector getRightVector(Location loc){Location temp = loc.clone();temp.setYaw(temp.getYaw()+90.0F); return temp.getDirection();}
-	public static Vector getUpVector(Location loc){Location temp = loc.clone();temp.setPitch(temp.getPitch()-90.0F);; return temp.getDirection();}
+	public static Vector getUpVector(Location loc){Location temp = loc.clone();temp.setPitch(temp.getPitch()-90.0F); return temp.getDirection();}
 	public static void VectorAngles(Vector forward, double[] angle)
 	{
 		double tmp, yaw, pitch;
@@ -145,7 +160,21 @@ public class Main extends JavaPlugin implements Listener{
 		Bukkit.getLogger().info("appeared "+c+" times");
 		return c;
 	}
-
+	public static String getRomanNumber(int number) {
+		return "I".repeat(number)
+				.replace("IIIII", "V")
+				.replace("IIII", "IV")
+				.replace("VV", "X")
+				.replace("VIV", "IX")
+				.replace("XXXXX", "L")
+				.replace("XXXX", "XL")
+				.replace("LL", "C")
+				.replace("LXL", "XC")
+				.replace("CCCCC", "D")
+				.replace("CCCC", "CD")
+				.replace("DD", "M")
+				.replace("DCD", "CM");
+	}
 	public enum ItemProperties{
 		weaponType,
 		itemAction

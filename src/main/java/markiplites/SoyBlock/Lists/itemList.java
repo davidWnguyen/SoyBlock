@@ -78,7 +78,7 @@ public class itemList implements Listener
 		attributes.put(attr.intelligenceBonusRaw, 900.0);
 		attributes.put(attr.itemType, 101.0);
 		attributes.put(attr.rarity, 5.0);
-		new Chestplate("chestplateOfDoom", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
+		new Chestplate("CHESTPLATE_OF_DOOM", "<GRADIENT:02e494>FAMILY CHEST DEATH DOOM CREST</GRADIENT:0252e4>",
 				Material.LEATHER_CHESTPLATE, attributes, "carry on my wayward son","2 195 228");
 
 		attributes.clear();
@@ -86,7 +86,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, 300.0);
 		attributes.put(attr.itemType, 200.0);
 		attributes.put(attr.rarity, 3.0);
-		new Talisman("soulRing", "<GRADIENT:02e494>Soules Ring</GRADIENT:0252e4>",
+		new Talisman("SOUL_RING", "<GRADIENT:02e494>Soules Ring</GRADIENT:0252e4>",
 				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
 
 		attributes.clear();
@@ -94,7 +94,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, 800.0);
 		attributes.put(attr.itemType, 200.0);
 		attributes.put(attr.rarity, 4.0);
-		new Talisman("soulRingRare", "<GRADIENT:02e494>Darkest Soules Ring</GRADIENT:0252e4>",
+		new Talisman("SOUL_RING_RARE", "<GRADIENT:02e494>Darkest Soules Ring</GRADIENT:0252e4>",
 				Material.BLAZE_POWDER, attributes, "hand it over, that thing. your dark soul.","soulTalismans");
 
 		attributes.clear();
@@ -102,7 +102,7 @@ public class itemList implements Listener
 		attributes.put(attr.dexterityBonusRaw, -100.0);
 		attributes.put(attr.itemType, 200.0);
 		attributes.put(attr.rarity, 5.0);
-		new Talisman("waterAffinityFeather", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
+		new Talisman("WATER_AFFINITY_FEATHER", "<GRADIENT:02e494>Buoyancy Feather</GRADIENT:0252e4>",
 				Material.FEATHER, attributes, "Gives bonus swag.","waterAffinity");
 
 		attributes.clear();
@@ -538,6 +538,11 @@ public class itemList implements Listener
 		double currentMana = Main.getAttributes().get(uuid).get("Mana");
 		if(!(currentMana - manaCost >= 0)) {p.sendMessage("§4You do not have enough mana for this!");return false;}
 		Main.getAttributes().get(uuid).replace("Mana", (currentMana - manaCost));
+
+		int clockworkValue = meta.getPersistentDataContainer().getOrDefault(Main.modifierKeys.get( "clockwork"), PersistentDataType.INTEGER, 0);
+		if(clockworkValue > 0)
+			delay *= 1.0-(clockworkValue*0.15);
+
 		ability_cooldown.get(uuid).replace(itemID, (1000.0*delay) + System.currentTimeMillis());
 
 

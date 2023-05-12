@@ -1,19 +1,25 @@
 package markiplites.SoyBlock.Lists;
 
+import markiplites.SoyBlock.CustomAttributes;
 import markiplites.SoyBlock.ItemListHandler;
 import markiplites.SoyBlock.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class recipeList implements Listener {
@@ -81,5 +87,64 @@ public class recipeList implements Listener {
         }
         if(failure)
             inv.setResult(new ItemStack(Material.AIR));
+    }
+
+    @EventHandler
+    public void prepareAnvilCraft(PrepareAnvilEvent e){
+        AnvilInventory inv = e.getInventory();
+        if(inv == null)
+            return;
+
+        //Player p = (Player) e.getViewers().get(0);
+
+        int xpLevelCost = 0;
+        int itemCost = 1;
+
+        ItemStack receivingItem = inv.getItem(0);
+        ItemStack consumedItem = inv.getItem(1);
+
+        if(consumedItem == null || receivingItem == null) return;
+        ItemMeta receivingMeta = consumedItem.getItemMeta();
+        ItemMeta consumedMeta = consumedItem.getItemMeta();
+
+        if(consumedMeta == null || receivingMeta == null) return;
+        PersistentDataContainer receivingContainer = receivingMeta.getPersistentDataContainer();
+        PersistentDataContainer consumedContainer = consumedMeta.getPersistentDataContainer();
+
+        if(receivingContainer == null || consumedContainer == null) return;
+        String consumedItemID = consumedContainer.get(Main.attributeKeys.get("itemID"), PersistentDataType.STRING);
+
+        if(consumedItemID == null || consumedItemID.isEmpty()) return;
+
+        ItemStack result = receivingItem.clone();
+        ItemMeta resultMeta = result.getItemMeta();
+        PersistentDataContainer resultContainer = resultMeta.getPersistentDataContainer();
+
+        boolean change = false;
+        switch(consumedItemID){
+            case "PERFECT_DIAMOND" ->{
+                int amount = resultContainer.getOrDefault(Main.modifierKeys.get("clockwork"), PersistentDataType.INTEGER, 0);
+                if(amount < 3){
+                    resultContainer.set(Main.modifierKeys.get("clockwork"), PersistentDataType.INTEGER, amount+1);
+                    change = true;
+                }
+            }
+            case "ECHO_SHARD" ->{
+                int amount = resultContainer.getOrDefault(Main.modifierKeys.get("clockwork"), PersistentDataType.INTEGER, 0);
+                if(amount < 3){
+                    resultContainer.set(Main.modifierKeys.get("clockwork"), PersistentDataType.INTEGER, amount+1);
+                    change = true;
+                }
+            }
+        }
+        if(change){
+            result.setItemMeta(resultMeta);
+            CustomAttributes.updateItem(result);
+            e.setResult(result);
+        }else{
+            e.setResult(null);
+        }
+        Main.getInstance().getServer().getScheduler().runTask(Main.getInstance(), () -> inv.setRepairCostAmount(itemCost));
+        Main.getInstance().getServer().getScheduler().runTask(Main.getInstance(), () -> inv.setRepairCost(xpLevelCost));
     }
 }

@@ -119,7 +119,7 @@ public class ClickableItems implements Listener {
 				.addIngredient('v', new SimpleItem(new ItemBuilder(Material.ENDER_CHEST).setDisplayName(IridiumColorAPI.process("<SOLID:6666ff>Vault"))
 					.addLoreLines(IridiumColorAPI.process("<SOLID:4d4dff>Store & access items."))) )
 
-				.addIngredient('r', new SimpleItem(new ItemBuilder(Material.IRON_CHESTPLATE).setDisplayName(IridiumColorAPI.process("<SOLID:33ccff>Armory"))
+				.addIngredient('r', new SimpleItem(new ItemBuilder(ItemListHandler.getItemForDisplay(Material.IRON_CHESTPLATE)).setDisplayName(IridiumColorAPI.process("<SOLID:33ccff>Armory"))
 					.addLoreLines(IridiumColorAPI.process("<SOLID:33cccc>See your collection of items."))) )
 
 				.addIngredient('t', new SimpleItem(new ItemBuilder(Material.ENDER_PEARL).setDisplayName(IridiumColorAPI.process("<SOLID:00cc66>Teleport"))
@@ -130,7 +130,7 @@ public class ClickableItems implements Listener {
 
 				.addIngredient('i', new SkillsMenu())
 
-				.addIngredient('e', new SimpleItem(new ItemBuilder(Material.IRON_SWORD).setDisplayName(IridiumColorAPI.process("<SOLID:ff9933>Equipment"))
+				.addIngredient('e', new SimpleItem(new ItemBuilder(ItemListHandler.getItemForDisplay(Material.IRON_SWORD)).setDisplayName(IridiumColorAPI.process("<SOLID:ff9933>Equipment"))
 					.addLoreLines(IridiumColorAPI.process("<SOLID:ffcc00>Change out your currently worn gear."))) )
 
 				.addIngredient('i', new CraftingMenu())
