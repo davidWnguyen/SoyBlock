@@ -3,11 +3,11 @@ package markiplites.SoyBlock;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
@@ -29,12 +29,14 @@ public class Item implements Listener
 
 		attributes.put(attr.itemType, itemType);
 
-		meta.getPersistentDataContainer().set(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING, itemID);
-		meta.getPersistentDataContainer().set(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
+		PersistentDataContainer container = meta.getPersistentDataContainer();
+
+		container.set(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING, itemID);
+		container.set(Main.attributeKeys.get( "additionalLore"), PersistentDataType.STRING, IridiumColorAPI.process(lore));
 		
 		for(attr attributeName : attributes.keySet()) {
 			double attributeValue = attributes.get(attributeName);
-			meta.getPersistentDataContainer().set(Main.attributeKeys.get( attributeName.name()), PersistentDataType.DOUBLE, attributeValue);
+			container.set(Main.attributeKeys.get( attributeName.name()), PersistentDataType.DOUBLE, attributeValue);
 		}
 
 		if(attributes.containsKey(attr.itemTexture)) {
