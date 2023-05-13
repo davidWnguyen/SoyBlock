@@ -4,5 +4,5 @@ public enum modifiers {
     clockwork,
     infernal,
     lengthy,
-    ultraSharpened
+    sharp,
 }

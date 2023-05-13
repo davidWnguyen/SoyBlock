@@ -39,4 +39,8 @@ public enum attr {
     stackable,
     itemTexture,
     itemAbilityTotalCooldown,
+    enchantmentSlots,
+    modifierSlots,
+    reforge,
+    drawTime
 }

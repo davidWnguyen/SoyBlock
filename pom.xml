@@ -208,6 +208,7 @@
                 </relocation>
 			</relocations>
 				<shadedArtifactAttached>true</shadedArtifactAttached>
+				<outputDirectory>../../Servers/SoyblockTestServer/plugins</outputDirectory>
             </configuration>
         </plugin>
       </plugins>

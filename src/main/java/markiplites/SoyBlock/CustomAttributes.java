@@ -513,6 +513,7 @@ public class CustomAttributes implements Listener {
 		getUpdatedPlayerAttributes(p, attributes, false);
 		playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
+		BowHandler.useTime.remove(p.getUniqueId());
 	}
 	@EventHandler
 	public void onInventoryMoved(InventoryClickEvent e){
