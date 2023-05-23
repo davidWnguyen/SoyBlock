@@ -60,9 +60,14 @@ public class MiningSpeed implements Listener{
 					blockBeingMined.remove(p.getUniqueId());
 					p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
 				}
-				if(!digType.equals(PlayerDigType.RELEASE_USE_ITEM)) {
-					BowHandler.useTime.remove(p.getUniqueId());
-				}
+				
+				new BukkitRunnable(){
+					@Override
+					public void run()
+					{
+						BowHandler.onCancelDraw(p);
+					}
+				}.runTaskLater(Main.getInstance(), 1);
             }
         });
     }
