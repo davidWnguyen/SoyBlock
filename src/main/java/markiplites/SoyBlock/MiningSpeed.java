@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -37,7 +38,6 @@ public class MiningSpeed implements Listener{
     private final ProtocolManager protocolManager;
 
 	private final HashMap<UUID, Block> blockBeingMined = new HashMap<>();
-	private final HashMap<UUID, Integer> blockBreakStage = new HashMap<>();
     Main mainPlugin;
     public MiningSpeed(Main main) {
         mainPlugin = main;
@@ -58,20 +58,18 @@ public class MiningSpeed implements Listener{
                 
                 if(!digType.equals(PlayerDigType.START_DESTROY_BLOCK)) {
 					blockBeingMined.remove(p.getUniqueId());
-					blockBreakStage.remove(p.getUniqueId());
-					setFatigue(p, 0, -1);
+					p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
 				}
+				
+				new BukkitRunnable(){
+					@Override
+					public void run()
+					{
+						BowHandler.onCancelDraw(p);
+					}
+				}.runTaskLater(Main.getInstance(), 1);
             }
         });
-		protocolManager.addPacketListener(new PacketAdapter(mainPlugin, ListenerPriority.NORMAL, PacketType.Play.Server.BLOCK_BREAK_ANIMATION) {
-			@Override
-			public void onPacketSending(PacketEvent event){
-				PacketContainer packet = event.getPacket();
-				Player p = event.getPlayer();
-				int stage = blockBreakStage.getOrDefault(p.getUniqueId(), 0);
-				packet.getIntegers().write(1, stage);
-			}
-		});
     }
     @EventHandler
     public void OnBlockPlace(BlockPlaceEvent event)
@@ -136,8 +134,7 @@ public class MiningSpeed implements Listener{
 
     public void MiningBlock(BlockDamageEvent event, Block block) {
 		Player p = event.getPlayer();
-		//p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 200, 4, true));
-		setFatigue(p, 200,4);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 200, -1, false, false));
 		//Instead of getting the hash every time the breaking process is done, get it when it starts.
 		PersistentDataContainer customBlockData = new CustomBlockData(event.getBlock(), mainPlugin);
 		String blockID;
@@ -174,32 +171,6 @@ public class MiningSpeed implements Listener{
 			e.printStackTrace();
 		}
 	}
-	public void setFatigue(Player p, int duration, int amplitude)
-	{
-		if(amplitude == -1)
-		{
-			PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.REMOVE_ENTITY_EFFECT);
-			potionPacket.getIntegers().write(0, p.getEntityId());
-			potionPacket.getEffectTypes().write(0, PotionEffectType.SLOW_DIGGING);
-			try {
-				protocolManager.sendServerPacket(p, potionPacket);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return;
-		}
-		PacketContainer potionPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EFFECT);
-		potionPacket.getIntegers().write(0, p.getEntityId())
-				.write(1, duration);
-		potionPacket.getBytes().write(0, (byte) amplitude)
-				.write(1, (byte) ((byte) 0x1 | ((byte) 0x0)));
-		potionPacket.getEffectTypes().write(0, PotionEffectType.SLOW_DIGGING);
-		try {
-			protocolManager.sendServerPacket(p, potionPacket);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
     public void blockBreakingStages(Player p, int stage, Block block, long temporaryBreakTime, String blockID)
     {
 		UUID uuid = p.getUniqueId();
@@ -207,11 +178,10 @@ public class MiningSpeed implements Listener{
 		if(!(blockBeingMined.containsKey(uuid) && blockBeingMined.get(uuid).equals(block)))
 			return;
 
-		blockBreakStage.put(uuid, stage);
+		//blockBreakStage.put(uuid, stage);
 		blockBreakEffect(p, block.getLocation().toVector(), stage);
 		new BukkitRunnable() {
 			public void run() {
-				blockBreakEffect(p, block.getLocation().toVector(), stage);
 				if (stage < 9) {
 					blockBreakingStages(p, stage + 1, block, temporaryBreakTime, blockID);
 				} else {
@@ -252,7 +222,7 @@ public class MiningSpeed implements Listener{
 						if(blockList.block_attributes.get(blockID).containsKey(attr.blockForagingExp))
 							Skills.addSkillExp(uuid, "Foraging", blockList.block_attributes.get(blockID).get(attr.blockForagingExp));
 					}
-					setFatigue(p, 0, -1);
+					p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
 				}
 			}
 		}.runTaskLater(mainPlugin,temporaryBreakTime);

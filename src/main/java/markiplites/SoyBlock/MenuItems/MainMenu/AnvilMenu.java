@@ -23,6 +23,6 @@ public class AnvilMenu extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        player.openInventory(Bukkit.createInventory(null, InventoryType.ANVIL));
+        player.openInventory(Bukkit.createInventory(player, InventoryType.ANVIL));
     }
 }

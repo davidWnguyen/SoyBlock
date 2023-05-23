@@ -3,6 +3,8 @@ package markiplites.SoyBlock.Lists;
 import markiplites.SoyBlock.CustomAttributes;
 import markiplites.SoyBlock.ItemListHandler;
 import markiplites.SoyBlock.Main;
+import markiplites.SoyBlock.modifiers;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -123,9 +125,9 @@ public class recipeList implements Listener {
         boolean change = false;
         switch(consumedItemID){
             case "PERFECT_DIAMOND" ->{
-                int amount = resultContainer.getOrDefault(Main.modifierKeys.get("clockwork"), PersistentDataType.INTEGER, 0);
-                if(amount < 3){
-                    resultContainer.set(Main.modifierKeys.get("clockwork"), PersistentDataType.INTEGER, amount+1);
+                int amount = resultContainer.getOrDefault(Main.modifierKeys.get("sharp"), PersistentDataType.INTEGER, 0);
+                if(amount < 5){
+                    resultContainer.set(Main.modifierKeys.get("sharp"), PersistentDataType.INTEGER, amount+1);
                     change = true;
                 }
             }
@@ -137,14 +139,30 @@ public class recipeList implements Listener {
                 }
             }
         }
+        
+        // Add a maximum amount of modifiers to items
+        int modifiersAllowed = receivingContainer.getOrDefault(Main.attributeKeys.get("modifierSlots"), PersistentDataType.INTEGER, 0);
+        if(modifiersAllowed > 0){
+            int modifiersSpent = 0;
+            for(modifiers Modifier : modifiers.values()){
+                modifiersSpent += resultContainer.getOrDefault(Main.modifierKeys.get(Modifier.name()), PersistentDataType.INTEGER, 0);
+            }
+            if(modifiersSpent > modifiersAllowed){
+                change = false;
+            }
+        }
+        else{
+            change = false;
+        }
+
         if(change){
             result.setItemMeta(resultMeta);
             CustomAttributes.updateItem(result);
             e.setResult(result);
+            Main.getInstance().getServer().getScheduler().runTask(Main.getInstance(), () -> inv.setRepairCostAmount(itemCost));
+            Main.getInstance().getServer().getScheduler().runTask(Main.getInstance(), () -> inv.setRepairCost(xpLevelCost));
         }else{
             e.setResult(null);
         }
-        Main.getInstance().getServer().getScheduler().runTask(Main.getInstance(), () -> inv.setRepairCostAmount(itemCost));
-        Main.getInstance().getServer().getScheduler().runTask(Main.getInstance(), () -> inv.setRepairCost(xpLevelCost));
     }
 }

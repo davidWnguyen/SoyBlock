@@ -506,13 +506,15 @@ public class CustomAttributes implements Listener {
 		HashMap<String, Double> attributes = CustomAttributes.defaultStats();
 
 		if(p.getInventory().getItem(e.getNewSlot()) != null) {
-			p.setCooldown(p.getInventory().getItem(e.getNewSlot()).getType(), 4);
+			if(p.getCooldown(p.getInventory().getItem(e.getNewSlot()).getType()) < 4)
+				p.setCooldown(p.getInventory().getItem(e.getNewSlot()).getType(), 4);
 			CustomAttributes.giveItemStats(p.getInventory().getItem(e.getNewSlot()),attributes);
 		}
 		new BukkitRunnable(){public void run(){//Start of Delay
 		getUpdatedPlayerAttributes(p, attributes, false);
 		playerAttributes.put(p.getUniqueId(), attributes);
 		}}.runTaskLater(Main.getInstance(), 1);
+		BowHandler.onCancelDraw(p);
 	}
 	@EventHandler
 	public void onInventoryMoved(InventoryClickEvent e){

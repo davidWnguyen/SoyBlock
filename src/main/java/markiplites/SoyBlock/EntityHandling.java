@@ -400,6 +400,7 @@ public class EntityHandling implements Listener {
 		else
 			color = "EF320E"; //red
 		if(Ent.nameTags.containsKey(entityID))
-			Ent.nameTags.get(entityID).setCustomName(customNames.get(entityID) + ": " + IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
+			Ent.nameTags.get(entityID).setCustomName(customNames.get(entityID) + ": " +
+			IridiumColorAPI.process(String.format("<SOLID:%s> %.0f/%.0f", color, entityAttributes.get(entityID).get("Health"), entityAttributes.get(entityID).get("MaxHealth"))));
 	}
 }

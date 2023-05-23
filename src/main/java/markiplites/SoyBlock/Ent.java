@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -16,8 +20,8 @@ public class Ent {
     static HashMap<String, EntityType> models = new HashMap<>();
     public static HashMap<String, String> names = new HashMap<>();
     public static HashMap<UUID, ArmorStand> nameTags = new HashMap<>();
+
     public Ent(String entityID, String entityName, EntityType model, HashMap<String, Double> attributes) {
-        
         entityAttributes.put(entityID, (HashMap<String, Double>)attributes.clone());
         models.put(entityID, model);
         names.put(entityID, entityName);
@@ -32,25 +36,28 @@ public class Ent {
 
             EntityHandling.entityAttributes.get(ent.getUniqueId()).replace("Health", EntityHandling.entityAttributes.get(ent.getUniqueId()).get("MaxHealth")); //im mad at myself
 
-            ArmorStand hologram = (ArmorStand) ent.getWorld().spawnEntity(new Location(ent.getWorld(), 0, 0, 0), EntityType.ARMOR_STAND);
-            hologram.setVisible(false);
-            hologram.setBasePlate(false);
-            hologram.setCollidable(false);
-            hologram.setArms(false);
-            hologram.setSmall(true);
-            hologram.setSilent(true);
-            hologram.setCanPickupItems(false);
-            hologram.setGliding(true);
-            hologram.setLeftLegPose(EulerAngle.ZERO.add(180, 0, 0));
-            hologram.setRightLegPose(EulerAngle.ZERO.add(180, 0, 0));
-            hologram.setInvulnerable(true);
-            hologram.setCustomNameVisible(true);
-            hologram.setCustomName(names.get(entityID) + ": " + IridiumColorAPI.process(String.format("<SOLID:44E90B> %.0f/%.0f", entityAttributes.get(entityID).get("MaxHealth"), entityAttributes.get(entityID).get("MaxHealth"))));
-            hologram.setGravity(false);
-            ent.addPassenger(hologram);
-            nameTags.put(ent.getUniqueId(), hologram);
+            addHealthHologram(ent);
             return ent;
         }
         else return null;
+    }
+    public static void addHealthHologram(Entity e){
+        ArmorStand hologram = (ArmorStand) e.getWorld().spawnEntity(new Location(e.getWorld(), 0, 0, 0), EntityType.ARMOR_STAND);
+        hologram.setVisible(false);
+        hologram.setBasePlate(false);
+        hologram.setCollidable(false);
+        hologram.setArms(false);
+        hologram.setSmall(true);
+        hologram.setSilent(true);
+        hologram.setCanPickupItems(false);
+        hologram.setGliding(true);
+        hologram.setLeftLegPose(EulerAngle.ZERO.add(180, 0, 0));
+        hologram.setRightLegPose(EulerAngle.ZERO.add(180, 0, 0));
+        hologram.setInvulnerable(true);
+        hologram.setCustomNameVisible(true);
+        hologram.setGravity(false);
+        e.addPassenger(hologram);
+        nameTags.put(e.getUniqueId(), hologram);
+        EntityHandling.setNameHealth(e);
     }
 }

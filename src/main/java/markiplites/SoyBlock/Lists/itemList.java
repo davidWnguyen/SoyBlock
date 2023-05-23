@@ -209,6 +209,17 @@ public class itemList implements Listener
 		attributes.put(attr.rarity, 6.0);
 		attributes.put(attr.itemTexture, 1000000.0);
 		new Explosives("BLUNT_LAUNCHER", "<GRADIENT:cc9900>Blunt Launcher</GRADIENT:009933>", Material.WHEAT, attributes, "rawket lawnchair");
+
+		attributes.clear();
+
+		attributes.put(attr.baseDamage, 5000.0);
+		attributes.put(attr.baseAttackSpeed, 0.3);
+		attributes.put(attr.strengthBonusRaw, 200.0);
+		attributes.put(attr.strengthScaling, 3.0);
+		attributes.put(attr.projectileSpeed, 1.5);
+		attributes.put(attr.drawTime, 3.0);
+		attributes.put(attr.rarity, 6.0);
+		new Bow("LIGHTNING_GREATBOW", "<GRADIENT:ffff00>Lightning Greatbow</GRADIENT:ff9999>", Material.BOW, attributes, "");
 	}
 
 
