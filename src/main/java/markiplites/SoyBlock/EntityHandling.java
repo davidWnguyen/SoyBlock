@@ -196,8 +196,10 @@ public class EntityHandling implements Listener {
 	@EventHandler
 	public void onEntityRemoved(EntityRemoveFromWorldEvent event)
 	{
-		entityAttributes.remove(event.getEntity().getUniqueId());
-		customNames.remove(event.getEntity().getUniqueId());
+		UUID entUUID = event.getEntity().getUniqueId();
+		entityAttributes.remove(entUUID);
+		customNames.remove(entUUID);
+		projectileAttributes.remove(entUUID);
 	}
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
@@ -221,35 +223,37 @@ public class EntityHandling implements Listener {
 		if(i == null)
 			return;
 		Entity v = e.getHitEntity();
-		if(!(v instanceof LivingEntity))
-			return;
+		//Only for direct hits
+		if(!(v instanceof LivingEntity)){
+			ProjectileSource s = i.getShooter();
+			//Mobs cannot hit eachother, and player cannot hit eachother.
+			if(s instanceof Mob && v instanceof Mob)
+				return;
+			if(s instanceof Player && v instanceof Player)
+				return;
 
-		ProjectileSource s = i.getShooter();
-		//Mobs cannot hit eachother, and player cannot hit eachother.
-		if(s instanceof Mob && v instanceof Mob)
-			return;
-		if(s instanceof Player && v instanceof Player)
-			return;
+			UUID projID = i.getUniqueId();
+			if(projectileAttributes.containsKey(projID))
+			{
+				double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
+				int damageType = (int) Math.round(projectileAttributes.get(projID).getOrDefault("DamageType", 0.0));
+				boolean critBoolean = (projectileAttributes.get(projID).getOrDefault("CriticalAttack", 0.0))==1.0;
+				if(s instanceof LivingEntity)
+					dealDamageToEntity((LivingEntity)v, (LivingEntity) s, customDamage, critBoolean, damageType);
+				else
+					dealDamageToEntity((LivingEntity)v, null, customDamage, critBoolean, damageType);
+				resetIFrames((LivingEntity)v);
 
-		UUID projID = i.getUniqueId();
-		if(projectileAttributes.containsKey(projID))
-		{
-			double customDamage = projectileAttributes.get(projID).getOrDefault("Damage", 0.0);
-			int damageType = (int) Math.round(projectileAttributes.get(projID).getOrDefault("DamageType", 0.0));
-			boolean critBoolean = (projectileAttributes.get(projID).getOrDefault("CriticalAttack", 0.0))==1.0;
-			if(s instanceof LivingEntity)
-				dealDamageToEntity((LivingEntity)v, (LivingEntity) s, customDamage, critBoolean, damageType);
-			else
-				dealDamageToEntity((LivingEntity)v, null, customDamage, critBoolean, damageType);
-			resetIFrames((LivingEntity)v);
+				double knockback = projectileAttributes.get(projID).getOrDefault("Knockback", 0.0);
+				if(knockback > 0.0)
+					dealKnockback(i, v, knockback, 0.2*knockback);
 
-			double knockback = projectileAttributes.get(projID).getOrDefault("Knockback", 0.0);
-			if(knockback > 0.0)
-				dealKnockback(i, v, knockback, 0.2*knockback);
-
-			e.setCancelled(true);
-			i.remove();
+				e.setCancelled(true);
+				i.remove();
+			}
 		}
+		//On hitting anything:
+		
 	}
 	@EventHandler
 	public void onEntityDamageEvent(EntityDamageEvent e) {

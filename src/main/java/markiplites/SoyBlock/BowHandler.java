@@ -85,7 +85,7 @@ public class BowHandler implements Listener {
 		if(e.getItem() != null && e.getItem().getType() == Material.BOW
 		&& (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) ) {
 			Player p = e.getPlayer();
-			useTime.put(p.getUniqueId(), new Object[]{System.currentTimeMillis(), false, true});
+			useTime.put(p.getUniqueId(), new Object[]{0, false, true});
 		}
 	}
 	@EventHandler
@@ -118,8 +118,8 @@ public class BowHandler implements Listener {
 		if(!(e.getEntity() instanceof Player))
 			return;
 		Player p = (Player) e.getEntity();
-
-		if(!useTime.containsKey(p.getUniqueId()))
+		UUID uuid = p.getUniqueId();
+		if(!useTime.containsKey(uuid))
 			return;
 
 		ItemStack item = e.getBow();
@@ -131,9 +131,9 @@ public class BowHandler implements Listener {
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 		String itemID = container.get(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING);
 		if(itemID == null || itemID.isEmpty()) return;
-
+		Object[] status = useTime.get(uuid);
 		//If fully charged:
-		if((boolean)useTime.get(p.getUniqueId())[1]){
+		if((boolean)status[1]){
 			switch(itemID){
 				case "LIGHTNING_GREATBOW"->{
 					e.getProjectile().remove();
@@ -146,18 +146,30 @@ public class BowHandler implements Listener {
 						p.getWorld().strikeLightningEffect(hitLocation.toLocation(p.getWorld()));
 
 						Collection<Entity> entities = p.getWorld().getNearbyEntities(hitLocation.toLocation(p.getWorld()), 6.0, 6.0, 6.0, ignoreList);
+						double damageDealt = 2.0*CustomAttributes.getDamageModified(uuid, true);
 						for(Entity entity : entities) {
-							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 2.0*CustomAttributes.getDamageModified(p.getUniqueId(), true), true, 1);
+							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, damageDealt, true, 1);
 						}
 					}
 				}
 			}
-		}else{
+		}else{//Non-charged:
+			double timer = container.getOrDefault(Main.attributeKeys.get( "drawTime"), PersistentDataType.DOUBLE, 0.0);
+			long timeLeft = System.currentTimeMillis() - (long)status[0];
+			double chargePct = (1-(timer - timeLeft/1000.0)/timer);
 			switch(itemID){
 				case "LIGHTNING_GREATBOW"->{
 					Arrow ent = (Arrow) e.getProjectile();
 					ent.setCritical(false);
 					ent.setPierceLevel(ent.getPierceLevel() + 4);
+					boolean isCrit = Math.random() < Main.getAttributes().get(uuid).getOrDefault("CritChance", 0.0);
+					double customDamage = CustomAttributes.getDamageModified(uuid, isCrit)*chargePct;
+					HashMap<String, Double> attributes = new HashMap<>();
+					attributes.put("Damage", customDamage);
+					attributes.put("CriticalAttack", isCrit ? 1.0 : 0.0);
+
+					EntityHandling.projectileAttributes.put(ent.getUniqueId(), attributes);
+					//Particle
 					new BukkitRunnable() {
 						int timerCount = 0;
 						@Override
@@ -167,7 +179,6 @@ public class BowHandler implements Listener {
 								return;
 							}
 							ent.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, ent.getLocation(), 3);
-
 							timerCount++;
 						}
 					}.runTaskTimer(Main.getInstance(), 0, 10);
