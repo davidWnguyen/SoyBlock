@@ -59,6 +59,10 @@ public class BowHandler implements Listener {
 					if(meta == null)
 						return;
 					PersistentDataContainer container = meta.getPersistentDataContainer();
+
+					if((long)status[0] == 0)
+						return;
+
 					double timer = container.getOrDefault(Main.attributeKeys.get( "drawTime"), PersistentDataType.DOUBLE, 0.0);
 					BossBar progress = useTimeBar.get(uuid);
 					long timeLeft = System.currentTimeMillis() - (long)status[0];
@@ -85,7 +89,7 @@ public class BowHandler implements Listener {
 		if(e.getItem() != null && e.getItem().getType() == Material.BOW
 		&& (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) ) {
 			Player p = e.getPlayer();
-			useTime.put(p.getUniqueId(), new Object[]{0, false, true});
+			useTime.put(p.getUniqueId(), new Object[]{0l, false, true});
 		}
 	}
 	@EventHandler
@@ -94,7 +98,7 @@ public class BowHandler implements Listener {
 		if(!p.getInventory().contains(Material.ARROW))
 			return;
 
-		if(!(boolean)useTime.getOrDefault(p.getUniqueId(), new Object[]{0, false, false})[2])
+		if(!(boolean)useTime.getOrDefault(p.getUniqueId(), new Object[]{0l, false, false})[2])
 			return;
 
 		useTime.put(p.getUniqueId(), new Object[]{System.currentTimeMillis(), false, false});

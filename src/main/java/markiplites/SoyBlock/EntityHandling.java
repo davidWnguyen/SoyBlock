@@ -224,7 +224,7 @@ public class EntityHandling implements Listener {
 			return;
 		Entity v = e.getHitEntity();
 		//Only for direct hits
-		if(!(v instanceof LivingEntity)){
+		if(v instanceof LivingEntity){
 			ProjectileSource s = i.getShooter();
 			//Mobs cannot hit eachother, and player cannot hit eachother.
 			if(s instanceof Mob && v instanceof Mob)
