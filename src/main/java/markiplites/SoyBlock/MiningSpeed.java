@@ -58,16 +58,33 @@ public class MiningSpeed implements Listener{
                 
                 if(!digType.equals(PlayerDigType.START_DESTROY_BLOCK)) {
 					blockBeingMined.remove(p.getUniqueId());
-					p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
+					new BukkitRunnable(){
+						@Override
+						public void run()
+						{
+							p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
+						}
+					}.runTask(Main.getInstance());
 				}
-				
-				new BukkitRunnable(){
-					@Override
-					public void run()
-					{
-						BowHandler.onCancelDraw(p);
-					}
-				}.runTaskLater(Main.getInstance(), 1);
+
+				if(p.getInventory().getItemInMainHand().getType() == Material.BOW || p.getInventory().getItemInMainHand().getType() == Material.TRIDENT){
+					new BukkitRunnable(){
+						@Override
+						public void run()
+						{
+							BowHandler.onCancelDraw(p);
+						}
+					}.runTaskLater(Main.getInstance(), 1);
+				}
+				else if(p.getInventory().getItemInMainHand().getType() == Material.CROSSBOW){
+					new BukkitRunnable(){
+						@Override
+						public void run()
+						{
+							BowHandler.finishCrossbowDraw(p);
+						}
+					}.runTaskLater(Main.getInstance(), 1);
+				}
             }
         });
     }

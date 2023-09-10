@@ -42,5 +42,6 @@ public enum attr {
     enchantmentSlots,
     modifierSlots,
     reforge,
-    drawTime
+    drawTime,
+    chargePct
 }

@@ -220,6 +220,9 @@ public class itemList implements Listener
 		attributes.put(attr.drawTime, 3.0);
 		attributes.put(attr.rarity, 6.0);
 		new Bow("LIGHTNING_GREATBOW", "<GRADIENT:ffff00>Lightning Greatbow</GRADIENT:ff9999>", Material.BOW, attributes, "");
+		new Sword("LIGHTNING_TRIDENT", "<GRADIENT:ffff00>Lightning Trident</GRADIENT:ff9999>", Material.TRIDENT, attributes, "");
+		new Crossbow("REPEATING_CROSSBOW", "<GRADIENT:ffff00>Repeating Crossbow</GRADIENT:ff9999>", Material.CROSSBOW, attributes, "");
+
 	}
 
 

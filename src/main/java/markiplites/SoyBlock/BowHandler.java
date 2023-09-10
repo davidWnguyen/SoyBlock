@@ -15,15 +15,19 @@ import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,7 +53,7 @@ public class BowHandler implements Listener {
 						continue;
 					
 					Object[] status = useTime.get(uuid);
-					if((boolean)status[1])
+					if(status == null || (boolean)status[1])
 						continue;
 
 					ItemStack item = p.getInventory().getItemInMainHand();
@@ -82,10 +86,35 @@ public class BowHandler implements Listener {
 
 	@EventHandler
 	public void onDraw(PlayerInteractEvent e) {
-		if(e.getItem() != null && e.getItem().getType() == Material.BOW
-		&& (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) ) {
-			Player p = e.getPlayer();
-			useTime.put(p.getUniqueId(), new Object[]{System.currentTimeMillis(), false, true});
+		if(e.getItem() == null || !(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) || e.getPlayer().hasCooldown(e.getItem().getType()))
+			return;
+		
+		Player p = e.getPlayer();
+		switch(e.getItem().getType())
+		{
+			case BOW,CROSSBOW ->{
+				useTime.put(p.getUniqueId(), new Object[]{System.currentTimeMillis(), false, true});
+			}
+			case TRIDENT->{
+				useTime.put(p.getUniqueId(), new Object[]{System.currentTimeMillis(), false, false});
+
+				ItemStack item = p.getInventory().getItemInMainHand();
+				if(item == null)
+					return;
+				ItemMeta meta = item.getItemMeta();
+				if(meta == null)
+					return;
+				PersistentDataContainer container = meta.getPersistentDataContainer();
+				double timer = container.getOrDefault(Main.attributeKeys.get( "drawTime"), PersistentDataType.DOUBLE, 0.0);
+				BossBar progress = Bukkit.createBossBar("Charge: " + timer + "s", BarColor.BLUE, BarStyle.SEGMENTED_20);
+				progress.setVisible(true);
+				progress.addPlayer(p);
+
+				useTimeBar.put(p.getUniqueId(), progress);
+			}
+			default -> {
+
+			}
 		}
 	}
 	@EventHandler
@@ -108,23 +137,28 @@ public class BowHandler implements Listener {
 		PersistentDataContainer container = meta.getPersistentDataContainer();
 		double timer = container.getOrDefault(Main.attributeKeys.get( "drawTime"), PersistentDataType.DOUBLE, 0.0);
 		BossBar progress = Bukkit.createBossBar("Charge: " + timer + "s", BarColor.BLUE, BarStyle.SEGMENTED_20);
+		progress.setVisible(true);
 		progress.addPlayer(p);
 
 		useTimeBar.put(p.getUniqueId(), progress);
 	}
 
 	@EventHandler
-	public void onShoot(EntityShootBowEvent e){
-		if(!(e.getEntity() instanceof Player))
-			return;
-		Player p = (Player) e.getEntity();
+	public void onShoot(ProjectileLaunchEvent e){
+		Projectile ent = e.getEntity();
 
-		if(!useTime.containsKey(p.getUniqueId()))
+		if(!(ent.getShooter() instanceof Player))
 			return;
 
-		ItemStack item = e.getBow();
+		Player p = (Player) ent.getShooter();
+		UUID uuid = p.getUniqueId();
+		if(!useTime.containsKey(uuid))
+			return;
+
+		ItemStack item = p.getInventory().getItemInMainHand();
 		if(item == null)
 			return;
+
 		ItemMeta meta = item.getItemMeta();
 		if(meta == null)
 			return;
@@ -132,11 +166,26 @@ public class BowHandler implements Listener {
 		String itemID = container.get(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING);
 		if(itemID == null || itemID.isEmpty()) return;
 
+		double chargePct = container.getOrDefault(Main.attributeKeys.get("chargePct"), PersistentDataType.DOUBLE, 0.0);
+
+		if(chargePct == 0.0){
+			Object[] status = useTime.get(uuid);
+			if(status == null)
+				return;
+
+			double timer = container.getOrDefault(Main.attributeKeys.get( "drawTime"), PersistentDataType.DOUBLE, 0.0);
+			long timeLeft = System.currentTimeMillis() - (long)status[0];
+			chargePct = 1-(timer - timeLeft/1000.0)/timer;
+		}
+
+		container.set(Main.attributeKeys.get("chargePct"), PersistentDataType.DOUBLE, 0.0);
+
+		item.setItemMeta(meta);
 		//If fully charged:
-		if((boolean)useTime.get(p.getUniqueId())[1]){
+		if(chargePct >= 1.0){
 			switch(itemID){
-				case "LIGHTNING_GREATBOW"->{
-					e.getProjectile().remove();
+				case "LIGHTNING_GREATBOW","LIGHTNING_TRIDENT"->{
+					ent.remove();
 					Location eyeLocation = p.getEyeLocation();
 					Predicate<Entity> ignoreList = i -> (i != p && i instanceof LivingEntity && !i.isDead() && i.getType() != EntityType.ARMOR_STAND);
 					RayTraceResult traceResult = p.getWorld().rayTrace(eyeLocation, eyeLocation.getDirection(), 100.0, FluidCollisionMode.NEVER, true,0.25, ignoreList);
@@ -147,22 +196,66 @@ public class BowHandler implements Listener {
 
 						Collection<Entity> entities = p.getWorld().getNearbyEntities(hitLocation.toLocation(p.getWorld()), 6.0, 6.0, 6.0, ignoreList);
 						for(Entity entity : entities) {
-							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 2.0*CustomAttributes.getDamageModified(p.getUniqueId(), true), true, 1);
+							EntityHandling.dealDamageToEntity((LivingEntity)entity, p, 2.0*CustomAttributes.getDamageModified(uuid, true), true, 1);
 						}
 					}
 				}
-			}
-		}else{
-			switch(itemID){
-				case "LIGHTNING_GREATBOW"->{
-					Arrow ent = (Arrow) e.getProjectile();
-					ent.setCritical(false);
-					ent.setPierceLevel(ent.getPierceLevel() + 4);
+				case "REPEATING_CROSSBOW" ->{
+					ent.remove();
 					new BukkitRunnable() {
 						int timerCount = 0;
 						@Override
 						public void run() {
-							if(timerCount > 5 || ent.isDead() || ent.isInBlock()){
+							if(timerCount > 15){
+								cancel();
+								return;
+							}
+							double projSpeed = 3.0*container.getOrDefault(Main.attributeKeys.get( "projectileSpeed"), PersistentDataType.DOUBLE, 1.0);
+							Vector playerDirection = p.getLocation().getDirection();
+							Arrow shortbowArrow = p.launchProjectile(Arrow.class, playerDirection.multiply(projSpeed));
+							if (shortbowArrow == null)
+								return;
+
+							shortbowArrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+
+							HashMap<String, Double> attributes = new HashMap<>();
+
+							double critChance = Main.getAttributes().get(uuid).getOrDefault("CritChance", 0.0);
+							boolean critBoolean = Math.random() < critChance;
+							double customDamage = CustomAttributes.getDamageModified(p.getUniqueId(), critBoolean);
+
+							attributes.put("Damage", customDamage);
+							attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
+
+							EntityHandling.projectileAttributes.put(shortbowArrow.getUniqueId(), attributes);
+							p.getWorld().playSound(p.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 0.8f,1f);
+							timerCount++;
+						}
+					}.runTaskTimer(Main.getInstance(), 1, 3);
+				}
+			}
+		}else if (chargePct <= 1.0){
+			switch(itemID){
+				case "LIGHTNING_GREATBOW","LIGHTNING_TRIDENT","REPEATING_CROSSBOW"->{
+					((AbstractArrow)ent).setCritical(false);
+					((AbstractArrow)ent).setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+					((AbstractArrow)ent).setPierceLevel(((AbstractArrow)ent).getPierceLevel() + 4);
+
+					HashMap<String, Double> attributes = new HashMap<>();
+
+					double critChance = Main.getAttributes().get(uuid).getOrDefault("CritChance", 0.0);
+					boolean critBoolean = Math.random() < critChance;
+					double customDamage = (0.5+chargePct)*CustomAttributes.getDamageModified(uuid, critBoolean);
+
+					attributes.put("Damage", customDamage);
+					attributes.put("CriticalAttack", critBoolean ? 1.0 : 0.0);//lol
+
+					EntityHandling.projectileAttributes.put(ent.getUniqueId(), attributes);
+					new BukkitRunnable() {
+						int timerCount = 0;
+						@Override
+						public void run() {
+							if(timerCount > 5 || ent.isDead() || ((AbstractArrow)ent).isInBlock()){
 								cancel();
 								return;
 							}
@@ -180,7 +273,7 @@ public class BowHandler implements Listener {
 		if(itemID == null || itemID.isEmpty()) return;
 
 		switch(itemID){
-			case "LIGHTNING_GREATBOW"->{
+			case "LIGHTNING_GREATBOW","LIGHTNING_TRIDENT"->{
 				p.getWorld().playSound(p.getLocation(), Sound.ITEM_TRIDENT_THUNDER, 0.8f,1f);
 				p.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, p.getLocation(), 50);
 			}
@@ -192,6 +285,38 @@ public class BowHandler implements Listener {
 	}
 	public static void onCancelDraw(Player p){
 		UUID id = p.getUniqueId();
+
+		if(useTimeBar.containsKey(id)){
+			BossBar bar = useTimeBar.get(id);
+			bar.removeAll();
+			useTimeBar.remove(id);
+		}
+		useTime.remove(id);
+	}
+	public static void finishCrossbowDraw(Player p){
+		UUID id = p.getUniqueId();
+
+		ItemStack item = p.getInventory().getItemInMainHand();
+		if(item == null)
+			return;
+
+		ItemMeta meta = item.getItemMeta();
+		if(meta == null)
+			return;
+
+		PersistentDataContainer data = meta.getPersistentDataContainer();
+		if(data == null)
+			return;
+
+		String itemID = data.get(Main.attributeKeys.get( "itemID"), PersistentDataType.STRING);
+		if(itemID == null) return;
+
+		double timer = data.getOrDefault(Main.attributeKeys.get( "drawTime"), PersistentDataType.DOUBLE, 0.0);
+		long timeLeft = System.currentTimeMillis() - (long)useTime.get(id)[0];
+		double chargePct = 1-(timer - timeLeft/1000.0)/timer;
+
+		data.set(Main.attributeKeys.get("chargePct"), PersistentDataType.DOUBLE, chargePct);
+		item.setItemMeta(meta);
 
 		if(useTimeBar.containsKey(id)){
 			BossBar bar = useTimeBar.get(id);
