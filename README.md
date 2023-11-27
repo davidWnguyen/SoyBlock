@@ -1,4 +1,4 @@
 # SoyBlock
 Minecraft RPG Bukkit plugin
 
-CURRENTLY ABANDONED
+CURRENTLY ABANDONED, see [this](https://github.com/kurwabomber/Soycraft)
